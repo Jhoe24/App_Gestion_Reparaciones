@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Acceso Bloqueado{% endblock %}
+
+{% block auth_content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card text-center border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="fas fa-lock"></i> Acceso Bloqueado Temporalmente</h4>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Has excedido el número máximo de intentos de inicio de sesión fallidos.</p>
+                    <p class="card-text">Por favor, inténtalo de nuevo más tarde o <a href="{% url 'authentication:password_reset' %}">restablece tu contraseña</a> si la has olvidado.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

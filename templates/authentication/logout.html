@@ -1,0 +1,29 @@
+
+<!-- =====================================================
+ARCHIVO: templates/authentication/logout.html
+===================================================== -->
+{% extends 'base.html' %}
+
+{% block title %}Sesión Cerrada - {{ block.super }}{% endblock %}
+
+{% block auth_content %}
+<div class="login-container d-flex align-items-center justify-content-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="login-card p-5 text-center">
+                    <i class="fas fa-sign-out-alt fa-3x text-success mb-3"></i>
+                    <h3>Sesión Cerrada</h3>
+                    <p class="text-muted mb-4">Has cerrado sesión exitosamente</p>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'authentication:login' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión Nuevamente
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

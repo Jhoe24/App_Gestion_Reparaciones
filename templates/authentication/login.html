@@ -1,0 +1,87 @@
+<!-- =====================================================
+ARCHIVO: templates/authentication/login.html
+===================================================== -->
+{% extends 'base.html' %}
+
+{% block title %}Iniciar Sesión - {{ block.super }}{% endblock %}
+
+{% block auth_content %}
+<div class="login-container d-flex align-items-center justify-content-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="login-card p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-tools fa-3x text-primary mb-3"></i>
+                        <h3>Sistema de Mantenimiento</h3>
+                        <p class="text-muted">Universidad Politécnica Territorial "José Félix Ribas"</p>
+                    </div>
+                    
+                    {% include 'partials/messages.html' %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">
+                                <i class="fas fa-envelope"></i> {{ form.username.label }}
+                            </label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.username.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.password.id_for_label }}" class="form-label">
+                                <i class="fas fa-lock"></i> {{ form.password.label }}
+                            </label>
+                            {{ form.password }}
+                            {% if form.password.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.password.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    <p class="mb-0">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="d-grid gap-2 mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                            </button>
+                        </div>
+                        
+                        <div class="text-center">
+                            <a href="{% url 'authentication:password_reset' %}" class="text-decoration-none">
+                                ¿Olvidaste tu contraseña?
+                            </a>
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                ¿No tienes cuenta? 
+                                <a href="{% url 'authentication:register' %}" class="text-decoration-none">
+                                    Regístrate aquí
+                                </a>
+                            </small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
