@@ -1,0 +1,19 @@
+# --- Dependencias Principales de Django ---
+asgiref==3.8.1         # Requerido por Django para funcionalidades asíncronas
+Django==5.2.3          # El framework web principal del proyecto
+sqlparse==0.5.3        # Usado por la barra de depuración de Django
+tzdata==2025.2         # Provee datos de zonas horarias para Django
+
+# --- Seguridad ---
+bcrypt==4.3.0          # Para el hashing seguro de contraseñas
+django-axes==8.0.0     # Limita los intentos de inicio de sesión para prevenir ataques de fuerza bruta
+
+# --- Utilidades y Herramientas ---
+pillow==11.2.1         # Librería para el manejo de imágenes (ej. para ImageField)
+python-dotenv==1.1.0   # Carga variables de entorno desde un archivo .env
+
+# --- Tipado y Desarrollo (Type Hinting) ---
+django-stubs==5.2.1        # Stubs de tipos para Django (mejora el autocompletado y análisis estático)
+django-stubs-ext==5.2.1    # Extensiones para django-stubs
+types-PyYAML==6.0.12.20250516 # Stubs de tipos para PyYAML
+typing_extensions==4.14.0  # Soporte para nuevas funcionalidades de tipado en versiones antiguas de Python
