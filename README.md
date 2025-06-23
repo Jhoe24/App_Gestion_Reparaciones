@@ -1,9 +1,3 @@
----
-title: Sistema de Gestión de Mantenimiento de Equipos
-author: Deviam
-date: 2024-07-20
----
-
 # 🛠️ Sistema de Gestión de Mantenimiento de Equipos
 
 ¡Bienvenido al Sistema de Gestión de Mantenimiento de Equipos! Este proyecto es como un "cerebro" digital que ayuda a la universidad a mantener todos sus equipos (computadoras, impresoras, proyectores, etc.) funcionando perfectamente. Imagina que es un asistente muy organizado que sabe qué equipo necesita reparación, quién lo está arreglando y cuándo estará listo.
