@@ -28,7 +28,7 @@ db.sqlite3-journal
 # Archivos de entorno
 # -----------------------------------------------------------------
 # ¡MUY IMPORTANTE! Nunca subas tus variables de entorno.
-.env
+#.env
 
 # Archivos estáticos y de medios
 # -----------------------------------------------------------------
