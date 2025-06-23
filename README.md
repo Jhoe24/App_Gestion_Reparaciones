@@ -10,7 +10,7 @@ date: 2024-07-20
 
 ## ✨ ¿Qué hace este sistema? (Las "Super Habilidades")
 
-Este sistema está diseñado para simplificar la vida de todos en la universidad, desde los estudiantes hasta los técnicos. Aquí te explico sus principales "super habilidades":
+Este sistema está diseñado para simplificar la vida de todos en la universidad, desde el personal administrativo hasta los técnicos. Aquí te explico sus principales "super habilidades":
 
 *   **Gestión de Usuarios Inteligente**:
     *   **Administradores**: Son como los "directores" del sistema. Pueden ver y controlar todo, crear nuevas cuentas para técnicos y usuarios, y asegurarse de que todo funcione bien.
@@ -41,7 +41,7 @@ Este proyecto está construido con algunas de las herramientas más populares y 
 
 ## 🚀 ¿Cómo ponerlo a funcionar? (¡Manos a la Obra!)
 
-No te preocupes si no sabes de programación. Sigue estos pasos como si fueran una receta de cocina. Necesitarás un poco de paciencia y seguir las instrucciones al pie de la letra.
+No te preocupes si no sabes. Sigue estos pasos como si fueran una receta de cocina. Necesitarás un poco de paciencia y seguir las instrucciones al pie de la letra.
 
 ### Paso 1: Las Herramientas Necesarias (Pre-requisitos)
 
@@ -157,15 +157,7 @@ Una vez que el sistema esté funcionando en tu navegador:
 
 ## 🤝 Contribuciones
 
-¡Tu ayuda es bienvenida! Si eres programador y quieres mejorar este sistema, puedes:
-*   Reportar errores.
-*   Sugerir nuevas funcionalidades.
-*   Enviar tus propias mejoras (pull requests).
-
 ## 📄 Licencia
 
-Este proyecto está bajo la licencia MIT. Puedes ver los detalles en el archivo `LICENSE` (si existe) en la carpeta principal del proyecto.
 
 ---
-
-¡Gracias por usar y apoyar el Sistema de Gestión de Mantenimiento de Equipos!
