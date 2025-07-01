@@ -84,6 +84,7 @@ class CustomUser(AbstractUser):
         """Devuelve el valor legible por humanos para el campo rol."""
         return dict(self.ROLES).get(self.rol, self.rol)
 
+ 
     @property
     def is_administrador(self):
         return self.rol == 'administrador'

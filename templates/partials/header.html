@@ -1,0 +1,35 @@
+<!-- Navbar extraído del dashboard -->
+<nav class="navbar navbar-expand-lg" style="background-color: #3498db;">
+    <div class="container-fluid">
+        <a class="navbar-brand text-white" href="{% url 'equipment:user_dashboard' %}">
+            <i class="fas fa-tools"></i> Sistema de Mantenimiento
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user"></i> {{ user.get_full_name }}
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'authentication:profile' %}">
+                            <i class="fas fa-user-cog"></i> Mi Perfil
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'authentication:password_change' %}">
+                            <i class="fas fa-key"></i> Cambiar Contraseña
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="{% url 'authentication:logout' %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

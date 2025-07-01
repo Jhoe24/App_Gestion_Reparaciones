@@ -20,8 +20,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '*']
 
-
-
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 # Definición de la aplicación
 
@@ -58,6 +56,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'axes.middleware.AxesMiddleware',
+    
+    'apps.authentication.url_blocker_middleware.URLBlockerMiddleware',  # Middleware personalizado para bloquear URLs
 
 ]
 
@@ -120,11 +120,14 @@ AUTH_USER_MODEL = 'users.CustomUser'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-STATIC_URL='/static/'
-# si staticfile no existe se creara
-STATICFILES_DIRS=[os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT=os.path.join(BASE_DIR, 'staticfiles')
 
+if DEBUG:
+    STATIC_URL = '/static/'
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+else:
+    STATIC_URL = '/static/'
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    
 
 
 

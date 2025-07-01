@@ -82,7 +82,7 @@ class CustomLoginView(LoginView):
         """Redirección según el rol del usuario"""
         user = cast(CustomUser, self.request.user)
         
-        if user.is_administrador:
+        if  user.is_superuser or user.is_administrador:
             return reverse_lazy('equipment:admin_dashboard')
         elif user.is_tecnico:
             return reverse_lazy('equipment:tech_dashboard')

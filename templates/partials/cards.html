@@ -1,0 +1,53 @@
+<div class="row mb-4">
+    {% if user.is_administrador or user.is_superuser %}
+        <div class="col-md-4">
+            <div class="card text-bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Equipos Reparados</h5>
+                    <p class="card-text display-6">{{ equipos_reparados }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-bg-warning mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">En Espera</h5>
+                    <p class="card-text display-6">{{ equipos_espera }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-bg-info mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Solicitudes</h5>
+                    <p class="card-text display-6">{{ solicitudes }}</p>
+                </div>
+            </div>
+        </div>
+    {% elif user.is_usuario_regular %}
+        <div class="col-md-4">
+            <div class="card text-bg-info mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Mis Solicitudes</h5>
+                    <p class="card-text display-6">{{ solicitudes }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-bg-warning mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">En Espera</h5>
+                    <p class="card-text display-6">{{ equipos_espera }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Completados</h5>
+                    <p class="card-text display-6">{{ completados }}</p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>

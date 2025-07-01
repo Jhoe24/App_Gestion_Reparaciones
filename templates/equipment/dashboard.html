@@ -1,7 +1,28 @@
 {% extends 'base.html' %}
 
 {% block title %} Panel del Usuario {% endblock %}
-
+{% csrf_token %}
 {% block auth_content %}
-    <h1>Hola desde dashboard</h1>
+    {% if user.is_authenticated %}
+        {% include 'partials/header.html' %}
+        <div class="container-fluid">
+            <div class="row">
+                {% include 'partials/sidebar.html' %}
+                <!-- Main content -->
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 overflow-auto">
+                    <div class="pt-3">
+                        {% include 'partials/messages.html' %}
+                        {% block content %}
+                            {% include 'partials/cards.html' %}
+                            {% include 'partials/lista_reparados.html' %}
+                        {% endblock %}
+                    </div>
+                </main>
+            </div>
+        </div>
+    {% else %}
+        <div class="container mt-5">
+            <div class="alert alert-warning">Debes iniciar sesión para acceder al panel.</div>
+        </div>
+    {% endif %}
 {% endblock %}

@@ -1,0 +1,68 @@
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white d-flex align-items-center">
+        <i class="fas fa-check-circle me-2"></i>
+        {% if user.is_administrador or user.is_superuser %}
+            <span>Equipos Reparados Recientemente</span>
+        {% elif user.is_usuario_regular %}
+            <span>Solicitudes de reportes realizados</span>
+        {% else %}
+            <span>Equipos Reparados</span>
+        {% endif %}
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped align-middle mb-0">
+            <thead class="table-primary">
+                <tr>
+                    {% if user.is_administrador or user.is_superuser %}
+                        <th>Equipo</th>
+                        <th>Técnico</th>
+                        <th>Usuario</th>
+                        <th>Fecha Reparación</th>
+                        <th>Acciones</th>
+                    {% elif user.is_usuario_regular %}
+                        <th>Equipo</th>
+                        <th>Técnico</th>
+                        <th>Estado</th>
+                        <th>Fecha Solicitud</th>
+                        <th>Acciones</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for equipo in equipos_reparados_lista %}
+                <tr>
+                    {% if user.is_administrador or user.is_superuser %}
+                        <td><i class="fas fa-laptop-code text-success me-2"></i> {{ equipo.nombre }}</td>
+                        <td><i class="fas fa-user-cog text-secondary me-2"></i> {{ equipo.tecnico }}</td>
+                        <td> <i class="fas fa-user text-info me-2"></i> {{ equipo.usuario }}</td>
+                        <td><span class="badge bg-success">{{ equipo.fecha_reparacion }}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-info" onclick="alert('Detalles de {{ equipo.nombre }}')">
+                                <i class="fas fa-info-circle"></i> Ver detalles
+                            </button>
+                        </td>
+                    {% elif user.is_usuario_regular %}
+                        <td><i class="fas fa-laptop-code text-success me-2"></i> {{ equipo.nombre }}</td>
+                        <td><i class="fas fa-user-cog text-secondary me-2"></i> {{ equipo.tecnico }}</td>
+                        <td>
+                            <span class="badge {% if equipo.estado == 'Reparado' %}bg-success{% else %}bg-warning{% endif %}">
+                                {{ equipo.estado }}
+                            </span>
+                        </td>
+                        <td><span class="badge bg-info">{{ equipo.fecha_solicitud }}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-info" onclick="alert('Detalles de {{ equipo.nombre }}')">
+                                <i class="fas fa-info-circle"></i> Ver detalles
+                            </button>
+                        </td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-muted text-center">No hay equipos reparados recientemente.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

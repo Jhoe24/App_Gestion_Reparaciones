@@ -19,9 +19,12 @@ class RoleRequiredMixin(AccessMixin):
             return self.handle_no_permission()
         
         user = cast(CustomUser, request.user)
+        # Permitir acceso a superusuarios sin importar el rol
+        if getattr(user, 'is_superuser', False):
+            return super().dispatch(request, *args, **kwargs)
         if user.rol not in self.required_roles:
-            messages.error(request, 'No tienes permisos para acceder a esta página.')
-            return redirect('equipment:user_dashboard')
+            from config import views  # Importa aquí para evitar import circular
+            return views.custom_403_view(request)
         
         return super().dispatch(request, *args, **kwargs)  # type: ignore[misc]
 

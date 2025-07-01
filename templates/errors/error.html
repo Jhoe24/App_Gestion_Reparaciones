@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Error {{ error_code|default:'Error' }} - {{ error_message|default:'Ha ocurrido un error' }}{% endblock %}
+
+{% block auth_content %}
+<div class="container">
+    <div style="text-align: center; padding: 50px 20px;">
+        <h1 style="font-size: 72px; color: #e74c3c; margin-bottom: 20px;">{{ error_code|default:'Error' }}</h1>
+        <h2 style="color: #333; margin-bottom: 20px;">{{ error_message|default:'Ha ocurrido un error inesperado.' }}</h2>
+        <p style="color: #666; font-size: 18px; margin-bottom: 30px;">
+            {{ error_description|default:'Lo sentimos, ha ocurrido un problema. Por favor, inténtalo de nuevo más tarde.' }}
+        </p>
+        <div style="margin-bottom: 30px;">
+            {% if actions %}
+                {% for action in actions %}
+                    <a href="{{ action.url|default:'#' }}" style="{{ action.style|default:'background-color: #4a90e2; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; margin-right: 10px;' }}">
+                        {{ action.label|default:'Acción' }}
+                    </a>
+                {% endfor %}
+            {% else %}
+                <a href="/" style="background-color: #4a90e2; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; margin-right: 10px;">Ir al Inicio</a>
+            {% endif %}
+        </div>
+        <div style="color: #7f8c8d; font-size: 14px;">
+            <p>Si crees que esto es un error, por favor contacta al administrador.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
