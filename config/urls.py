@@ -16,7 +16,7 @@ urlpatterns = [
     path('users/', include('apps.users.urls')),
     path('dashboard/', include('apps.equipment.urls')),  # Dashboard principal
     #path('', RedirectView.as_view(url='/dashboard/', permanent=False)),
-    path('', RedirectView.as_view(url='/auth/login/', permanent=False)),
+    #path('', RedirectView.as_view(url='/404', permanent=False)),
     path('maintenance/', include(('apps.maintenance.urls', 'maintenance'), namespace='maintenance')),
     path('reports/', include(('apps.reports.urls', 'reports'), namespace='reports')),
 

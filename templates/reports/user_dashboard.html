@@ -1,5 +1,59 @@
 {% extends 'equipment/dashboard.html' %}
 
 {% block content %}
-<!-- Aquí va el contenido específico de reportes usuario -->
+<div class="container mt-4">
+    <h2 class="mb-4">Mis reportes</h2>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <input type="text" id="busquedaReporte" class="form-control" placeholder="Buscar por descripción, estado o fecha...">
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{% url 'reports:reporte_create' %}" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Nuevo reporte
+            </a>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle" id="tablaReportes">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Descripción</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reporte in reportes %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ reporte.descripcion_falla|truncatechars:50 }}</td>
+                    <td>{{ reporte.fecha_reporte|date:'d/m/Y' }}</td>
+                    <td>{{ reporte.get_estado_reporte_display }}</td>
+                    <td>
+                        <a href="{% url 'reports:reporte_detail' reporte.pk %}" class="btn btn-sm btn-info">Ver</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No tienes reportes registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+// Búsqueda en tiempo real en la tabla de reportes
+const inputBusqueda = document.getElementById('busquedaReporte');
+const tabla = document.getElementById('tablaReportes');
+inputBusqueda.addEventListener('keyup', function() {
+    const filtro = this.value.toLowerCase();
+    for (let fila of tabla.tBodies[0].rows) {
+        let texto = fila.textContent.toLowerCase();
+        fila.style.display = texto.includes(filtro) ? '' : 'none';
+    }
+});
+</script>
 {% endblock %}

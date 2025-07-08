@@ -1,4 +1,3 @@
-
 # =====================================================
 # ARCHIVO: apps/users/views.py
 # =====================================================
@@ -12,7 +11,7 @@ from django.db.models import Q
 
 from .models import CustomUser, LogAcceso
 from apps.authentication.mixins import AdminRequiredMixin
-from apps.authentication.forms import CustomUserCreationForm, ProfileForm
+from apps.authentication.forms import CustomUserCreationForm, CustomUserChangeForm
 
 
 class UserListView(AdminRequiredMixin, ListView):
@@ -88,7 +87,7 @@ class UserCreateView(AdminRequiredMixin, CreateView):
 class UserUpdateView(AdminRequiredMixin, UpdateView):
     """Vista para editar usuario"""
     model = CustomUser
-    form_class = ProfileForm
+    form_class = CustomUserChangeForm  # Usar el nuevo formulario que incluye todos los campos
     template_name = 'users/user_form.html'
     success_url = reverse_lazy('users:user_list')
     

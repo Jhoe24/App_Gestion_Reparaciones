@@ -1,0 +1,27 @@
+{% extends 'equipment/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Nuevo Reporte</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            {% for field in form.visible_fields %}
+            <div class="mb-3 col-md-6">
+                <label for="id_{{ field.name }}" class="form-label">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                {% endif %}
+                {% for error in field.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-success rounded-3">Guardar</button>
+        <a href="{% url 'reports:user_dashboard' %}" class="btn btn-secondary rounded-3">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

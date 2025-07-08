@@ -1,0 +1,49 @@
+{% extends 'equipment/dashboard.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{% if form.instance.pk %}Editar Usuario{% else %}Crear Usuario{% endif %}</h2>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="row">
+            {% for field in form.visible_fields %}
+            <div class="mb-3 col-md-6">
+                <label for="id_{{ field.name }}" class="form-label">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                {% endif %}
+                {% for error in field.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="{% url 'users:user_list' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+
+<script>
+    // Enfocar el campo de nombre de usuario al cargar
+    document.addEventListener('DOMContentLoaded', function() {
+        var usernameInput = document.getElementById('id_username');
+        if (usernameInput) {
+            usernameInput.focus();
+        }
+    });
+</script>
+{% endblock %}
+
+{% block extra_content %}
+<div class="container mt-4">
+    <form method="get" action="" class="row g-3 mb-3">
+        <div class="col-md-4">
+            <input type="text" name="search" class="form-control" placeholder="Buscar por nombre o cédula" value="{{ search }}">
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-outline-primary">Buscar</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

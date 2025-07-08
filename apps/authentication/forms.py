@@ -120,10 +120,24 @@ class CustomUserCreationForm(UserCreationForm):
         })
     )
     
+    rol = forms.ChoiceField(
+        choices=CustomUser.ROLES,
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'placeholder': 'Rol'
+        })
+    )
+    
+    activo = forms.BooleanField(
+        required=False,
+        label='Usuario activo',
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    
     class Meta:
         model = CustomUser
         fields = ('username', 'email', 'first_name', 'last_name', 
-                 'cedula', 'telefono', 'cargo', 'password1', 'password2')
+                 'cedula', 'telefono', 'cargo', 'rol', 'activo', 'password1', 'password2')
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -152,6 +166,8 @@ class CustomUserCreationForm(UserCreationForm):
         self.fields['cedula'].label = 'Cédula de identidad'
         self.fields['telefono'].label = 'Teléfono'
         self.fields['cargo'].label = 'Cargo'
+        self.fields['rol'].label = 'Rol'
+        self.fields['activo'].label = 'Usuario activo'
         self.fields['password1'].label = 'Contraseña'
         self.fields['password2'].label = 'Confirmar contraseña'
     
@@ -176,6 +192,50 @@ class CustomUserCreationForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+
+class CustomUserChangeForm(forms.ModelForm):
+    """Formulario para editar usuarios (sin contraseña)"""
+    
+    class Meta:
+        model = CustomUser
+        fields = ('username', 'email', 'first_name', 'last_name', 'cedula', 'telefono', 'cargo', 'rol', 'activo')
+        
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de usuario'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'correo@ejemplo.com'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombres'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellidos'}),
+            'cedula': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'V-12345678'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '04XX-XXXXXXX'}),
+            'cargo': forms.Select(attrs={'class': 'form-control'}),
+            'rol': forms.Select(attrs={'class': 'form-control'}),
+            'activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+        
+        labels = {
+            'username': 'Nombre de usuario',
+            'email': 'Correo electrónico',
+            'first_name': 'Nombres',
+            'last_name': 'Apellidos',
+            'cedula': 'Cédula de identidad',
+            'telefono': 'Teléfono',
+            'cargo': 'Cargo',
+            'rol': 'Rol',
+            'activo': 'Usuario activo',
+        }
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if CustomUser.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+            raise ValidationError('Ya existe un usuario con este correo electrónico.')
+        return email
+    
+    def clean_cedula(self):
+        cedula = self.cleaned_data.get('cedula')
+        if CustomUser.objects.filter(cedula=cedula).exclude(pk=self.instance.pk).exists():
+            raise ValidationError('Ya existe un usuario con esta cédula.')
+        return cedula
 
 
 class CustomPasswordResetForm(PasswordResetForm):

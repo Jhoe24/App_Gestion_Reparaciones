@@ -2,7 +2,7 @@ from pathlib import Path
 import sys
 import os
 from dotenv import load_dotenv
-
+from datetime import timedelta
 # Construye las rutas dentro del proyecto como: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -16,7 +16,7 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = 'django-insecure-s9v$#l6z8*@u%+d5hq!1ikm+$#me!5dpluz$5y2_b4teuy2-kn'
 
 # ADVERTENCIA DE SEGURIDAD: ¡no ejecutes con debug activado en producción!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '*']
 
@@ -33,8 +33,8 @@ INSTALLED_APPS = [
     
     'apps.authentication.apps.AuthenticationConfig',
     'apps.equipment.apps.EquipmentConfig',  # Considera actualizar a la ruta de AppConfig si existe
-    'apps.maintenance',  # Considera actualizar a la ruta de AppConfig si existe
-    'apps.reports',  # Considera actualizar a la ruta de AppConfig si existe
+    'apps.maintenance.apps.MaintenanceConfig',  # Considera actualizar a la ruta de AppConfig si existe
+    'apps.reports.apps.ReportsConfig',  # Considera actualizar a la ruta de AppConfig si existe
     'apps.users.apps.UsersConfig',
     'axes',
 
@@ -63,8 +63,10 @@ MIDDLEWARE = [
 
 # Configuración de AXES (ejemplo)
 AXES_FAILURE_LIMIT = 3  # Bloquear después de 3 intentos fallidos
-AXES_COOLOFF_TIME = 0.1  # Bloquear por 6 minutos
+AXES_COOLOFF_TIME = timedelta(minutes=3)  # Bloquear por 6 minutos
 AXES_LOCKOUT_TEMPLATE = 'authentication/lockout.html' # Crea esta plantilla
+AXES_ONLY_USER_FAILURES = True  # Solo contar fallos por usuario, no por IP
+AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = False
 
 ROOT_URLCONF = 'config.urls'
 

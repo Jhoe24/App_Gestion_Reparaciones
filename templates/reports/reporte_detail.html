@@ -1,0 +1,24 @@
+{% extends 'equipment/dashboard.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Detalle del Reporte</h2>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">{{ reporte.descripcion_falla|default:'Sin descripción' }}</h5>
+            <p><strong>Equipo:</strong> {{ reporte.equipo }}</p>
+            <p><strong>Usuario que reporta:</strong> {{ reporte.usuario_reporta.get_full_name }}</p>
+            <p><strong>Fecha de reporte:</strong> {{ reporte.fecha_reporte|date:'d/m/Y H:i' }}</p>
+            <p><strong>Estado:</strong> {{ reporte.get_estado_reporte_display }}</p>
+            <p><strong>Prioridad:</strong> {{ reporte.get_prioridad_display }}</p>
+            <p><strong>Tipo de falla:</strong> {{ reporte.get_tipo_falla_display }}</p>
+            <p><strong>Condiciones de la falla:</strong> {{ reporte.condiciones_falla|default:'-' }}</p>
+            <p><strong>Pasos para reproducir:</strong> {{ reporte.pasos_reproducir|default:'-' }}</p>
+            <p><strong>Intentos de solución:</strong> {{ reporte.intentos_solucion|default:'-' }}</p>
+            <p><strong>Observaciones:</strong> {{ reporte.observaciones|default:'-' }}</p>
+            <p><strong>Técnico asignado:</strong> {% if reporte.tecnico_asignado %}{{ reporte.tecnico_asignado.get_full_name }}{% else %}-{% endif %}</p>
+        </div>
+    </div>
+    <a href="{% url 'reports:dashboard' %}" class="btn btn-secondary">Volver</a>
+</div>
+{% endblock %}

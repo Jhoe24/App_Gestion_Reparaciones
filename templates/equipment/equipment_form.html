@@ -1,0 +1,26 @@
+{% extends 'equipment/dashboard.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Registrar nuevo equipo</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            {% for field in form.visible_fields %}
+            <div class="mb-3 col-md-6">
+                <label for="id_{{ field.name }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                {% endif %}
+                {% for error in field.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">Registrar</button>
+        <a href="{% url 'equipment:user_list' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
