@@ -55,7 +55,7 @@ def generic_error_view(request, exception=None, status_code=500):
         'error_description': config['error_description'],
         'actions': [
             {
-                'url': '/',
+                'url': '/auth/login/',
                 'label': 'Ir al Inicio',
                 'style': 'background-color: #4a90e2; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; margin-right: 10px;'
             },
