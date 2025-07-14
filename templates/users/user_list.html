@@ -31,7 +31,7 @@
                     <th>Nombre de Usuario</th>
                     <th>Nombre</th>
                     <th>Cédula</th>
-                    <th>Teléfono</th>
+                    <th>Celular</th>
                     <th>Cargo</th>
                     <th>Rol</th>
                     <th>Estado</th>
@@ -45,7 +45,7 @@
                     <td>{{ user.username }}</td>
                     <td>{{ user.get_full_name }}</td>
                     <td>{{ user.cedula }}</td>
-                    <td>{{ user.telefono }}</td>
+                    <td>{{ user.celular }}</td>
                     <td>{{ user.get_cargo_display }}</td>
                     <td>{{ user.get_rol_display }}</td>
                     <td>
@@ -75,8 +75,12 @@
                         <p><strong>Nombre de usuario:</strong> {{ user.username }}</p>
                         <p><strong>Nombre:</strong> {{ user.get_full_name }}</p>
                         <p><strong>Cédula:</strong> {{ user.cedula }}</p>
-                        <p><strong>Teléfono:</strong> {{ user.telefono }}</p>
+                        <p><strong>Celular:</strong> {{ user.celular }}</p>
+                        {% if user.cargo == 'docente' %}
+                        <p><strong>Cargo:</strong> Docente</p>
+                        {% else %}
                         <p><strong>Cargo:</strong> {{ user.get_cargo_display }}</p>
+                        {% endif %}
                         <p><strong>Rol:</strong> {{ user.get_rol_display }}</p>
                         <p><strong>Estado:</strong> {% if user.activo %}Activo{% else %}Inactivo{% endif %}</p>
                         <p><strong>Fecha de creación:</strong> {{ user.fecha_creacion|date:'d/m/Y H:i' }}</p>

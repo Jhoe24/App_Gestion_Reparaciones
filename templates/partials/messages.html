@@ -1,15 +1,287 @@
-
 <!-- =====================================================
 ARCHIVO: templates/partials/messages.html
 ===================================================== -->
 {% if messages %}
     <div class="messages-container mb-4">
         {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}exclamation-triangle{% elif message.tags == 'warning' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
+            {% if message.tags == 'success' %}
+                <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm message-alert" role="alert" style="background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border-left: 5px solid #28a745 !important;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle text-success me-3 message-icon"></i>
+                        <div class="flex-grow-1">
+                            <strong class="message-title">¡Éxito!</strong>
+                            <div class="message-text">{{ message }}</div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            {% elif message.tags == 'error' or message.tags == 'danger' %}
+                <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm message-alert" role="alert" style="background: linear-gradient(135deg, #f8d7da 0%, #f1aeb5 100%); border-left: 5px solid #dc3545 !important;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle text-danger me-3 message-icon"></i>
+                        <div class="flex-grow-1">
+                            <strong class="message-title">Error:</strong>
+                            <div class="message-text">{{ message }}</div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            {% elif message.tags == 'warning' %}
+                <div class="alert alert-warning alert-dismissible fade show border-0 shadow-sm message-alert" role="alert" style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-left: 5px solid #ffc107 !important;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-circle text-warning me-3 message-icon"></i>
+                        <div class="flex-grow-1">
+                            <strong class="message-title">Advertencia:</strong>
+                            <div class="message-text">{{ message }}</div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            {% elif message.tags == 'info' %}
+                <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm message-alert" role="alert" style="background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); border-left: 5px solid #17a2b8 !important;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-info-circle text-info me-3 message-icon"></i>
+                        <div class="flex-grow-1">
+                            <strong class="message-title">Información:</strong>
+                            <div class="message-text">{{ message }}</div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            {% elif message.tags == 'debug' %}
+                <div class="alert alert-secondary alert-dismissible fade show border-0 shadow-sm message-alert" role="alert" style="background: linear-gradient(135deg, #e2e3e5 0%, #d6d8db 100%); border-left: 5px solid #6c757d !important;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-bug text-secondary me-3 message-icon"></i>
+                        <div class="flex-grow-1">
+                            <strong class="message-title">Debug:</strong>
+                            <div class="message-text">{{ message }}</div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            {% else %}
+                <!-- Mensaje por defecto -->
+                <div class="alert alert-primary alert-dismissible fade show border-0 shadow-sm message-alert" role="alert" style="background: linear-gradient(135deg, #d6e9ff 0%, #cce7ff 100%); border-left: 5px solid #007bff !important;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-bell text-primary me-3 message-icon"></i>
+                        <div class="flex-grow-1">
+                            <strong class="message-title">Notificación:</strong>
+                            <div class="message-text">{{ message }}</div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
 {% endif %}
+
+<style>
+/* Estilos personalizados para los mensajes */
+.messages-container {
+    position: relative;
+    z-index: 10;
+}
+
+.messages-container .message-alert {
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    padding: 1.25rem;
+    font-size: 0.95rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.messages-container .message-alert::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.messages-container .message-alert:hover::before {
+    opacity: 1;
+}
+
+.messages-container .message-alert:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+.messages-container .message-icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.messages-container .message-title {
+    font-weight: 600;
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.messages-container .message-text {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    opacity: 0.9;
+}
+
+.messages-container .btn-close {
+    filter: none;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+    padding: 0.25rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.messages-container .btn-close:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+/* Animación de entrada mejorada */
+.messages-container .message-alert {
+    animation: slideInFromTop 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInFromTop {
+    0% {
+        transform: translateY(-30px) scale(0.95);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Estilos específicos para cada tipo de mensaje */
+.alert-success {
+    color: #155724;
+    --bs-alert-color: #155724;
+}
+
+.alert-danger {
+    color: #721c24;
+    --bs-alert-color: #721c24;
+}
+
+.alert-warning {
+    color: #856404;
+    --bs-alert-color: #856404;
+}
+
+.alert-info {
+    color: #0c5460;
+    --bs-alert-color: #0c5460;
+}
+
+.alert-secondary {
+    color: #383d41;
+    --bs-alert-color: #383d41;
+}
+
+.alert-primary {
+    color: #004085;
+    --bs-alert-color: #004085;
+}
+
+/* Efecto de pulso para mensajes importantes */
+.messages-container .alert-danger .message-icon,
+.messages-container .alert-warning .message-icon {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .messages-container {
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+    }
+    
+    .messages-container .message-alert {
+        font-size: 0.9rem;
+        padding: 1rem;
+        border-radius: 8px;
+    }
+    
+    .messages-container .message-icon {
+        font-size: 1.1rem;
+    }
+    
+    .messages-container .message-title {
+        font-size: 0.95rem;
+    }
+    
+    .messages-container .message-text {
+        font-size: 0.85rem;
+    }
+    
+    .messages-container .btn-close {
+        width: 20px;
+        height: 20px;
+        top: 0.75rem;
+        right: 0.75rem;
+    }
+}
+
+/* Animación de salida */
+.messages-container .alert.fade:not(.show) {
+    animation: slideOutToTop 0.3s ease-in forwards;
+}
+
+@keyframes slideOutToTop {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-20px) scale(0.95);
+        opacity: 0;
+    }
+}
+
+/* Tema oscuro (opcional) */
+@media (prefers-color-scheme: dark) {
+    .messages-container .message-alert {
+        backdrop-filter: blur(20px);
+    }
+    
+    .messages-container .btn-close {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .messages-container .btn-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+}
+</style>

@@ -107,3 +107,8 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 input[type="password"]::-webkit-input-password-toggle-button {
     display: none !important;
 }
+
+select#nacionalidad {
+        width: auto;
+        flex: none;
+    }

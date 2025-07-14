@@ -1,5 +1,5 @@
 <!-- =====================================================
-ARCHIVO: templates/authentication/register.html
+ARCHIVO: templates/authentication/register.html - CON VALIDACIONES AJAX
 ===================================================== -->
 {% extends 'base.html' %}
 
@@ -19,143 +19,119 @@ ARCHIVO: templates/authentication/register.html
                     
                     {% include 'partials/messages.html' %}
                     
-                    <form method="post">
+                    <form method="post" id="registerForm">
                         {% csrf_token %}
-                        
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.first_name.id_for_label }}" class="form-label">
-                                    {{ form.first_name.label }}
+                                <label for="id_first_name" class="form-label">
+                                    Nombre
                                 </label>
-                                {{ form.first_name }}
-                                {% if form.first_name.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {{ form.first_name.errors|first }}
-                                    </div>
-                                {% endif %}
+                                <input placeholder='Nombre' type="text" name="first_name" id="id_first_name" class="form-control capitalize-input" required>
+                                <div class="invalid-feedback" id="error_first_name"></div>
+                                <div class="valid-feedback" id="success_first_name"></div>
                             </div>
-                            
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.last_name.id_for_label }}" class="form-label">
-                                    {{ form.last_name.label }}
+                                <label for="id_last_name" class="form-label">
+                                    Apellido
                                 </label>
-                                {{ form.last_name }}
-                                {% if form.last_name.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {{ form.last_name.errors|first }}
-                                    </div>
-                                {% endif %}
+                                <input type="text" name="last_name" id="id_last_name" class="form-control capitalize-input" required placeholder='Apellido'>
+                                <div class="invalid-feedback" id="error_last_name"></div>
+                                <div class="valid-feedback" id="success_last_name"></div>
                             </div>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="{{ form.cedula.id_for_label }}" class="form-label">
-                                {{ form.cedula.label }}
-                            </label>
-                            {{ form.cedula }}
-                            {% if form.cedula.errors %}
-                                <div class="text-danger small mt-1">
-                                    {{ form.cedula.errors|first }}
+                            <label class="form-label">Cédula</label>
+                            <div class="input-group">
+                                <select class="form-select form-control-sm" name="nacionalidad" id="nacionalidad">
+                                    <option value="V-">V-</option>
+                                    <option value="E-">E-</option>
+                                </select>
+                                <input type="text" name="cedula" id="cedula" class="form-control" maxlength="8" pattern="[0-9]{7,8}" required placeholder="Cédula (7-8 dígitos)">
+                                <div class="input-group-text" id="cedula-spinner" style="display: none;">
+                                    <i class="fas fa-spinner fa-spin"></i>
                                 </div>
-                            {% endif %}
+                            </div>
+                            <div class="invalid-feedback" id="error_cedula"></div>
+                            <div class="valid-feedback" id="success_cedula"></div>
                         </div>
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.email.id_for_label }}" class="form-label">
-                                    {{ form.email.label }}
+                                <label for="id_email" class="form-label">
+                                    Email
+                                    <span class="spinner-border spinner-border-sm ms-2" id="email-spinner" style="display: none;"></span>
                                 </label>
-                                {{ form.email }}
-                                {% if form.email.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {{ form.email.errors|first }}
-                                    </div>
-                                {% endif %}
+                                <input type="email" name="email" id="id_email" class="form-control" required placeholder="ejemplo@gmail.com">
+                                <div class="invalid-feedback" id="error_email"></div>
+                                <div class="valid-feedback" id="success_email"></div>
                             </div>
-                            
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.telefono.id_for_label }}" class="form-label">
-                                    {{ form.telefono.label }}
-                                </label>
-                                {{ form.telefono }}
-                                {% if form.telefono.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {{ form.telefono.errors|first }}
-                                    </div>
-                                {% endif %}
+                                <label for="celular" class="form-label">Celular</label>
+                                <input type="text" name="celular" id="celular" class="form-control" maxlength="11" pattern="[0-9]{11}" required placeholder="0414-1234567">
+                                <div class="invalid-feedback" id="error_celular"></div>
+                                <div class="valid-feedback" id="success_celular"></div>
                             </div>
                         </div>
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.username.id_for_label }}" class="form-label">
-                                    {{ form.username.label }}
+                                <label for="id_username" class="form-label">
+                                    Usuario
+                                    <span class="spinner-border spinner-border-sm ms-2" id="username-spinner" style="display: none;"></span>
                                 </label>
-                                {{ form.username }}
-                                {% if form.username.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {{ form.username.errors|first }}
-                                    </div>
-                                {% endif %}
+                                <input type="text" name="username" id="id_username" class="form-control" required placeholder="Usuario (mínimo 3 caracteres)">
+                                <div class="invalid-feedback" id="error_username"></div>
+                                <div class="valid-feedback" id="success_username"></div>
                             </div>
-                            
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.cargo.id_for_label }}" class="form-label">
-                                    {{ form.cargo.label }}
+                                <label for="cargo" class="form-label">
+                                    Cargo de Trabajo
                                 </label>
-                                {{ form.cargo }}
-                                {% if form.cargo.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {{ form.cargo.errors|first }}
-                                    </div>
-                                {% endif %}
+                                <select name="cargo" id="cargo" class="form-select">
+                                    <option value="">Selecciona un cargo</option>
+                                    <option value="docente">Docente</option>
+                                    <option value="coordinador">Coordinador</option>
+                                    <option value="administrativo">Personal Administrativo</option>
+                                    <option value="tecnico">Tecnico</option>
+                                </select>
+                                <div class="invalid-feedback" id="error_cargo"></div>
+                                <div class="valid-feedback" id="success_cargo"></div>
                             </div>
                         </div>
                         
                         <div class="row">
                             <div class="col-md-6 mb-3 position-relative">
-                                <label for="{{ form.password1.id_for_label }}" class="form-label">
-                                    {{ form.password1.label }}
+                                <label for="id_password1" class="form-label">
+                                    Contraseña
                                 </label>
                                 <div class="input-group">
-                                    {{ form.password1 }}
+                                    <input type="password" name="password1" id="id_password1" class="form-control" required placeholder="Contraseña (mínimo 8 caracteres)">
                                     <button type="button" class="btn btn-outline-secondary toggle-password" tabindex="-1" style="border-top-left-radius: 0; border-bottom-left-radius: 0;" onclick="togglePasswordVisibility('id_password1', this)">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </div>
-                                {% if form.password1.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {{ form.password1.errors|first }}
-                                    </div>
-                                {% endif %}
+                                <div class="invalid-feedback" id="error_password1"></div>
+                                <div class="valid-feedback" id="success_password1"></div>
                             </div>
                             
                             <div class="col-md-6 mb-3 position-relative">
-                                <label for="{{ form.password2.id_for_label }}" class="form-label">
-                                    {{ form.password2.label }}
+                                <label for="id_password2" class="form-label">
+                                    Confirmar Contraseña
                                 </label>
                                 <div class="input-group">
-                                    {{ form.password2 }}
+                                    <input type="password" name="password2" id="id_password2" class="form-control" required placeholder="Confirma tu contraseña">
                                     <button type="button" class="btn btn-outline-secondary toggle-password" tabindex="-1" style="border-top-left-radius: 0; border-bottom-left-radius: 0;" onclick="togglePasswordVisibility('id_password2', this)">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </div>
-                                {% if form.password2.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {{ form.password2.errors|first }}
-                                    </div>
-                                {% endif %}
+                                <div class="invalid-feedback" id="error_password2"></div>
+                                <div class="valid-feedback" id="success_password2"></div>
                             </div>
                         </div>
                         
-                        {% if form.non_field_errors %}
-                            <div class="alert alert-danger">
-                                {{ form.non_field_errors|first }}
-                            </div>
-                        {% endif %}
-                        
                         <div class="d-grid gap-2 mb-3">
-                            <button type="submit" class="btn btn-primary btn-lg">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
                                 <i class="fas fa-user-plus"></i> Crear Cuenta
                             </button>
                         </div>
@@ -191,5 +167,459 @@ function togglePasswordVisibility(inputId, btn) {
         icon.classList.add('fa-eye');
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registerForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Configuración de validaciones
+    const validationRules = {
+        first_name: {
+            required: true,
+            pattern: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,}$/,
+            message: 'El nombre solo puede contener letras y debe tener al menos 2 caracteres',
+            successMessage: 'Nombre válido'
+        },
+        last_name: {
+            required: true,
+            pattern: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,}$/,
+            message: 'El apellido solo puede contener letras y debe tener al menos 2 caracteres',
+            successMessage: 'Apellido válido'
+        },
+        cedula: {
+            required: true,
+            pattern: /^[0-9]{7,8}$/,
+            message: 'La cédula debe tener entre 7 y 8 números',
+            successMessage: 'Cédula válida y disponible',
+            ajax: true
+        },
+        email: {
+            required: true,
+            pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            message: 'Ingrese un email válido',
+            successMessage: 'Email válido y disponible',
+            ajax: true
+        },
+        celular: {
+            required: true,
+            pattern: /^[0-9]{11}$/,
+            message: 'El celular debe tener exactamente 11 números',
+            successMessage: 'Celular válido'
+        },
+        username: {
+            required: true,
+            pattern: /^[a-zA-Z0-9_]{3,}$/,
+            message: 'El usuario debe tener al menos 3 caracteres (letras, números y guión bajo)',
+            successMessage: 'Usuario válido y disponible',
+            ajax: true
+        },
+        cargo: {
+            required: true,
+            message: 'Debe seleccionar un cargo',
+            successMessage: 'Cargo seleccionado'
+        },
+        password1: {
+            required: true,
+            pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
+            message: 'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número',
+            successMessage: 'Contraseña válida'
+        },
+        password2: {
+            required: true,
+            message: 'Las contraseñas no coinciden',
+            successMessage: 'Contraseñas coinciden'
+        }
+    };
+    
+    // Objetos para controlar las validaciones AJAX
+    const ajaxTimeouts = {};
+    const ajaxRequests = {};
+    
+    // Validar cada campo en tiempo real
+    Object.keys(validationRules).forEach(fieldName => {
+        const field = document.getElementById(fieldName === 'cedula' ? 'cedula' : 'id_' + fieldName);
+        if (field) {
+            // Validación mientras escribe
+            field.addEventListener('input', function() {
+                // Limpiar timeouts anteriores
+                if (ajaxTimeouts[fieldName]) {
+                    clearTimeout(ajaxTimeouts[fieldName]);
+                }
+                
+                // Cancelar requests anteriores
+                if (ajaxRequests[fieldName]) {
+                    ajaxRequests[fieldName].abort();
+                }
+                
+                // Limpiar estado visual
+                clearFieldStatus(fieldName);
+                
+                // Validaciones inmediatas
+                if (fieldName === 'first_name' || fieldName === 'last_name') {
+                    restrictToLetters(field);
+                } else if (fieldName === 'cedula' || fieldName === 'celular') {
+                    restrictToNumbers(field);
+                }
+                
+                // Validación con debounce
+                ajaxTimeouts[fieldName] = setTimeout(() => {
+                    validateField(fieldName, field);
+                }, 800);
+            });
+            
+            // Validación al perder foco
+            field.addEventListener('blur', function() {
+                if (this.value.trim()) {
+                    if (ajaxTimeouts[fieldName]) {
+                        clearTimeout(ajaxTimeouts[fieldName]);
+                    }
+                    validateField(fieldName, field);
+                }
+            });
+        }
+    });
+    
+    // Validación especial para cambio de nacionalidad
+    document.getElementById('nacionalidad').addEventListener('change', function() {
+        const cedulaField = document.getElementById('cedula');
+        if (cedulaField.value.trim()) {
+            setTimeout(() => {
+                validateField('cedula', cedulaField);
+            }, 100);
+        }
+    });
+    
+    // Mayúscula automática
+    document.querySelectorAll('.capitalize-input').forEach(function(input) {
+        input.addEventListener('input', function() {
+            if (input.value.length > 0) {
+                input.value = input.value.charAt(0).toUpperCase() + input.value.slice(1);
+            }
+        });
+    });
+    
+    // Validación del formulario
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Cancelar todas las validaciones AJAX pendientes
+        Object.values(ajaxRequests).forEach(request => {
+            if (request && request.abort) {
+                request.abort();
+            }
+        });
+        
+        let isValid = true;
+        let pendingValidations = 0;
+        
+        Object.keys(validationRules).forEach(fieldName => {
+            const field = document.getElementById(fieldName === 'cedula' ? 'cedula' : 'id_' + fieldName);
+            if (field) {
+                const rule = validationRules[fieldName];
+                
+                if (rule.ajax && field.value.trim()) {
+                    pendingValidations++;
+                    validateFieldAjax(fieldName, field, () => {
+                        pendingValidations--;
+                        if (pendingValidations === 0) {
+                            checkAndSubmit();
+                        }
+                    });
+                } else {
+                    if (!validateField(fieldName, field)) {
+                        isValid = false;
+                    }
+                }
+            }
+        });
+        
+        if (pendingValidations === 0) {
+            checkAndSubmit();
+        }
+        
+        function checkAndSubmit() {
+            // Verificar que no haya campos inválidos
+            const invalidFields = document.querySelectorAll('.is-invalid');
+            if (invalidFields.length === 0) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando cuenta...';
+                form.submit();
+            } else {
+                invalidFields[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                invalidFields[0].focus();
+            }
+        }
+    });
+    
+    function validateField(fieldName, field) {
+        const rule = validationRules[fieldName];
+        const value = field.value.trim();
+        
+        // Validar campo requerido
+        if (rule.required && !value) {
+            if (field.id !== 'cargo') {
+                showFieldError(fieldName, 'Este campo es obligatorio');
+                return false;
+            }
+        }
+        
+        // Validaciones específicas
+        if (value) {
+            if (fieldName === 'cedula') {
+                const isFormatValid = validateCedulaFormat(fieldName, value);
+                if (isFormatValid && rule.ajax) {
+                    validateFieldAjax(fieldName, field);
+                }
+                return isFormatValid;
+            } else if (fieldName === 'cargo') {
+                return validateCargo(fieldName, value);
+            } else if (fieldName === 'password2') {
+                return validatePasswordMatch(fieldName);
+            } else if (rule.pattern && !rule.pattern.test(value)) {
+                showFieldError(fieldName, rule.message);
+                return false;
+            } else if (rule.ajax) {
+                validateFieldAjax(fieldName, field);
+                return true;
+            }
+        }
+        
+        // Campo válido
+        if (value || fieldName === 'cargo') {
+            showFieldSuccess(fieldName, rule.successMessage);
+            return true;
+        }
+        
+        return true;
+    }
+    
+    function validateCedulaFormat(fieldName, value) {
+        const rule = validationRules[fieldName];
+        const nacionalidad = document.getElementById('nacionalidad').value;
+        
+        if (!rule.pattern.test(value)) {
+            showFieldError(fieldName, rule.message);
+            return false;
+        }
+        
+        const cedulaCompleta = nacionalidad + value;
+        if (!/^[VE]-[0-9]{7,8}$/.test(cedulaCompleta)) {
+            showFieldError(fieldName, 'La cédula debe tener el formato V-12345678 o E-12345678');
+            return false;
+        }
+        
+        return true;
+    }
+    
+    function validateCargo(fieldName, value) {
+        const rule = validationRules[fieldName];
+        if (!value) {
+            showFieldError(fieldName, rule.message);
+            return false;
+        }
+        showFieldSuccess(fieldName, rule.successMessage);
+        return true;
+    }
+    
+    function validatePasswordMatch(fieldName) {
+        const password1 = document.getElementById('id_password1').value;
+        const password2 = document.getElementById('id_password2').value;
+        const rule = validationRules[fieldName];
+        
+        if (password2 && password1 !== password2) {
+            showFieldError(fieldName, rule.message);
+            return false;
+        }
+        
+        if (password2 && password1 === password2) {
+            showFieldSuccess(fieldName, rule.successMessage);
+            return true;
+        }
+        
+        return true;
+    }
+    
+    function validateFieldAjax(fieldName, field, callback) {
+    const value = field.value.trim();
+    if (!value) {
+        if (callback) callback();
+        return;
+    }
+    
+    // Cancelar request anterior si existe
+    if (ajaxRequests[fieldName]) {
+        ajaxRequests[fieldName].abort();
+    }
+    
+    // Crear nuevo AbortController
+    const controller = new AbortController();
+    ajaxRequests[fieldName] = controller;
+    
+    // Mostrar spinner
+    showSpinner(fieldName, true);
+    
+    // Preparar parámetros
+    const params = new URLSearchParams({
+        field: fieldName,
+        value: value
+    });
+    
+    // Agregar nacionalidad para cédula
+    if (fieldName === 'cedula') {
+        params.append('nacionalidad', document.getElementById('nacionalidad').value);
+    }
+    
+    // Realizar petición AJAX
+    const url = "{% url 'authentication:validate_field' %}?" + params.toString();
+    
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        signal: controller.signal
+    })
+    .then(response => response.json())
+    .then(data => {
+        showSpinner(fieldName, false);
+        
+        if (data.exists) {
+            showFieldError(fieldName, data.message);
+        } else {
+            showFieldSuccess(fieldName, validationRules[fieldName].successMessage);
+        }
+        
+        if (callback) callback();
+    })
+    .catch(error => {
+        showSpinner(fieldName, false);
+        if (error.name !== 'AbortError') {
+            console.error('Error en validación:', error);
+        }
+        if (callback) callback();
+    });
+}
+    
+    function showSpinner(fieldName, show) {
+        const spinner = document.getElementById(fieldName + '-spinner');
+        if (spinner) {
+            spinner.style.display = show ? 'inline-block' : 'none';
+        }
+    }
+    
+    function showFieldError(fieldName, message) {
+        const field = document.getElementById(fieldName === 'cedula' ? 'cedula' : 'id_' + fieldName);
+        const errorDiv = document.getElementById('error_' + fieldName);
+        const successDiv = document.getElementById('success_' + fieldName);
+        
+        field.classList.add('is-invalid');
+        field.classList.remove('is-valid');
+        
+        if (errorDiv) {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+        
+        if (successDiv) {
+            successDiv.style.display = 'none';
+        }
+    }
+    
+    function showFieldSuccess(fieldName, message) {
+        const field = document.getElementById(fieldName === 'cedula' ? 'cedula' : 'id_' + fieldName);
+        const errorDiv = document.getElementById('error_' + fieldName);
+        const successDiv = document.getElementById('success_' + fieldName);
+        
+        field.classList.add('is-valid');
+        field.classList.remove('is-invalid');
+        
+        if (errorDiv) {
+            errorDiv.style.display = 'none';
+        }
+        
+        if (successDiv) {
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+        }
+    }
+    
+    function clearFieldStatus(fieldName) {
+        const field = document.getElementById(fieldName === 'cedula' ? 'cedula' : 'id_' + fieldName);
+        const errorDiv = document.getElementById('error_' + fieldName);
+        const successDiv = document.getElementById('success_' + fieldName);
+        
+        field.classList.remove('is-invalid', 'is-valid');
+        
+        if (errorDiv) errorDiv.style.display = 'none';
+        if (successDiv) successDiv.style.display = 'none';
+    }
+    
+    function restrictToLetters(field) {
+        const value = field.value;
+        const newValue = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+        if (value !== newValue) {
+            field.value = newValue;
+        }
+    }
+    
+    function restrictToNumbers(field) {
+        const value = field.value;
+        const newValue = value.replace(/[^0-9]/g, '');
+        if (value !== newValue) {
+            field.value = newValue;
+        }
+    }
+});
 </script>
+
+<style>
+.valid-feedback {
+    display: none;
+    color: #28a745;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.invalid-feedback {
+    display: none;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.form-control.is-valid,
+.form-select.is-valid {
+    border-color: #28a745;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='m2.3 6.73.8-.77-.8-.77V4.25L1.5 4.25C1.22 4.25 1 4.47 1 4.75v.5c0 .28.22.5.5.5l.8-.02zm1.57-2.58L3.87 2.4l.8.75-.8.75zM6.85 4.25l-.8.02v1.96l.8-.77.8.77V4.25z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #dc3545;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 4.6 1.4 1.4M6.2 7.4l-1.4-1.4'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-control.is-valid:focus {
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.form-control.is-invalid:focus {
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+</style>
 {% endblock %}

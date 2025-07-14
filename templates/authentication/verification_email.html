@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifica tu cuenta</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .welcome-message {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .welcome-message h2 {
+            color: #2d3436;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .welcome-message p {
+            color: #636e72;
+            font-size: 16px;
+        }
+        
+        .user-info {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            border-left: 4px solid #667eea;
+        }
+        
+        .user-info h3 {
+            color: #2d3436;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .user-detail {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .user-detail:last-child {
+            border-bottom: none;
+        }
+        
+        .user-detail strong {
+            color: #495057;
+            font-weight: 600;
+        }
+        
+        .user-detail span {
+            color: #667eea;
+            font-weight: 500;
+        }
+        
+        .verify-button {
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .verify-button a {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 40px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .verify-button a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .instructions {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        
+        .instructions h4 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .instructions p {
+            color: #856404;
+            font-size: 14px;
+        }
+        
+        .security-note {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        
+        .security-note h4 {
+            color: #0c5460;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .security-note p {
+            color: #0c5460;
+            font-size: 14px;
+        }
+        
+        .footer {
+            background-color: #2d3436;
+            color: #b2bec3;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .footer p {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            margin: 30px 0;
+            border-radius: 1px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                margin: 0 10px;
+            }
+            
+            .header, .content {
+                padding: 30px 20px;
+            }
+            
+            .user-detail {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .user-detail span {
+                margin-top: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 ¡Bienvenido!</h1>
+            <p>Gracias por registrarte en nuestro sistema</p>
+        </div>
+        
+        <div class="content">
+            <div class="welcome-message">
+                <h2>Hola, {{ user.first_name|default:user.username }}!</h2>
+                <p>Tu cuenta ha sido creada exitosamente. Solo falta un último paso para activarla.</p>
+            </div>
+            
+            <div class="user-info">
+                <h3>📋 Información de tu cuenta</h3>
+                <div class="user-detail">
+                    <strong>Usuario:</strong>
+                    <span>{{ user.username }}</span>
+                </div>
+                <div class="user-detail">
+                    <strong>Email:</strong>
+                    <span>{{ user.email }}</span>
+                </div>
+                <div class="user-detail">
+                    <strong>Nombre:</strong>
+                    <span>{{ user.first_name|default:"No especificado" }}</span>
+                </div>
+                <div class="user-detail">
+                    <strong>Apellido:</strong>
+                    <span>{{ user.last_name|default:"No especificado" }}</span>
+                </div>
+                <div class="user-detail">
+                    <strong>Fecha de registro:</strong>
+                    <span>{{ user.date_joined|date:"d/m/Y H:i" }}</span>
+                </div>
+            </div>
+            
+            <div class="verify-button">
+                <a href="{{ verification_link }}">✅ Verificar mi cuenta</a>
+            </div>
+            
+            <div class="instructions">
+                <h4>📝 Instrucciones:</h4>
+                <p>
+                    Haz clic en el botón "Verificar mi cuenta" para activar tu cuenta y poder iniciar sesión. 
+                    Si el botón no funciona, copia y pega el siguiente enlace en tu navegador:
+                </p>
+                <p style="margin-top: 10px; word-break: break-all; font-family: monospace; background: white; padding: 10px; border-radius: 4px;">
+                    {{ verification_link }}
+                </p>
+            </div>
+            
+            <div class="security-note">
+                <h4>🔒 Nota de seguridad:</h4>
+                <p>
+                    Este enlace es único y expira en 24 horas por razones de seguridad. 
+                    Si no verificas tu cuenta en este tiempo, deberás solicitar un nuevo enlace de verificación.
+                </p>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div style="text-align: center; color: #636e72;">
+                <p>
+                    <strong>¿No solicitaste esta cuenta?</strong><br>
+                    Si no creaste esta cuenta, puedes ignorar este email. 
+                    La cuenta no será activada sin la verificación.
+                </p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>{{ site_name }}</strong></p>
+            <p>Este es un mensaje automático, por favor no respondas a este email.</p>
+            <p>Si tienes problemas, contacta nuestro <a href="mailto:support@{{ domain }}">soporte técnico</a></p>
+            <p style="margin-top: 20px; font-size: 12px; opacity: 0.8;">
+                © {{ "now"|date:"Y" }} {{ site_name }}. Todos los derechos reservados.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

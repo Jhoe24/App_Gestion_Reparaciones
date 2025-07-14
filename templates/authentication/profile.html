@@ -30,7 +30,7 @@ ARCHIVO: templates/authentication/profile.html
                     </div>
                     <div class="col-md-6 mb-3">
                         <strong>Cédula:</strong>
-                        <p class="text-muted">{{ user.cedula }}</p>
+                        <p class="text-muted">{% if user.nacionalidad %}{{ user.nacionalidad }}{% endif %}{{ user.cedula }}</p>
                     </div>
                     <div class="col-md-6 mb-3">
                         <strong>Correo Electrónico:</strong>
@@ -38,11 +38,15 @@ ARCHIVO: templates/authentication/profile.html
                     </div>
                     <div class="col-md-6 mb-3">
                         <strong>Teléfono:</strong>
-                        <p class="text-muted">{{ user.telefono }}</p>
+                        <p class="text-muted">{{ user.celular }}</p>
                     </div>
                     <div class="col-md-6 mb-3">
                         <strong>Cargo:</strong>
+                        {% if user.cargo == 'docente' %}
+                        <p class="text-muted">Docente</p>
+                        {% else %}
                         <p class="text-muted">{{ user.cargo }}</p>
+                        {% endif %}
                     </div>
                     <div class="col-md-6 mb-3">
                         <strong>Rol en el Sistema:</strong>

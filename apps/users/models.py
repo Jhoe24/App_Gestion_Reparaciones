@@ -5,6 +5,7 @@ from django.core.validators import RegexValidator
 
 
 class CustomUser(AbstractUser):
+    email_verification_token = models.CharField(max_length=64, blank=True, null=True, help_text='Token para la verificación de correo electrónico')
     """
     Modelo de usuario personalizado para el sistema de gestión de mantenimiento
     """
@@ -31,21 +32,20 @@ class CustomUser(AbstractUser):
     telefono = models.CharField(
         max_length=20,
         validators=[phone_validator],
-        help_text='Número de teléfono de contacto'
+        help_text='Número de celular de contacto'
     )
     CARGO_CHOICES =  [
-        ('coornidador', 'Coordinador'),
-        ('administrativo', 'Personal Administrativo'),
-        ('obrero', 'Personal Obrero'),
+        ('docente', 'Docente'),
+        ('coordinador', 'Coordinador'),
+        ('administrativo', 'Peronal Administrativo'),
         ('tecnico', 'Tecnico'),
-        ('otro', 'Otro'),
     ]
     
     cargo = models.CharField(
         max_length=50,
         choices=CARGO_CHOICES,
-        default='Personal Administrativo',
-        help_text='Cargo  o funcio que desempeña el usuario'
+        default='Docente',
+        help_text='Seleccione el cargo o función que desempeña el usuario'
     )
     
     # Roles del sistema
@@ -62,6 +62,9 @@ class CustomUser(AbstractUser):
         help_text='Rol del usuario en el sistema'
     )
     
+    # Verificación de correo
+    is_email_verified = models.BooleanField(default=False, help_text='Indica si el usuario ha verificado su correo electrónico')
+    is_verified = models.BooleanField(default=False, help_text='Indica si el usuario ha verificado su email (usado en login y registro)')
     # Campos de auditoría
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)

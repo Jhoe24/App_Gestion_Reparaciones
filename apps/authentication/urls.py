@@ -4,6 +4,7 @@
 
 from django.urls import path
 from . import views
+from .ajax_validations import validate_field
 
 app_name = 'authentication'
 
@@ -14,6 +15,8 @@ urlpatterns = [
     
     # Registro
     path('register/', views.RegisterView.as_view(), name='register'),
+    path('verify/<str:uidb64>/<str:token>/', views.verify_email, name='verify_email'),
+    path('resend-verification/', views.resend_verification_email, name='resend_verification'),
     
     # Recuperación de contraseña
     path('password-reset/', views.CustomPasswordResetView.as_view(), name='password_reset'),
@@ -28,4 +31,5 @@ urlpatterns = [
     # Perfil de usuario
     path('profile/', views.ProfileView.as_view(), name='profile'),
     path('profile/edit/', views.ProfileEditView.as_view(), name='profile_edit'),
+    path('validate-field/', validate_field, name='validate_field'),
 ]

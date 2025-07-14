@@ -20,6 +20,15 @@ from django.views.decorators.csrf import csrf_protect
 from django.http import HttpResponseRedirect
 from django.db.models import Q
 from typing import cast
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.contrib.auth.tokens import default_token_generator
+from django.conf import settings
+from django.shortcuts import get_object_or_404
 
 from apps.users.models import CustomUser, LogAcceso
 from .forms import (
@@ -45,6 +54,14 @@ class CustomLoginView(LoginView):
         """Login exitoso"""
         user = cast(CustomUser, form.get_user())
 
+        # Verificar si el usuario ha verificado su email
+        if not user.is_verified:
+            messages.error(
+                self.request,
+                'Debes verificar tu email antes de iniciar sesión. Revisa tu bandeja de entrada.'
+            )
+            return self.form_invalid(form)
+
         # Registrar login exitoso
         log_user_action(
             user=user,
@@ -62,7 +79,6 @@ class CustomLoginView(LoginView):
         username = form.cleaned_data.get("username")
         user = None
         if username:
-            # El formulario parece usar el campo 'username' para el email, así que verificamos ambos.
             user = CustomUser.objects.filter(
                 Q(email__iexact=username) | Q(username__iexact=username)
             ).first()
@@ -82,7 +98,7 @@ class CustomLoginView(LoginView):
         """Redirección según el rol del usuario"""
         user = cast(CustomUser, self.request.user)
         
-        if  user.is_superuser or user.is_administrador:
+        if user.is_superuser or user.is_administrador:
             return reverse_lazy('equipment:admin_dashboard')
         elif user.is_tecnico:
             return reverse_lazy('equipment:tech_dashboard')
@@ -93,7 +109,6 @@ class CustomLoginView(LoginView):
 class CustomLogoutView(LogoutView):
     """Vista personalizada para logout"""
     template_name = 'authentication/logout.html'
-    # Forzar el uso de POST para el logout por seguridad (previene CSRF en logout).
     http_method_names = ['post', 'options']
     
     def post(self, request, *args, **kwargs):
@@ -118,14 +133,61 @@ class RegisterView(CreateView):
     template_name = 'authentication/register.html'
     success_url = reverse_lazy('authentication:login')
     
+    def send_verification_email(self, user):
+        """Envía el email de verificación"""
+        current_site = get_current_site(self.request)
+        
+        # Generar token de verificación
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        
+        # Crear el link de verificación
+        verification_link = f"http://{current_site.domain}/auth/verify/{uid}/{token}/"
+        
+        # Contexto para el template
+        context = {
+            'user': user,
+            'domain': current_site.domain,
+            'site_name': current_site.name,
+            'verification_link': verification_link,
+            'protocol': 'https' if self.request.is_secure() else 'http',
+        }
+        
+        # Renderizar el template HTML
+        html_message = render_to_string('authentication/verification_email.html', context)
+        plain_message = strip_tags(html_message)
+        
+        # Enviar el email
+        send_mail(
+            subject='Verifica tu cuenta - Bienvenido a nuestro sistema',
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+    
     def form_valid(self, form):
         """Registro exitoso"""
         response = super().form_valid(form)
         
-        messages.success(
-            self.request,
-            '¡Registro exitoso! Ya puedes iniciar sesión con tus credenciales.'
-        )
+        # Marcar el usuario como no verificado
+        self.object.is_verified = False
+        self.object.save()
+        
+        # Enviar email de verificación
+        try:
+            self.send_verification_email(self.object)
+            messages.success(
+                self.request,
+                '¡Registro exitoso! Te hemos enviado un email de verificación. '
+                'Revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta.'
+            )
+        except Exception as e:
+            messages.error(
+                self.request,
+                'Error al enviar el email de verificación. Contacta al administrador.'
+            )
         
         # Registrar creación de usuario
         log_user_action(
@@ -144,6 +206,67 @@ class RegisterView(CreateView):
             'Error en el registro. Por favor, revise los datos ingresados.'
         )
         return super().form_invalid(form)
+
+
+def verify_email(request, uidb64, token):
+    """Vista para verificar el email del usuario"""
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = CustomUser.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+        user = None
+    
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_verified = True
+        user.save()
+        
+        # Registrar verificación exitosa
+        log_user_action(
+            user=user,
+            action='email_verified',
+            ip_address=get_client_ip(request),
+            user_agent=request.META.get('HTTP_USER_AGENT', '')
+        )
+        
+        messages.success(
+            request,
+            '¡Email verificado exitosamente! Ya puedes iniciar sesión.'
+        )
+        return redirect('authentication:login')
+    else:
+        messages.error(
+            request,
+            'El enlace de verificación es inválido o ha expirado.'
+        )
+        return redirect('authentication:register')
+
+
+def resend_verification_email(request):
+    """Vista para reenviar email de verificación"""
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        if email:
+            try:
+                user = CustomUser.objects.get(email=email, is_verified=False)
+                
+                # Reutilizar la función de envío de email
+                register_view = RegisterView()
+                register_view.request = request
+                register_view.send_verification_email(user)
+                
+                messages.success(
+                    request,
+                    'Email de verificación reenviado. Revisa tu bandeja de entrada.'
+                )
+            except CustomUser.DoesNotExist:
+                messages.error(
+                    request,
+                    'No se encontró un usuario con ese email o ya está verificado.'
+                )
+        else:
+            messages.error(request, 'Por favor, ingresa un email válido.')
+    
+    return render(request, 'authentication/resend_verification.html')
 
 
 class CustomPasswordResetView(PasswordResetView):

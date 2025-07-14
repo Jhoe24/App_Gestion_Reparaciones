@@ -94,42 +94,55 @@ class CustomUserCreationForm(UserCreationForm):
         })
     )
     
-    cedula = forms.CharField(
-        max_length=20,
+    nacionalidad = forms.ChoiceField(
+        choices=[('V-', 'V-'), ('E-', 'E-')],
         required=True,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'V-12345678'
+        widget=forms.Select(attrs={
+            'class': 'form-select form-control-sm',
+            'id': 'nacionalidad'
         })
     )
     
-    telefono = forms.CharField(
-        max_length=20,
+    cedula = forms.CharField(
+        max_length=8,
         required=True,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': '04XX-XXXXXXX'
+            'id': 'cedula',
+            'maxlength': '8',
+            'pattern': '[0-9]{7,8}',
+            'required': True
+        })
+    )
+    
+    celular = forms.CharField(
+        max_length=11,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'celular',
+            'maxlength': '11',
+            'pattern': '[0-9]{11}',
+            'required': True
         })
     )
     
     cargo = forms.ChoiceField(
-        choices = CustomUser.CARGO_CHOICES,
+        choices=[
+            ('docente', 'Docente'),
+            ('coordinador', 'Coordinador'),
+            ('administrativo', 'Personal Administrativo'),
+            ('tecnico', 'Técnico'),
+        ],
+        required=True,
         widget=forms.Select(attrs={
-            'class': 'form-control',
-            'placeholder': 'Cargo o Funcion'
-        })
-    )
-    
-    rol = forms.ChoiceField(
-        choices=CustomUser.ROLES,
-        widget=forms.Select(attrs={
-            'class': 'form-control',
-            'placeholder': 'Rol'
+            'class': 'form-control'
         })
     )
     
     activo = forms.BooleanField(
         required=False,
+        initial=True,
         label='Usuario activo',
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
@@ -137,7 +150,7 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
         fields = ('username', 'email', 'first_name', 'last_name', 
-                 'cedula', 'telefono', 'cargo', 'rol', 'activo', 'password1', 'password2')
+                 'nacionalidad', 'cedula', 'celular', 'cargo', 'activo', 'password1', 'password2')
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -163,10 +176,10 @@ class CustomUserCreationForm(UserCreationForm):
         self.fields['email'].label = 'Correo electrónico'
         self.fields['first_name'].label = 'Nombres'
         self.fields['last_name'].label = 'Apellidos'
-        self.fields['cedula'].label = 'Cédula de identidad'
-        self.fields['telefono'].label = 'Teléfono'
+        self.fields['nacionalidad'].label = 'Nacionalidad'
+        self.fields['cedula'].label = 'Cédula'
+        self.fields['celular'].label = 'Celular'
         self.fields['cargo'].label = 'Cargo'
-        self.fields['rol'].label = 'Rol'
         self.fields['activo'].label = 'Usuario activo'
         self.fields['password1'].label = 'Contraseña'
         self.fields['password2'].label = 'Confirmar contraseña'
@@ -178,16 +191,61 @@ class CustomUserCreationForm(UserCreationForm):
         return email
     
     def clean_cedula(self):
-        cedula = self.cleaned_data.get('cedula')
-        if CustomUser.objects.filter(cedula=cedula).exists():
+        nacionalidad = self.cleaned_data.get('nacionalidad', '')
+        cedula_num = self.cleaned_data.get('cedula', '')
+        
+        # Validar que cedula_num no esté vacío
+        if not cedula_num:
+            raise ValidationError('La cédula es requerida.')
+        
+        # Validar que sean solo dígitos
+        if not cedula_num.isdigit():
+            raise ValidationError('La cédula debe contener solo números.')
+        
+        # Validar longitud
+        if len(cedula_num) not in [7, 8]:
+            raise ValidationError('La cédula debe tener entre 7 y 8 dígitos numéricos.')
+        
+        # Formar la cédula completa
+        cedula_completa = f"{nacionalidad}{cedula_num}"
+        
+        # Validar formato completo
+        if not cedula_completa.startswith(('V-', 'E-')):
+            raise ValidationError('La cédula debe tener el formato V-12345678 o E-12345678')
+        
+        # Verificar si ya existe en la base de datos
+        if CustomUser.objects.filter(cedula=cedula_completa).exists():
             raise ValidationError('Ya existe un usuario con esta cédula.')
-        return cedula
+        
+        return cedula_completa  # Retornar la cédula completa
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        
+        # Verificar que nacionalidad y cedula estén presentes
+        nacionalidad = cleaned_data.get('nacionalidad')
+        cedula_num = cleaned_data.get('cedula')
+        
+        if nacionalidad and cedula_num:
+            # Si cedula_num ya es la cédula completa (viene de clean_cedula), no hacer nada
+            if not cedula_num.startswith(('V-', 'E-')):
+                # Formar la cédula completa
+                cedula_completa = f"{nacionalidad}{cedula_num}"
+                cleaned_data['cedula'] = cedula_completa
+        
+        return cleaned_data
     
     def save(self, commit=True):
         user = super().save(commit=False)
+        
+        # La cédula ya viene completa desde clean_cedula()
+        user.cedula = self.cleaned_data['cedula']
+        user.telefono = self.cleaned_data.get('celular', '')
         user.email = self.cleaned_data['email']
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
+        user.activo = self.cleaned_data.get('activo', True)
+        user.rol = 'usuario'  # Asignar rol por defecto
         
         if commit:
             user.save()
