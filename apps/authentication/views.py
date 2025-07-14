@@ -38,7 +38,6 @@ from .forms import (
 )
 from .utils import get_client_ip, log_user_action
 
-
 class CustomLoginView(LoginView):
     """Vista personalizada para login"""
     form_class = CustomAuthenticationForm
@@ -58,8 +57,47 @@ class CustomLoginView(LoginView):
         if not user.is_verified:
             messages.error(
                 self.request,
-                'Debes verificar tu email antes de iniciar sesión. Revisa tu bandeja de entrada.'
+                'Debes verificar tu email antes de iniciar sesión. '
+                'Revisa tu bandeja de entrada y haz clic en el enlace de verificación.'
             )
+            
+            # Agregar mensaje adicional con opción de reenvío
+            messages.info(
+                self.request,
+                f'¿No recibiste el email? '
+                f'<a href="{reverse_lazy("authentication:resend_verification")}" '
+                f'class="alert-link">Reenviar email de verificación</a>'
+            )
+            
+            # Registrar intento de login con usuario no verificado
+            log_user_action(
+                user=user,
+                action='login_unverified',
+                ip_address=get_client_ip(self.request),
+                user_agent=self.request.META.get('HTTP_USER_AGENT', '')
+            )
+            
+            # Marcar que ya se agregaron mensajes
+            self._messages_added = True
+            return self.form_invalid(form)
+
+        # Verificar si el usuario está activo
+        if not user.is_active:
+            messages.error(
+                self.request,
+                'Tu cuenta ha sido desactivada. Contacta al administrador.'
+            )
+            
+            # Registrar intento con cuenta desactivada
+            log_user_action(
+                user=user,
+                action='login_inactive',
+                ip_address=get_client_ip(self.request),
+                user_agent=self.request.META.get('HTTP_USER_AGENT', '')
+            )
+            
+            # Marcar que ya se agregaron mensajes
+            self._messages_added = True
             return self.form_invalid(form)
 
         # Registrar login exitoso
@@ -74,24 +112,45 @@ class CustomLoginView(LoginView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        """Login fallido"""
-        # Intentar obtener el usuario para el log
-        username = form.cleaned_data.get("username")
-        user = None
-        if username:
-            user = CustomUser.objects.filter(
-                Q(email__iexact=username) | Q(username__iexact=username)
-            ).first()
+        """Login fallido - Solo para credenciales incorrectas"""
+        # Solo agregar mensaje si no se agregaron previamente en form_valid
+        if not hasattr(self, '_messages_added'):
+            # Intentar obtener el usuario para dar mensaje específico
+            username = form.cleaned_data.get("username")
+            user = None
+            
+            if username:
+                user = CustomUser.objects.filter(
+                    Q(email__iexact=username) | Q(username__iexact=username)
+                ).first()
+                
+                if user:
+                    # Usuario existe pero credenciales incorrectas
+                    messages.error(
+                        self.request, 
+                        'Contraseña incorrecta. Intenta nuevamente.'
+                    )
+                else:
+                    # Usuario no encontrado
+                    messages.error(
+                        self.request, 
+                        'No se encontró un usuario con esas credenciales.'
+                    )
+            else:
+                # Campo username vacío
+                messages.error(
+                    self.request, 
+                    'Por favor, ingresa tu email o nombre de usuario.'
+                )
 
-        # Registrar intento fallido
-        log_user_action(
-            user=user,
-            action='failed_login',
-            ip_address=get_client_ip(self.request),
-            user_agent=self.request.META.get('HTTP_USER_AGENT', '')
-        )
+            # Registrar intento fallido
+            log_user_action(
+                user=user,
+                action='failed_login',
+                ip_address=get_client_ip(self.request),
+                user_agent=self.request.META.get('HTTP_USER_AGENT', '')
+            )
         
-        messages.error(self.request, 'Credenciales incorrectas. Intente nuevamente.')
         return super().form_invalid(form)
     
     def get_success_url(self):
@@ -125,13 +184,15 @@ class CustomLogoutView(LogoutView):
         messages.success(request, 'Has cerrado sesión correctamente.')
         return HttpResponseRedirect(self.get_success_url())
 
-
 class RegisterView(CreateView):
     """Vista para registro de nuevos usuarios"""
     model = CustomUser
     form_class = CustomUserCreationForm
     template_name = 'authentication/register.html'
-    success_url = reverse_lazy('authentication:login')
+    
+    def get_success_url(self):
+        """Redirige al login después del registro exitoso"""
+        return reverse_lazy('authentication:login')
     
     def send_verification_email(self, user):
         """Envía el email de verificación"""
@@ -183,11 +244,19 @@ class RegisterView(CreateView):
                 '¡Registro exitoso! Te hemos enviado un email de verificación. '
                 'Revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta.'
             )
+            
+            # Mensaje adicional para el login
+            messages.info(
+                self.request,
+                'Una vez que hayas verificado tu email, podrás iniciar sesión con tus credenciales.'
+            )
+            
         except Exception as e:
             messages.error(
                 self.request,
                 'Error al enviar el email de verificación. Contacta al administrador.'
             )
+            print(f"Error sending verification email: {e}")  # Para debugging
         
         # Registrar creación de usuario
         log_user_action(
@@ -240,34 +309,62 @@ def verify_email(request, uidb64, token):
         )
         return redirect('authentication:register')
 
-
 def resend_verification_email(request):
     """Vista para reenviar email de verificación"""
     if request.method == 'POST':
-        email = request.POST.get('email')
-        if email:
+        email = request.POST.get('email', '').strip()
+        
+        if not email:
+            messages.error(request, 'Por favor, ingresa un email válido.')
+            return render(request, 'authentication/resend_verification.html')
+        
+        try:
+            # Buscar usuario por email
+            user = CustomUser.objects.get(email__iexact=email)
+            
+            # Verificar si ya está verificado
+            if user.is_verified:
+                messages.info(
+                    request,
+                    'Esta cuenta ya ha sido verificada. Puedes iniciar sesión normalmente.'
+                )
+                return redirect('authentication:login')
+            
+            # Reenviar email de verificación
+            register_view = RegisterView()
+            register_view.request = request
+            
             try:
-                user = CustomUser.objects.get(email=email, is_verified=False)
-                
-                # Reutilizar la función de envío de email
-                register_view = RegisterView()
-                register_view.request = request
                 register_view.send_verification_email(user)
-                
                 messages.success(
                     request,
-                    'Email de verificación reenviado. Revisa tu bandeja de entrada.'
+                    f'Email de verificación reenviado a {email}. '
+                    f'Revisa tu bandeja de entrada y la carpeta de spam.'
                 )
-            except CustomUser.DoesNotExist:
+                
+                # Registrar reenvío
+                log_user_action(
+                    user=user,
+                    action='resend_verification',
+                    ip_address=get_client_ip(request),
+                    user_agent=request.META.get('HTTP_USER_AGENT', '')
+                )
+                
+            except Exception as e:
                 messages.error(
                     request,
-                    'No se encontró un usuario con ese email o ya está verificado.'
+                    'Error al enviar el email. Intenta nuevamente o contacta al administrador.'
                 )
-        else:
-            messages.error(request, 'Por favor, ingresa un email válido.')
+                print(f"Error resending verification email: {e}")  # Para debugging
+                
+        except CustomUser.DoesNotExist:
+            # No revelar si el usuario existe o no por seguridad
+            messages.info(
+                request,
+                'Si el email existe en nuestro sistema, se enviará un email de verificación.'
+            )
     
     return render(request, 'authentication/resend_verification.html')
-
 
 class CustomPasswordResetView(PasswordResetView):
     """Vista personalizada para recuperación de contraseña"""
@@ -276,6 +373,9 @@ class CustomPasswordResetView(PasswordResetView):
     email_template_name = 'authentication/password_reset_email.html'
     subject_template_name = 'authentication/password_reset_subject.txt'
     success_url = reverse_lazy('authentication:password_reset_done')
+    
+    html_email_template_name = 'authentication/password_reset_email.html' 
+
     
     def form_valid(self, form):
         messages.success(

@@ -5,208 +5,233 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verifica tu cuenta</title>
     <style>
+        /* Reset básico */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
+        /* Estilos del cuerpo, similares al fondo del login */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f9;
-            color: #333;
+            font-family: -apple-system, BlinkMacMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; /* Fuentes similares a Bootstrap */
+            background-color: #f4f6f9; /* Color de fondo ligero */
+            color: #212529; /* Texto oscuro similar a Bootstrap */
             line-height: 1.6;
+            -webkit-text-size-adjust: 100%; /* Para compatibilidad en móviles */
+            -ms-text-size-adjust: 100%;
         }
-        
+
+        /* Contenedor principal - imita la tarjeta de login */
         .container {
             max-width: 600px;
-            margin: 0 auto;
+            margin: 40px auto; /* Centrar con margen superior/inferior para el email */
             background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 0.75rem; /* 12px, similar a border-radius en Bootstrap */
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); /* Sombra similar a Bootstrap */
             overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.125); /* Borde de tarjeta Bootstrap */
         }
-        
+
+        /* Cabecera con degradado */
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 40px 30px;
+            padding: 2.5rem 1.5rem; /* Padding similar a p-5 en Bootstrap */
             text-align: center;
         }
-        
+
         .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
+            font-size: 1.75rem; /* Tamaño de h3 en Bootstrap */
+            margin-bottom: 0.5rem;
             font-weight: 300;
         }
-        
+
         .header p {
-            font-size: 16px;
+            font-size: 0.875rem; /* Tamaño de texto más pequeño */
             opacity: 0.9;
         }
-        
+
+        /* Contenido principal */
         .content {
-            padding: 40px 30px;
+            padding: 2.5rem 1.5rem; /* Padding similar a p-5 */
         }
-        
+
         .welcome-message {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 1.5rem; /* mb-3 */
         }
-        
+
         .welcome-message h2 {
-            color: #2d3436;
-            font-size: 24px;
-            margin-bottom: 15px;
+            color: #212529; /* Texto oscuro */
+            font-size: 1.5rem; /* h4 en Bootstrap */
+            margin-bottom: 1rem; /* mb-3 */
+            font-weight: 500; /* Medium weight */
         }
-        
+
         .welcome-message p {
-            color: #636e72;
-            font-size: 16px;
+            color: #6c757d; /* text-muted en Bootstrap */
+            font-size: 1rem; /* p en Bootstrap */
         }
-        
+
+        /* Información del usuario - imita el estilo de la tarjeta */
         .user-info {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 30px 0;
-            border-left: 4px solid #667eea;
+            background-color: #f8f9fa; /* bg-light */
+            border-radius: 0.5rem; /* 8px */
+            padding: 1rem; /* p-3 */
+            margin: 1.5rem 0; /* my-3 */
+            border-left: 0.25rem solid #667eea; /* Color primario */
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); /* Sombra sutil */
         }
-        
+
         .user-info h3 {
-            color: #2d3436;
-            margin-bottom: 15px;
-            font-size: 18px;
+            color: #212529;
+            margin-bottom: 1rem; /* mb-3 */
+            font-size: 1.25rem; /* h5 en Bootstrap */
+            font-weight: 500;
         }
-        
+
         .user-detail {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-            padding: 8px 0;
-            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 0.5rem; /* mb-2 */
+            padding: 0.5rem 0; /* py-2 */
+            border-bottom: 1px solid #dee2e6; /* border-bottom */
+            font-size: 0.9375rem; /* Ligeramente más pequeño que el texto normal */
         }
-        
+
         .user-detail:last-child {
             border-bottom: none;
         }
-        
+
         .user-detail strong {
-            color: #495057;
-            font-weight: 600;
+            color: #343a40; /* Texto más oscuro */
+            font-weight: 600; /* font-weight-bold */
         }
-        
+
         .user-detail span {
-            color: #667eea;
+            color: #007bff; /* Color de enlace principal de Bootstrap */
             font-weight: 500;
         }
-        
+
+        /* Botón de verificación - similar a btn-primary btn-lg */
         .verify-button {
             text-align: center;
-            margin: 40px 0;
+            margin: 2rem 0; /* my-4 */
         }
-        
+
         .verify-button a {
             display: inline-block;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 16px 40px;
+            padding: 0.75rem 2rem; /* py-3 px-4 */
             text-decoration: none;
-            border-radius: 50px;
-            font-size: 18px;
+            border-radius: 2rem; /* Bordes muy redondeados como el botón de login */
+            font-size: 1.125rem; /* h5 */
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 0.25rem 0.75rem rgba(102, 126, 234, 0.3); /* Sombra más pronunciada */
         }
-        
+
         .verify-button a:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 0.375rem 1.25rem rgba(102, 126, 234, 0.4); /* Sombra al pasar el ratón */
         }
-        
+
+        /* Secciones de información/advertencia */
         .instructions {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 30px 0;
+            background-color: #fff3cd; /* alert-warning */
+            border: 1px solid #ffeeba; /* border-warning */
+            border-radius: 0.5rem; /* 8px */
+            padding: 1rem; /* p-3 */
+            margin: 1.5rem 0; /* my-3 */
+            font-size: 0.9375rem; /* Pequeño */
         }
-        
+
         .instructions h4 {
-            color: #856404;
-            margin-bottom: 10px;
-            font-size: 16px;
+            color: #664d03; /* Color de texto para alert-warning */
+            margin-bottom: 0.5rem; /* mb-2 */
+            font-size: 1rem; /* Tamaño de un p normal */
         }
-        
+
         .instructions p {
-            color: #856404;
-            font-size: 14px;
+            color: #664d03;
         }
-        
+
         .security-note {
-            background-color: #d1ecf1;
-            border: 1px solid #bee5eb;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 30px 0;
+            background-color: #cfe2ff; /* alert-info */
+            border: 1px solid #b6d4fe; /* border-info */
+            border-radius: 0.5rem; /* 8px */
+            padding: 1rem; /* p-3 */
+            margin: 1.5rem 0; /* my-3 */
+            font-size: 0.9375rem;
         }
-        
+
         .security-note h4 {
-            color: #0c5460;
-            margin-bottom: 10px;
-            font-size: 16px;
+            color: #055160; /* Color de texto para alert-info */
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
         }
-        
+
         .security-note p {
-            color: #0c5460;
-            font-size: 14px;
+            color: #055160;
         }
-        
+
+        /* Pie de página */
         .footer {
-            background-color: #2d3436;
-            color: #b2bec3;
+            background-color: #343a40; /* bg-dark */
+            color: #adb5bd; /* text-light */
             text-align: center;
-            padding: 30px;
+            padding: 1.5rem; /* p-3 */
+            font-size: 0.875rem; /* sm */
         }
-        
+
         .footer p {
-            margin-bottom: 10px;
-            font-size: 14px;
+            margin-bottom: 0.5rem; /* mb-2 */
         }
-        
+
         .footer a {
-            color: #667eea;
+            color: #667eea; /* Enlace primario */
             text-decoration: none;
         }
-        
+
         .footer a:hover {
             text-decoration: underline;
         }
-        
+
         .divider {
             height: 2px;
             background: linear-gradient(90deg, #667eea, #764ba2);
-            margin: 30px 0;
+            margin: 1.5rem 0; /* my-3 */
             border-radius: 1px;
         }
         
+        /* Media Queries para responsividad, adaptadas a píxeles */
         @media (max-width: 600px) {
             .container {
-                margin: 0 10px;
+                margin: 20px 10px; /* Margen para pantallas pequeñas */
+                border-radius: 0; /* Sin bordes redondeados en móviles si se desea */
             }
             
             .header, .content {
-                padding: 30px 20px;
+                padding: 1.5rem 1rem; /* Reducir padding en móviles */
             }
             
             .user-detail {
                 flex-direction: column;
                 align-items: flex-start;
+                font-size: 0.875rem; /* Reducir tamaño de fuente */
             }
             
             .user-detail span {
                 margin-top: 5px;
+                display: block; /* Asegurar que se muestre en una nueva línea */
+            }
+
+            .verify-button a {
+                font-size: 1rem; /* Reducir tamaño de fuente del botón */
+                padding: 0.6rem 1.5rem;
             }
         }
     </style>
@@ -273,8 +298,8 @@
             
             <div class="divider"></div>
             
-            <div style="text-align: center; color: #636e72;">
-                <p>
+            <div style="text-align: center; color: #6c757d; font-size: 0.875rem;"> {# text-muted and small font #}
+                <p style="margin-bottom: 0.5rem;">
                     <strong>¿No solicitaste esta cuenta?</strong><br>
                     Si no creaste esta cuenta, puedes ignorar este email. 
                     La cuenta no será activada sin la verificación.
@@ -286,7 +311,7 @@
             <p><strong>{{ site_name }}</strong></p>
             <p>Este es un mensaje automático, por favor no respondas a este email.</p>
             <p>Si tienes problemas, contacta nuestro <a href="mailto:support@{{ domain }}">soporte técnico</a></p>
-            <p style="margin-top: 20px; font-size: 12px; opacity: 0.8;">
+            <p style="margin-top: 1rem; font-size: 0.75rem; opacity: 0.8;">
                 © {{ "now"|date:"Y" }} {{ site_name }}. Todos los derechos reservados.
             </p>
         </div>

@@ -17,7 +17,15 @@ ARCHIVO: templates/authentication/login.html
                         <p class="text-muted">Universidad Politécnica Territorial "José Félix Ribas"</p>
                     </div>
                     
-                    {% include 'partials/messages.html' %}
+                    <!-- Mensajes mejorados -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message|safe }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                     
                     <form method="post">
                         {% csrf_token %}
@@ -83,6 +91,16 @@ ARCHIVO: templates/authentication/login.html
                                 </a>
                             </small>
                         </div>
+                        
+                        <!-- Sección de ayuda para verificación -->
+                        <div class="text-center mt-4 pt-3 border-top">
+                            <small class="text-muted">
+                                ¿Problemas con la verificación? 
+                                <a href="{% url 'authentication:resend_verification' %}" class="text-decoration-none">
+                                    Reenviar email de verificación
+                                </a>
+                            </small>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -106,5 +124,20 @@ function togglePasswordVisibility(inputId, btn) {
         icon.classList.add('fa-eye');
     }
 }
+
+// Auto-cerrar alertas después de 10 segundos
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            if (alert.classList.contains('alert-success') || alert.classList.contains('alert-info')) {
+                const closeBtn = alert.querySelector('.btn-close');
+                if (closeBtn) {
+                    closeBtn.click();
+                }
+            }
+        });
+    }, 10000);
+});
 </script>
 {% endblock %}
