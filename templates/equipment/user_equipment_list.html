@@ -1,5 +1,4 @@
 {% extends 'equipment/dashboard.html' %}
-
 {% block content %}
 <div class="container mt-4">
     <h2 class="mb-4">Mis Equipos</h2>
@@ -24,8 +23,10 @@
                     <th>Marca</th>
                     <th>Modelo</th>
                     <th>Serial</th>
-                    <th>Ubicación</th>
+                    <th>Sede</th>
+                    <th>Dependencia</th>
                     <th>Estado</th>
+                    <th>¿Funcionando?</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,17 +39,29 @@
                     <td>{{ equipo.modelo }}</td>
                     <td>{{ equipo.numero_serie }}</td>
                     <td>{{ equipo.get_ubicacion_display }}</td>
+                    <td>{{ equipo.dependencia }}</td>
+                    <td>
+                        <span class="badge
+                            {% if equipo.estado_actual == 'operativo' %}bg-success
+                            {% elif equipo.estado_actual == 'en_mantenimiento' %}bg-warning
+                            {% elif equipo.estado_actual == 'reparado' %}bg-info
+                            {% elif equipo.estado_actual == 'no_reparable' %}bg-danger
+                            {% elif equipo.estado_actual == 'dado_de_baja' %}bg-secondary
+                            {% else %}bg-primary{% endif %}">
+                            {{ equipo.get_estado_actual_display }}
+                        </span>
+                    </td>
                     <td>
                         {% if equipo.activo %}
-                            <span class="badge bg-success">Activo</span>
+                            <span class="badge bg-success">Sí</span>
                         {% else %}
-                            <span class="badge bg-danger">Inactivo</span>
+                            <span class="badge bg-danger">No</span>
                         {% endif %}
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="8" class="text-center">No tienes equipos asignados.</td>
+                    <td colspan="10" class="text-center">No tienes equipos asignados.</td>
                 </tr>
                 {% endfor %}
             </tbody>

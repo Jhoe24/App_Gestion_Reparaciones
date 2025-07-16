@@ -1,5 +1,4 @@
 {% extends 'equipment/dashboard.html' %}
-
 {% block content %}
 <div class="container mt-4">
     <h2>Registrar nuevo equipo</h2>
@@ -7,6 +6,7 @@
         {% csrf_token %}
         <div class="row">
             {% for field in form.visible_fields %}
+            {% if field.name != 'otra_dependencia' %}
             <div class="mb-3 col-md-6">
                 <label for="id_{{ field.name }}" class="form-label">{{ field.label }}</label>
                 {{ field }}
@@ -17,10 +17,62 @@
                     <div class="text-danger small">{{ error }}</div>
                 {% endfor %}
             </div>
+            {% endif %}
             {% endfor %}
+            <!-- Campo para otra dependencia se maneja por separado -->
+            <div class="mb-3 col-md-6" id="otra-dependencia-container" style="display:none;">
+                <label for="id_otra_dependencia" class="form-label"></label>
+                {{ form.otra_dependencia }}
+                {% for error in form.otra_dependencia.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
         </div>
         <button type="submit" class="btn btn-primary">Registrar</button>
         <a href="{% url 'equipment:user_list' %}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
+<script>
+function checkDependencia(select) {
+    const otraDependenciaContainer = document.getElementById('otra-dependencia-container');
+    const otraDependenciaInput = document.getElementById('id_otra_dependencia');
+    if (select.value === 'otra') {
+        otraDependenciaContainer.style.display = 'block';
+        otraDependenciaInput.required = true;
+    } else {
+        otraDependenciaContainer.style.display = 'none';
+        otraDependenciaInput.required = false;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const dependenciaSelect = document.querySelector('select[name="dependencia"]');
+    if (dependenciaSelect) {
+        // Verificar si se debe mostrar el campo de otra dependencia al cargar
+        const otraDependenciaContainer = document.getElementById('otra-dependencia-container');
+        if (dependenciaSelect.value === 'otra') {
+            otraDependenciaContainer.style.display = 'block';
+        }
+
+        // Configurar el evento onchange
+        dependenciaSelect.onchange = function() {
+            checkDependencia(this);
+        };
+    }
+
+    // Capitalizar la primera letra de la otra dependencia
+    const otraDependenciaInput = document.getElementById('id_otra_dependencia');
+    if (otraDependenciaInput) {
+        otraDependenciaInput.addEventListener('input', function(e) {
+            let value = e.target.value;
+            if (value.length > 0) {
+                // Capitalizar la primera letra de cada palabra
+                e.target.value = value.split(' ').map(word =>
+                    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                ).join(' ');
+            }
+        });
+    }
+});
+</script>
 {% endblock %}
