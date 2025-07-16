@@ -1,8 +1,17 @@
 {% extends 'equipment/dashboard.html' %}
-
 {% block content %}
 <div class="container mt-4">
     <h2 class="mb-4">Equipos registrados (Administrador)</h2>
+    <!-- Formulario de búsqueda por responsable -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <form method="get" class="d-flex">
+                <input type="text" name="responsable" class="form-control me-2" placeholder="Buscar por responsable..." value="{{ responsable_search }}">
+                <button type="submit" class="btn btn-primary">Buscar</button>
+            </form>
+        </div>
+    </div>
+    <!-- Pestañas para filtrar equipos -->
     <ul class="nav nav-tabs mb-3" id="tabEquipos" role="tablist">
       <li class="nav-item" role="presentation">
         <button class="nav-link active" id="todos-tab" data-bs-toggle="tab" data-bs-target="#todos" type="button" role="tab">Todos</button>
@@ -17,6 +26,7 @@
         <button class="nav-link" id="espera-tab" data-bs-toggle="tab" data-bs-target="#espera" type="button" role="tab">En espera</button>
       </li>
     </ul>
+    <!-- Contenido de las pestañas -->
     <div class="tab-content" id="tabEquiposContent">
       <div class="tab-pane fade show active" id="todos" role="tabpanel">
         {% include 'equipment/partials/equipos_tabla.html' with equipos=equipos %}
