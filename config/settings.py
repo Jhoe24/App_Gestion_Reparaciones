@@ -17,7 +17,6 @@ SECRET_KEY = 'django-insecure-s9v$#l6z8*@u%+d5hq!1ikm+$#me!5dpluz$5y2_b4teuy2-kn
 
 # ADVERTENCIA DE SEGURIDAD: ¡no ejecutes con debug activado en producción!
 DEBUG = False
-
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '*']
 
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
