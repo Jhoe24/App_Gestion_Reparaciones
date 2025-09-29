@@ -1,11 +1,5 @@
-Primero verifica tu ip y verifica que en el setting en static_url este la ip + el puerto 
-
-luego ejecutamos en un terminal el siguiete comando 
-python -m http.server 8888 --directory staticfiles
+ python -m http.server 8888 --directory staticfiles
 
 
-luego abres otro terminal y colocas este otro comando
 waitress-serve --listen=0.0.0.0:8000 config.wsgi:application
 
-
-NOTA: Recuerda dejar el debug en false que es produccion 
