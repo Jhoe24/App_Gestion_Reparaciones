@@ -1,11 +1,13 @@
 from django.shortcuts import render
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import TemplateView, CreateView
 from django.urls import reverse_lazy
 from apps.users.models import CustomUser
 from apps.authentication.mixins import AdminRequiredMixin, TechRequiredMixin
 from .models import Equipo
 from .forms import EquipoForm, EquipoFormUsuario
+from apps.maintenance.models import Reporte, HistorialReparacion
+from datetime import datetime
 
 class CustomDashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'equipment/dashboard.html'
@@ -28,18 +30,15 @@ class AdminDashboardView(AdminRequiredMixin, CustomDashboardView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['equipos_reparados'] = str(50)
-        context['equipos_espera'] = str(20)
-        context['solicitudes'] = str(37)
-        context['equipos_reparados_lista'] = [
-            {'nombre': 'Laptop HP', 'tecnico': 'Jose luis', 'usuario': 'Maria',  'fecha_reparacion': '2025-06-30'},
-            {'nombre': 'Impresora Epson', 'tecnico': 'Carlos', 'usuario': 'Ana', 'fecha_reparacion': '2025-06-28'},
-            {'nombre': 'Monitor Samsung', 'tecnico': 'Luis', 'usuario': 'Pedro', 'fecha_reparacion': '2025-06-25'},
-        ]
+        context['Solicitudes_Pendientes'] = Reporte.objects.filter(estado_reporte='en_espera')
+        context['en_repacion'] = Reporte.objects.filter(estado_reporte='en_mantenimiento').count()
+        context['completadas_hoy'] = Reporte.objects.filter(estado_reporte='reparado', fecha_finalizacion__date=datetime.today()).count()
+        context['urgentes'] = Reporte.objects.filter(prioridad='critica', estado_reporte__in=['en_espera', 'en_mantenimiento']).count()
+        context['actividad_reciente'] = HistorialReparacion.objects.select_related('equipo', 'tecnico').order_by('-fecha_hora')[:5]
         return context
 
 class TechDashboardView(TechRequiredMixin, CustomDashboardView):
-    template_name = 'equipment/dashboard.html'
+    template_name = 'dashboard/tech.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -92,3 +91,20 @@ class EquipmentCreateView(LoginRequiredMixin, CreateView):
         equipo.creado_por = self.request.user
         equipo.save()
         return super().form_valid(form)
+
+class AdminPanelView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'home/home_dashboard_admin.html'
+
+    def test_func(self):
+        return self.request.user.is_superuser or getattr(self.request.user, 'is_administrador', False)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['user'] = user
+        context['nombre'] = user.first_name
+        context['apellido'] = user.last_name
+        context['email'] = user.email
+        context['username'] = user.username
+        # Agrega aquí cualquier otro dato necesario
+        return context

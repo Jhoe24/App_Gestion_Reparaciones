@@ -1,3 +1,7 @@
 from django.contrib import admin
+from .models import Reporte, HistorialReparacion, Repuesto
 
-# Register your models here.
+admin.site.register(Reporte)
+admin.site.register(HistorialReparacion)
+admin.site.register(Repuesto)
+

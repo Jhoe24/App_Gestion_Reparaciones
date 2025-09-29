@@ -17,4 +17,5 @@ urlpatterns =[
     path('user/list/', views.UserEquipmentListView.as_view(), name='user_list'),
     # Registro de equipos
     path('create/', views.EquipmentCreateView.as_view(), name='equipment_create'),
+    path('admin/panel/', views.AdminPanelView.as_view(), name='admin_panel'),
 ]

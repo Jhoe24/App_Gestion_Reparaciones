@@ -1,0 +1,867 @@
+<!-- Mi Perfil Section - Para usar con Django extends -->
+{% extends 'dashboard/admin.html' %}
+<!-- Block para el título de la página -->
+{% block title %}Mi Perfil{% endblock %}
+
+<!-- Block para estilos específicos de la página -->
+{% block extra_css %}
+<style>
+    .profile-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: var(--white);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 20px,
+            rgba(255, 255, 255, 0.05) 20px,
+            rgba(255, 255, 255, 0.05) 40px
+        );
+        animation: diagonalMove 20s linear infinite;
+    }
+
+    @keyframes diagonalMove {
+        0% { transform: translateX(-100%) translateY(-100%); }
+        100% { transform: translateX(0) translateY(0); }
+    }
+
+    .profile-header-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, var(--primary-yellow), var(--bright-yellow));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: var(--primary-blue);
+        font-weight: bold;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        position: relative;
+    }
+
+    .profile-avatar:hover {
+        transform: scale(1.05);
+    }
+
+    .avatar-upload {
+        position: absolute;
+        bottom: -5px;
+        right: -5px;
+        width: 35px;
+        height: 35px;
+        background: var(--primary-red);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .avatar-upload:hover {
+        background: var(--bright-orange);
+        transform: scale(1.1);
+    }
+
+    .profile-info h2 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .profile-role {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+
+    .profile-stats {
+        display: flex;
+        gap: 2rem;
+        margin-top: 1rem;
+        color: var(--white);
+    }
+
+    .stat-item {
+        text-align: center;
+        color: var(--white);
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: bold;
+        display: block;
+        color: var(--white);
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        opacity: 0.8;
+        color: var(--white);
+    }
+
+    .profile-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .profile-card {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: var(--shadow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .profile-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: between;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--primary-blue);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .card-title i {
+        color: var(--primary-yellow);
+    }
+
+    .edit-btn {
+        background: var(--primary-blue);
+        color: var(--white);
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .item-configurar {
+        text-decoration: none;
+    }
+
+    .edit-btn:hover {
+        background: var(--dark-blue);
+        transform: translateY(-1px);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--primary-blue);
+        font-size: 0.9rem;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        background: #fafafa;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        background: var(--white);
+        box-shadow: 0 0 0 3px rgba(2, 2, 135, 0.1);
+    }
+
+    .form-input:disabled {
+        background: #f8f9fa;
+        color: var(--dark-gray);
+        cursor: not-allowed;
+    }
+
+    .form-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.75rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+        appearance: none;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-weight: 500;
+        color: var(--dark-gray);
+    }
+
+    .info-value {
+        color: var(--primary-blue);
+        font-weight: 600;
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--primary-blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+
+    .activity-content {
+        flex: 1;
+    }
+
+    .activity-title {
+        font-weight: 600;
+        color: var(--primary-blue);
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .activity-description {
+        font-size: 0.8rem;
+        color: var(--dark-gray);
+        margin-bottom: 0.25rem;
+    }
+
+    .activity-time {
+        font-size: 0.75rem;
+        color: var(--dark-gray);
+    }
+
+    .save-btn {
+        background: #28a745;
+        color: var(--white);
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .save-btn:hover {
+        background: #218838;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+
+    .cancel-btn {
+        background: var(--dark-gray);
+        color: var(--white);
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-left: 1rem;
+    }
+
+    .cancel-btn:hover {
+        background: #5a6268;
+        transform: translateY(-1px);
+    }
+
+    .password-strength {
+        margin-top: 0.5rem;
+        height: 4px;
+        background: #e9ecef;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    .password-strength-bar {
+        height: 100%;
+        width: 0%;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+    }
+
+    .strength-weak { background: var(--primary-red); width: 30%; }
+    .strength-medium { background: var(--orange); width: 60%; }
+    .strength-strong { background: var(--success); width: 100%; }
+
+    .notification-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+        margin-bottom: 0.75rem;
+        border-left: 4px solid var(--primary-blue);
+    }
+
+    .notification-item.unread {
+        background: #e3f2fd;
+        border-left-color: var(--primary-yellow);
+    }
+
+    .notification-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--primary-blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+        margin-right: 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .notification-content {
+        flex: 1;
+    }
+
+    .notification-title {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--primary-blue);
+        margin-bottom: 0.25rem;
+    }
+
+    .notification-text {
+        font-size: 0.75rem;
+        color: var(--dark-gray);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .profile-content {
+            grid-template-columns: 1fr;
+        }
+
+        .profile-header-content {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .profile-stats {
+            justify-content: center;
+        }
+
+        .profile-card {
+            padding: 1.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            font-size: 2rem;
+        }
+
+        .profile-stats {
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+<!-- Block para el contenido principal -->
+{% block main_content %}
+<div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="profile-header-content">
+            <div class="profile-avatar" onclick="document.getElementById('avatarInput').click();">
+                {{ user.first_name.0|default:"U" }}{{ user.last_name.0|default:"" }}
+                <div class="avatar-upload">
+                    <i class="fas fa-camera"></i>
+                </div>
+                <input type="file" id="avatarInput" style="display: none;" accept="image/*">
+            </div>
+            
+            <div class="profile-info">
+                <h2>{{ user.get_full_name|default:user.username }}</h2>
+                <div class="profile-role">
+                    <i class="fas fa-user-tag"></i>
+                    {% if user.groups.all %}
+                        {{ user.groups.first.name }}
+                    {% else %}
+                        Usuario
+                    {% endif %}
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">{{ tickets_completed|default:0 }}</span>
+                        <span class="stat-label">Tickets Resueltos</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ days_active|default:0 }}</span>
+                        <span class="stat-label">Días Activo</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ avg_response_time|default:"0h" }}</span>
+                        <span class="stat-label">Tiempo Promedio</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Content -->
+    <div class="profile-content">
+        <!-- Personal Information -->
+        <div class="profile-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-user"></i>
+                    Información Personal
+                </h3>
+                <button class="edit-btn" onclick="toggleEditMode('personal')">
+                    <i class="fas fa-edit"></i>
+                    Editar
+                </button>
+            </div>
+
+            <form id="personalForm" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">Nombre</label>
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        name="first_name"
+                        value="{{ user.first_name }}" 
+                        disabled
+                        id="firstName"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Apellido</label>
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        name="last_name"
+                        value="{{ user.last_name }}" 
+                        disabled
+                        id="lastName"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Correo Electrónico</label>
+                    <input 
+                        type="email" 
+                        class="form-input" 
+                        name="email"
+                        value="{{ user.email }}" 
+                        disabled
+                        id="email"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Teléfono</label>
+                    <input 
+                        type="tel" 
+                        class="form-input" 
+                        name="phone"
+                        value="{{ user.profile.phone|default:'' }}" 
+                        disabled
+                        id="phone"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Departamento</label>
+                    <select class="form-input form-select" name="department" disabled id="department">
+                        <option value="">Seleccionar departamento</option>
+                        <option value="it" {% if user.profile.department == 'it' %}selected{% endif %}>Tecnología de la Información</option>
+                        <option value="maintenance" {% if user.profile.department == 'maintenance' %}selected{% endif %}>Mantenimiento</option>
+                        <option value="support" {% if user.profile.department == 'support' %}selected{% endif %}>Soporte Técnico</option>
+                        <option value="admin" {% if user.profile.department == 'admin' %}selected{% endif %}>Administración</option>
+                    </select>
+                </div>
+
+                <div id="personalActions" style="display: none; margin-top: 1.5rem;">
+                    <button type="submit" class="save-btn">
+                        <i class="fas fa-save"></i>
+                        Guardar Cambios
+                    </button>
+                    <button type="button" class="cancel-btn" onclick="cancelEdit('personal')">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Account Security -->
+        <div class="profile-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-shield-alt"></i>
+                    Seguridad de la Cuenta
+                </h3>
+                <button class="edit-btn" onclick="toggleEditMode('security')">
+                    <i class="fas fa-lock"></i>
+                    Cambiar
+                </button>
+            </div>
+
+            <div id="securityInfo">
+                <div class="info-item">
+                    <span class="info-label">Último acceso</span>
+                    <span class="info-value">{{ user.last_login|date:"d/m/Y H:i" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Fecha de registro</span>
+                    <span class="info-value">{{ user.date_joined|date:"d/m/Y" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Estado de la cuenta</span>
+                    <span class="info-value" style="color: var(--success);">
+                        <i class="fas fa-check-circle"></i> Activa
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Contraseña</span>
+                    <span class="info-value">••••••••</span>
+                </div>
+            </div>
+
+            <form id="securityForm" method="post" style="display: none;">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">Contraseña Actual</label>
+                    <input 
+                        type="password" 
+                        class="form-input" 
+                        name="current_password"
+                        placeholder="Ingresa tu contraseña actual"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Nueva Contraseña</label>
+                    <input 
+                        type="password" 
+                        class="form-input" 
+                        name="new_password"
+                        placeholder="Nueva contraseña"
+                        id="newPassword"
+                        required
+                    >
+                    <div class="password-strength">
+                        <div class="password-strength-bar" id="strengthBar"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Confirmar Nueva Contraseña</label>
+                    <input 
+                        type="password" 
+                        class="form-input" 
+                        name="confirm_password"
+                        placeholder="Confirma la nueva contraseña"
+                        required
+                    >
+                </div>
+
+                <div id="securityActions" style="margin-top: 1.5rem;">
+                    <button type="submit" class="save-btn">
+                        <i class="fas fa-shield-alt"></i>
+                        Actualizar Contraseña
+                    </button>
+                    <button type="button" class="cancel-btn" onclick="cancelEdit('security')">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="profile-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-history"></i>
+                    Actividad Reciente
+                </h3>
+            </div>
+
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-sign-in-alt"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">Inicio de sesión exitoso</div>
+                    <div class="activity-description">Acceso desde 192.168.1.100</div>
+                    <div class="activity-time">{{ user.last_login|timesince }} ago</div>
+                </div>
+            </div>
+
+            {% for activity in recent_activities %}
+            <div class="activity-item">
+                <div class="activity-icon" style="background: var(--{{ activity.color|default:'primary-blue' }});">
+                    <i class="fas fa-{{ activity.icon|default:'cog' }}"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">{{ activity.title }}</div>
+                    <div class="activity-description">{{ activity.description }}</div>
+                    <div class="activity-time">{{ activity.created_at|timesince }} ago</div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-info"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">Perfil actualizado</div>
+                    <div class="activity-description">Información personal modificada</div>
+                    <div class="activity-time">Hace 2 días</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Notifications -->
+        <div class="profile-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-bell"></i>
+                    Notificaciones
+                </h3>
+                <a class="edit-btn item-configurar" href="{% url 'maintenance:maintenance' %}">
+                    <i class="fas fa-cog"></i>
+                    Configurar
+                </a>
+            </div>
+
+            <div id="notificationsList">
+                {% for notification in notifications %}
+                <div class="notification-item {% if not notification.read %}unread{% endif %}">
+                    <div class="notification-icon">
+                        <i class="fas fa-{{ notification.icon|default:'bell' }}"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title">{{ notification.title }}</div>
+                        <div class="notification-text">{{ notification.message }}</div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="notification-item">
+                    <div class="notification-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title">No tienes notificaciones</div>
+                        <div class="notification-text">Todas las notificaciones están al día</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <form id="notificationForm" method="post" style="display: none;">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" name="email_notifications" {% if user.profile.email_notifications %}checked{% endif %}>
+                        Notificaciones por correo
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" name="ticket_notifications" {% if user.profile.ticket_notifications %}checked{% endif %}>
+                        Notificar nuevos tickets
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" name="maintenance_notifications" {% if user.profile.maintenance_notifications %}checked{% endif %}>
+                        Recordatorios de mantenimiento
+                    </label>
+                </div>
+
+                <div id="notificationActions" style="margin-top: 1.5rem;">
+                    <button type="submit" class="save-btn">
+                        <i class="fas fa-bell"></i>
+                        Guardar Preferencias
+                    </button>
+                    <button type="button" class="cancel-btn" onclick="cancelEdit('notifications')">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Block para JavaScript específico -->
+{% block extra_js %}
+<script>
+    function toggleEditMode(section) {
+        const infoDiv = document.getElementById(section + 'Info') || document.getElementById(section + 'List') || document.getElementById('notificationsList');
+        const form = document.getElementById(section + 'Form');
+        const inputs = form.querySelectorAll('.form-input, select');
+        const editBtn = form.previousElementSibling.querySelector('.edit-btn') || 
+                    form.parentElement.querySelector('.edit-btn');
+        
+        if (section === 'personal') {
+            inputs.forEach(input => {
+                input.disabled = false;
+                input.style.background = 'var(--white)';
+            });
+            document.getElementById('personalActions').style.display = 'block';
+            editBtn.innerHTML = '<i class="fas fa-times"></i> Cancelar';
+            editBtn.onclick = () => cancelEdit('personal');
+        } else if (section === 'security') {
+            if (infoDiv) infoDiv.style.display = 'none';
+            form.style.display = 'block';
+            editBtn.innerHTML = '<i class="fas fa-times"></i> Cancelar';
+            editBtn.onclick = () => cancelEdit('security');
+        } else if (section === 'notifications') {
+            if (infoDiv) infoDiv.style.display = 'none';
+            form.style.display = 'block';
+            editBtn.innerHTML = '<i class="fas fa-times"></i> Cancelar';
+            editBtn.onclick = () => cancelEdit('notifications');
+        }
+    }
+
+    function cancelEdit(section) {
+        const infoDiv = document.getElementById(section + 'Info') || document.getElementById(section + 'List') || document.getElementById('notificationsList');
+        const form = document.getElementById(section + 'Form');
+        const inputs = form.querySelectorAll('.form-input, select');
+        const editBtn = form.previousElementSibling?.querySelector('.edit-btn') || 
+                    form.parentElement.querySelector('.edit-btn');
+        
+        if (section === 'personal') {
+            inputs.forEach(input => {
+                input.disabled = true;
+                input.style.background = '#f8f9fa';
+            });
+            document.getElementById('personalActions').style.display = 'none';
+            editBtn.innerHTML = '<i class="fas fa-edit"></i> Editar';
+            editBtn.onclick = () => toggleEditMode('personal');
+            
+            // Reset form values
+            form.reset();
+        } else if (section === 'security') {
+            if (infoDiv) infoDiv.style.display = 'block';
+            form.style.display = 'none';
+            editBtn.innerHTML = '<i class="fas fa-lock"></i> Cambiar';
+            editBtn.onclick = () => toggleEditMode('security');
+            
+            // Reset form
+            form.reset();
+        } else if (section === 'notifications') {
+            if (infoDiv) infoDiv.style.display = 'block';
+            form.style.display = 'none';
+            editBtn.innerHTML = '<i class="fas fa-cog"></i> Configurar';
+            editBtn.onclick = () => toggleEditMode('notifications');
+        }
+    }
+
+    // Password strength checker
+    document.getElementById('newPassword')?.addEventListener('input', function() {
+        const password = this.value;
+        const strengthBar = document.getElementById('strengthBar');
+        let strength = 0;
+        
+        if (password.length >= 8) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^A-Za-z0-9]/.test(password)) strength++;
+        
+        strengthBar.className = 'password-strength-bar';
+        if (strength <= 1) {
+            strengthBar.classList.add('strength-weak');
+        } else if (strength <= 2) {
+            strengthBar.classList.add('strength-medium');
+        } else {
+            strengthBar.classList.add('strength-strong');
+        }
+    });
+</script>
+{% endblock %}

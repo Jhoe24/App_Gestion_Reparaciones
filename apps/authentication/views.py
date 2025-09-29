@@ -52,7 +52,7 @@ class CustomLoginView(LoginView):
     def form_valid(self, form):
         """Login exitoso"""
         user = cast(CustomUser, form.get_user())
-
+        
         # Verificar si el usuario ha verificado su email
         if not user.is_verified:
             messages.error(
@@ -154,11 +154,9 @@ class CustomLoginView(LoginView):
         return super().form_invalid(form)
     
     def get_success_url(self):
-        """Redirección según el rol del usuario"""
         user = cast(CustomUser, self.request.user)
-        
         if user.is_superuser or user.is_administrador:
-            return reverse_lazy('equipment:admin_dashboard')
+            return reverse_lazy('equipment:admin_panel')
         elif user.is_tecnico:
             return reverse_lazy('equipment:tech_dashboard')
         else:
@@ -168,10 +166,10 @@ class CustomLoginView(LoginView):
 class CustomLogoutView(LogoutView):
     """Vista personalizada para logout"""
     template_name = 'authentication/logout.html'
-    http_method_names = ['post', 'options']
-    
-    def post(self, request, *args, **kwargs):
-        """Realiza el logout y añade un mensaje de éxito."""
+    http_method_names = ['get', 'post', 'options']
+
+    def get(self, request, *args, **kwargs):
+        """Realiza el logout y añade un mensaje de éxito (GET)."""
         if request.user.is_authenticated:
             user = cast(CustomUser, request.user)
             log_user_action(

@@ -17,7 +17,7 @@ from apps.authentication.forms import CustomUserCreationForm, CustomUserChangeFo
 class UserListView(AdminRequiredMixin, ListView):
     """Vista para listar usuarios (solo admin)"""
     model = CustomUser
-    template_name = 'users/user_list.html'
+    template_name = 'users/list_user_admin.html'
     context_object_name = 'users'
     paginate_by = 20
     
@@ -142,3 +142,43 @@ def toggle_user_status(request, pk):
     messages.success(request, f'Usuario {user.get_full_name()} {status} exitosamente.')
     
     return redirect('users:user_list')
+
+@login_required
+def profile_view(request):
+    """Vista para que el usuario vea y edite su propio perfil"""
+    user = request.user
+    
+    if request.method == 'POST':
+        form = CustomUserChangeForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Perfil actualizado exitosamente.')
+            return redirect('users:profile')
+    else:
+        form = CustomUserChangeForm(instance=user)
+    
+    return render(request, 'profile/profile_admin.html', {'form': form, 'user_obj': user})
+
+@login_required
+def list_user_view(request):
+    """Vista para que el admin vea la lista de usuarios"""
+    users = CustomUser.objects.all().order_by('fecha_creacion')
+    
+    context = {
+        'users': users
+    }
+    return render(request, 'users/list_user_admin.html', context)
+
+@login_required
+def new_user_view(request):
+    """Vista para que el admin cree un nuevo usuario"""
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Usuario creado exitosamente.')
+            return redirect('users:list_user_admin')
+    else:
+        form = CustomUserCreationForm()
+    
+    return render(request, 'users/new_user.html', {'form': form})

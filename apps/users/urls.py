@@ -15,4 +15,10 @@ urlpatterns = [
     path('<int:pk>/edit/', views.UserUpdateView.as_view(), name='user_edit'),
     path('<int:pk>/delete/', views.UserDeleteView.as_view(), name='user_delete'),
     path('<int:pk>/toggle-status/', views.toggle_user_status, name='toggle_status'),
+    # agregamos la ruta para ver la lista de usuarios
+    path('list/users', views.list_user_view, name='list_user_admin'),
+    path('new/user', views.new_user_view, name='new_user'),
+    #agregamod la ruta para ver el perfil del usuario
+    path('profile/', views.profile_view, name='profile'),
+
 ]

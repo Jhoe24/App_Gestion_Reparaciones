@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Técnico - Soporte Universitario</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-red: #fb0301;
+            --primary-blue: #020287;
+            --primary-yellow: #f9f901;
+            --gold: #8d8c42;
+            --orange: #fba401;
+            --dark-blue: #292778;
+            --bright-yellow: #e8cd0f;
+            --bright-orange: #fb5c00;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --dark-gray: #6c757d;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--light-gray) 0%, #e9ecef 100%);
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            box-shadow: var(--shadow);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            color: var(--white);
+            text-decoration: none;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        .logo i {
+            margin-right: 0.75rem;
+            font-size: 1.8rem;
+            color: var(--primary-yellow);
+        }
+
+        .technician-badge {
+            background: rgba(251, 3, 1, 0.2);
+            color: var(--primary-yellow);
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            display: inline-block;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            color: var(--primary-yellow);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .nav-item {
+            display: block;
+            color: var(--white);
+            text-decoration: none;
+            padding: 0.875rem 1.5rem;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            position: relative;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--primary-yellow);
+            color: var(--primary-yellow);
+        }
+
+        .nav-item i {
+            margin-right: 0.875rem;
+            width: 1.25rem;
+            text-align: center;
+        }
+
+        .nav-badge {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary-red);
+            color: var(--white);
+            border-radius: 10px;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.65rem;
+            font-weight: bold;
+        }
+
+        /* Top Bar */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 280px;
+            right: 0;
+            height: 70px;
+            background: var(--white);
+            box-shadow: var(--shadow);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--dark-gray);
+            cursor: pointer;
+            margin-right: 1rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .quick-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quick-btn.urgent {
+            background: var(--primary-red);
+            color: var(--white);
+        }
+
+        .quick-btn.new-ticket {
+            background: var(--primary-yellow);
+            color: var(--primary-blue);
+        }
+
+        .quick-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .notification-bell {
+            position: relative;
+            color: var(--dark-gray);
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .notification-bell:hover {
+            color: var(--primary-red);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--primary-red);
+            color: var(--white);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-profile {
+            position: relative;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 25px;
+            transition: background 0.3s ease;
+        }
+
+        .user-profile:hover {
+            background: var(--light-gray);
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-blue), var(--primary-red));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+            margin-right: 0.75rem;
+        }
+
+        .user-info h4 {
+            font-size: 0.9rem;
+            color: var(--primary-blue);
+            margin-bottom: 0.1rem;
+        }
+
+        .user-info span {
+            font-size: 0.75rem;
+            color: var(--dark-gray);
+        }
+
+        .dropdown-arrow {
+            margin-left: 0.5rem;
+            color: var(--dark-gray);
+            transition: transform 0.3s ease;
+        }
+
+        .user-profile.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .user-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--dark-gray);
+            text-decoration: none;
+            border-bottom: 1px solid #f8f9fa;
+            transition: background 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background: var(--light-gray);
+            color: var(--primary-blue);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item i {
+            margin-right: 0.5rem;
+            width: 1rem;
+            text-align: center;
+        }
+
+        .dropdown-item.logout {
+            color: var(--primary-red);
+        }
+
+        .dropdown-item.logout:hover {
+            background: #ffebee;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            margin-top: 70px;
+            padding: 2rem;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+            opacity: 0;
+            animation: fadeInUp 0.4s ease forwards;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .stat-card.my-tasks::before { background: var(--primary-blue); }
+        .stat-card.pending::before { background: var(--orange); }
+        .stat-card.completed::before { background: var(--success); }
+        .stat-card.urgent::before { background: var(--primary-red); }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--white);
+        }
+
+        .stat-icon.my-tasks { background: var(--primary-blue); }
+        .stat-icon.pending { background: var(--orange); }
+        .stat-icon.completed { background: var(--success); }
+        .stat-icon.urgent { background: var(--primary-red); }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        .stat-label {
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Task Lists */
+        .task-section {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .task-header h3 {
+            color: var(--primary-blue);
+            font-size: 1.25rem;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-left: 4px solid #e9ecef;
+            margin-bottom: 1rem;
+            border-radius: 0 8px 8px 0;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            background: #fff;
+            border-left-color: var(--primary-blue);
+            box-shadow: var(--shadow);
+        }
+
+        .task-item.urgent {
+            border-left-color: var(--primary-red);
+            background: #ffebee;
+        }
+
+        .task-item.in-progress {
+            border-left-color: var(--orange);
+            background: #fff8e1;
+        }
+
+        .task-priority {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.1rem;
+            color: var(--white);
+            flex-shrink: 0;
+        }
+
+        .task-priority.high { background: var(--primary-red); }
+        .task-priority.medium { background: var(--orange); }
+        .task-priority.low { background: var(--success); }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-bottom: 0.25rem;
+        }
+
+        .task-description {
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: var(--dark-gray);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .btn-warning {
+            background: var(--orange);
+            color: var(--white);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Timer Widget */
+        .timer-widget {
+            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+            color: var(--white);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timer-widget::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.05) 10px,
+                rgba(255, 255, 255, 0.05) 20px
+            );
+            animation: move 10s linear infinite;
+        }
+
+        @keyframes move {
+            0% { transform: translateX(-50%) translateY(-50%) rotate(0deg); }
+            100% { transform: translateX(-50%) translateY(-50%) rotate(360deg); }
+        }
+
+        .timer-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .timer-display {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .timer-task {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Equipment Status */
+        .equipment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .equipment-item {
+            background: var(--white);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--success);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .equipment-item.maintenance {
+            border-left-color: var(--orange);
+        }
+
+        .equipment-item.repair {
+            border-left-color: var(--primary-red);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .dashboard-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .topbar {
+                left: 0;
+                padding: 0 1rem;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .page-title {
+                font-size: 1.2rem;
+            }
+
+            .user-info {
+                display: none;
+            }
+
+            .quick-actions {
+                display: none;
+            }
+
+            .task-meta {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="logo">
+                <i class="fas fa-tools"></i>
+                <div>
+                    <div>Soporte Tecnico UPT</div>
+                    <div class="technician-badge">TÉCNICO</div>
+                </div>
+            </a>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Mi Panel</div>
+                <a href="#" class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Panel Principal
+                </a>
+                {% comment %} <a href="#" class="nav-item" data-section="my-tasks">
+                    <i class="fas fa-tasks"></i>
+                    Mis Tareas
+                    <span class="nav-badge">7</span>
+                </a> {% endcomment %}
+            </div>
+{% comment %}             
+            <div class="nav-section">
+                <div class="nav-section-title">Solicitudes</div>
+                <a href="#" class="nav-item" data-section="assigned-tickets">
+                    <i class="fas fa-ticket-alt"></i>
+                    Asignadas a Mí
+                    <span class="nav-badge">5</span>
+                </a>
+                <a href="#" class="nav-item" data-section="urgent-tickets">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Urgentes
+                    <span class="nav-badge">2</span>
+                </a>
+                <a href="#" class="nav-item" data-section="new-request">
+                    <i class="fas fa-plus-circle"></i>
+                    Nueva Solicitud
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">Equipos</div>
+                <a href="#" class="nav-item" data-section="my-equipment">
+                    <i class="fas fa-desktop"></i>
+                    Equipos Asignados
+                </a>
+                <a href="#" class="nav-item" data-section="equipment-status">
+                    <i class="fas fa-clipboard-list"></i>
+                    Estado de Equipos
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">Herramientas</div>
+                <a href="#" class="nav-item" data-section="inventory">
+                    <i class="fas fa-boxes"></i>
+                    Inventario
+                </a>
+                <a href="#" class="nav-item" data-section="work-log">
+                    <i class="fas fa-clipboard"></i>
+                    Registro de Trabajo
+                </a>
+                <a href="#" class="nav-item" data-section="schedule">
+                    <i class="fas fa-calendar-alt"></i>
+                    Mi Horario
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">Reportes</div>
+                <a href="#" class="nav-item" data-section="my-reports">
+                    <i class="fas fa-chart-bar"></i>
+                    Mis Estadísticas
+                </a>
+            </div> {% endcomment %}
+        </nav>
+    </div>
+
+    <!-- Top Bar -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="page-title">Panel Principal - Técnico</h1>
+        </div>
+        
+        <div class="topbar-right">
+            <div class="quick-actions">
+                <a href="#" class="quick-btn urgent" onclick="showSection('urgent-tickets')">
+                    <i class="fas fa-fire"></i>
+                    Urgentes
+                </a>
+                {% comment %} <a href="#" class="quick-btn new-ticket" onclick="showSection('new-request')">
+                    <i class="fas fa-plus"></i>
+                    Nueva
+                </a> {% endcomment %}
+            </div>
+            
+            <div class="notification-bell">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">5</span>
+            </div>
+            
+            <div class="user-profile" id="userProfile">
+                <div class="user-avatar"></div>
+                <div class="user-info">
+                    <h4>{{user.username}}</h4>
+                    {% if user.is_active %}
+                                <span style="color: #28a745; font-size: 1rem;">&#9679;</span>
+                            {% else %}
+                                <span style="color: #dc3545; font-size: 1rem;">&#9679;</span>
+                            {% endif %}
+                            <span>{{user.rol}}</span>
+                </div>
+                <i class="fas fa-chevron-down dropdown-arrow"></i>
+                
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        Mi Perfil
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        Configuración
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-clock"></i>
+                        Tiempo Trabajado
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-question-circle"></i>
+                        Ayuda
+                    </a>
+                    <a href="{% url 'authentication:logout' %}" class="dropdown-item logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Cerrar Sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Dashboard Section (Default) -->
+        <div class="content-section active" id="dashboard">
+            <!-- Dashboard Cards -->
+            <div class="dashboard-cards">
+                <div class="card stat-card my-tasks">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-label">Mis Tareas Activas</div>
+                            <div class="stat-number">7</div>
+                        </div>
+                        <div class="stat-icon my-tasks">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card stat-card pending">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-label">Pendientes</div>
+                            <div class="stat-number">5</div>
+                        </div>
+                        <div class="stat-icon pending">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card stat-card completed">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-label">Completadas Hoy</div>
+                            <div class="stat-number">3</div>
+                        </div>
+                        <div class="stat-icon completed">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+
+                {% comment %} <div class="card timer-widget">
+                    <div class="timer-content">
+                        <div class="timer-display" id="currentTimer">02:15:30</div>
+                        <div class="timer-task">Reparación PC-LAB-A-15</div>
+                        <button class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white; margin-top: 0.5rem;" onclick="toggleTimer()">
+                            <i class="fas fa-pause"></i> Pausar
+                        </button>
+                    </div>
+                </div> {% endcomment %}
+            </div>
+
+            <!-- Current Tasks -->
+            <div class="task-section">
+                <div class="task-header">
+                    <h3>Mis Tareas Actuales</h3>
+                    <a href="#" onclick="showSection('my-tasks')" style="color: var(--primary-blue); text-decoration: none; font-size: 0.9rem;">Ver todas</a>
+                </div>
+                
+                <div class="task-item urgent">
+                    <div class="task-priority high">
+                        <i class="fas fa-exclamation"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">#TK-001 - Impresora Biblioteca Sin Funcionar</div>
+                        <div class="task-description">Error de conexión y atasco de papel - Biblioteca Central</div>
+                        <div class="task-meta">
+                            <span><i class="fas fa-map-marker-alt"></i> Biblioteca</span>
+                            <span><i class="fas fa-user"></i> Prof. Martínez</span>
+                            <span><i class="fas fa-clock"></i> Vence en 2 horas</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-sm btn-success">
+                            <i class="fas fa-play"></i> Iniciar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="task-item in-progress">
+                    <div class="task-priority medium">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">#TK-002 - Reparación PC Laboratorio A</div>
+                        <div class="task-description">Reemplazo de disco duro y reinstalación de SO</div>
+                        <div class="task-meta">
+                            <span><i class="fas fa-map-marker-alt"></i> Lab A - Puesto 15</span>
+                            <span><i class="fas fa-clock"></i> En progreso - 2h 15min</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-sm btn-warning">
+                            <i class="fas fa-pause"></i> Pausar
+                        </button>
+                        <button class="btn btn-sm btn-success">
+                            <i class="fas fa-check"></i> Completar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-priority low">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">#TK-003 - Mantenimiento Proyector Aula 201</div>
+                        <div class="task-description">Limpieza de lentes y calibración</div>
+                        <div class="task-meta">
+                            <span><i class="fas fa-map-marker-alt"></i> Aula 201</span>
+                            <span><i class="fas fa-calendar"></i> Programado para mañana</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-sm btn-primary">
+                            <i class="fas fa-info"></i> Ver Detalles
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Tasks Section -->
+        <div class="content-section" id="my-tasks">
+            <div class="task-section">
+                <div class="task-header">
+                    <h3>Todas Mis Tareas</h3>
+                    <div>
+                        <select style="padding: 0.5rem; border-radius: 6px; border: 1px solid #ddd;">
+                            <option>Todas las tareas</option>
+                            <option>En progreso</option>
+                            <option>Pendientes</option>
+                            <option>Completadas</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="task-item urgent">
+                    <div class="task-priority high">
+                        <i class="fas fa-exclamation"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">#TK-001 - Impresora Biblioteca Sin Funcionar</div>
+                        <div class="task-description">Error de conexión y atasco de papel - Biblioteca Central</div>
+                        <div class="task-meta">
+                            <span><i class="fas fa-map-marker-alt"></i> Biblioteca Central</span>
+                            <span><i class="fas fa-user"></i> Prof. Martínez</span>
+                            <span><i class="fas fa-clock"></i> Creado: 09:30 AM</span>
+                            <span><i class="fas fa-calendar"></i> Vence: Hoy 15:00</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-sm btn-success">
+                            <i class="fas fa-play"></i> Iniciar
+                        </button>
+                        <button class="btn btn-sm btn-primary">
+                            <i class="fas fa-info"></i> Detalles
+                        </button>
+                    </div>
+                </div>
+
+                <div class="task-item in-progress">
+                    <div class="task-priority medium">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">#TK-002 - Reparación PC Laboratorio A</div>
+                        <div class="task-description">Reemplazo de disco duro y reinstalación de SO - PC-LAB-A-15</div>
+                        <div class="task-meta">
+                            <span><i class="fas fa-map-marker-alt"></i> Lab A - Puesto 15</span>
+                            <span><i class="fas fa-user"></i> Coordinación IT</span>
+                            <span><i class="fas fa-clock"></i> Iniciado: 08:00 AM</span>
+                            <span><i class="fas fa-stopwatch"></i> Tiempo: 2h 15min</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-sm btn-warning">
+                            <i class="fas fa-pause"></i> Pausar
+                        </button>
+                        <button class="btn btn-sm btn-success">
+                            <i class="fas fa-check"></i> Completar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-priority low">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">#TK-003 - Mantenimiento Proyector Aula 201</div>
+                        <div class="task-description">Limpieza preventiva de lentes y calibración de imagen</div>
+                        <div class="task-meta">
+                            <span><i class="fas fa-map-marker-alt"></i> Aula 201</span>
+                            <span><i class="fas fa-calendar"></i> Programado: Mañana 10:00 AM</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-sm btn-primary">
+                            <i class="fas fa-info"></i> Ver Detalles
+                        </button>
+                        <button class="btn btn-sm" style="background: #6c757d; color: white;">
+                            <i class="fas fa-calendar"></i> Reprogramar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-priority medium">
+                        <i class="fas fa-desktop"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">#TK-004 - Actualización Software Aula B</div>
+                        <div class="task-description">Actualizar sistema operativo en 15 PCs del laboratorio B</div>
+                        <div class="task-meta">
+                            <span><i class="fas fa-map-marker-alt"></i> Laboratorio B</span>
+                            <span><i class="fas fa-calendar"></i> Programado: Viernes 14:00</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-sm btn-primary">
+                            <i class="fas fa-info"></i> Ver Detalles
+                        </button>
+                    </div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-priority high">
+                        <i class="fas fa-print"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">#TK-005 - Reparación Impresora Administración</div>
+                        <div class="task-description">Error de impresión y cambio de tóner - Canon imageRUNNER</div>
+                        <div class="task-meta">
+                            <span><i class="fas fa-map-marker-alt"></i> Oficina Administrativa</span>
+                            <span><i class="fas fa-clock"></i> Vence: Hoy 17:00</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-sm btn-success">
+                            <i class="fas fa-play"></i> Iniciar
+                        </button>
+                        <button class="btn btn-sm btn-primary">
+                            <i class="fas fa-info"></i> Detalles
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assigned Tickets Section -->
+        <div class="content-section" id="assigned-tickets">
+            <div class="task-section">
+                <div class="task-header">
+                    <h3>Solicitudes Asignadas a Mí</h3>
+                    <span style="color: var(--dark-gray);">5 solicitudes activas</span>
+                </div>
+                
+                <div class="task-item urgent">
+                    <div class="task-priority high">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">#SOL-2025-001 - Sistema de Sonido Aula Magna</div>
+                        <div class="task-description">Falla total del sistema de audio durante conferencia importante</div>
+                        <div class="task-meta">
+                            <span><i class="fas fa-user"></i> Decanato</span>
+                            <span><i class="fas fa-clock"></i> Hace 30 minutos</span>
+                            <span><i class="fas fa-exclamation-triangle"></i> CRÍTICO</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-sm btn-success">
+                            <i class="fas fa-thumbs-up"></i> Aceptar
+                        </button>
+                        <button class="btn btn-sm" style="background: #6c757d; color: white;">
+                            <i class="fas fa-times"></i> Rechazar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-priority medium">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">#SOL-2025-002 - Laptop Docente No Enciende</div>
+                        <div class="task-description">Laptop asignado al Prof. García no responde al encendido</div>
+                        <div class="task-meta">
+                            <span><i class="fas fa-user"></i> Prof. García</span>
+                            <span><i class="fas fa-clock"></i> Hace 2 horas</span>
+                            <span><i class="fas fa-tag"></i> Hardware</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-sm btn-success">
+                            <i class="fas fa-thumbs-up"></i> Aceptar
+                        </button>
+                        <button class="btn btn-sm btn-primary">
+                            <i class="fas fa-info"></i> Más Info
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Urgent Tickets Section -->
+        <div class="content-section" id="urgent-tickets">
+            <div class="task-section">
+                <div class="task-header">
+                    <h3>Solicitudes Urgentes</h3>
+                    <span style="color: var(--primary-red); font-weight: bold;">2 tickets críticos</span>
+                </div>
+                
+                <div class="task-item urgent">
+                    <div class="task-priority high">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">#URG-001 - Servidor Principal Caído</div>
+                        <div class="task-description">El servidor principal no responde, afecta todas las aplicaciones web</div>
+                        <div class="task-meta">
+                            <span><i class="fas fa-server"></i> Datacenter</span>
+                            <span><i class="fas fa-clock"></i> Hace 15 minutos</span>
+                            <span><i class="fas fa-exclamation-triangle"></i> CRÍTICO - SLA: 1 hora</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-sm btn-success">
+                            <i class="fas fa-rocket"></i> Atender Ya
+                        </button>
+                    </div>
+                </div>
+
+                <div class="task-item urgent">
+                    <div class="task-priority high">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">#URG-002 - Red WiFi Universidad Intermitente</div>
+                        <div class="task-description">Conexión WiFi inestable en todo el campus, afecta clases virtuales</div>
+                        <div class="task-meta">
+                            <span><i class="fas fa-wifi"></i> Todo el campus</span>
+                            <span><i class="fas fa-clock"></i> Hace 45 minutos</span>
+                            <span><i class="fas fa-users"></i> Afecta 500+ usuarios</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-sm btn-success">
+                            <i class="fas fa-rocket"></i> Atender Ya
+                        </button>
+                        <button class="btn btn-sm btn-warning">
+                            <i class="fas fa-user-plus"></i> Solicitar Ayuda
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Request Section -->
+        <div class="content-section" id="new-request">
+            <div style="max-width: 600px;">
+                <h2 style="color: var(--primary-blue); margin-bottom: 1rem;">Nueva Solicitud de Soporte</h2>
+                <div class="card">
+                    <form>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--primary-blue);">Tipo de Equipo</label>
+                            <select style="width: 100%; padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px;">
+                                <option>Seleccionar tipo de equipo</option>
+                                <option>Computadora</option>
+                                <option>Impresora</option>
+                                <option>Proyector</option>
+                                <option>Laptop</option>
+                                <option>Red/WiFi</option>
+                                <option>Servidor</option>
+                                <option>Otro</option>
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--primary-blue);">Ubicación</label>
+                            <input type="text" placeholder="Ej: Laboratorio A - Puesto 5" style="width: 100%; padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px;">
+                        </div>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--primary-blue);">Prioridad</label>
+                            <select style="width: 100%; padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px;">
+                                <option>Seleccionar prioridad</option>
+                                <option>Baja</option>
+                                <option>Media</option>
+                                <option>Alta</option>
+                                <option>Crítica/Urgente</option>
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--primary-blue);">Descripción del Problema</label>
+                            <textarea rows="4" placeholder="Describa detalladamente el problema..." style="width: 100%; padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px; resize: vertical;"></textarea>
+                        </div>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--primary-blue);">Solicitado por</label>
+                            <input type="text" placeholder="Nombre del solicitante" style="width: 100%; padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px;">
+                        </div>
+                        
+                        <div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus-circle"></i>
+                                Crear Solicitud
+                            </button>
+                            <button type="button" class="btn" style="background: #6c757d; color: white; margin-left: 10px;" onclick="showSection('dashboard')">
+                                Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Equipment Section -->
+        <div class="content-section" id="my-equipment">
+            <div class="task-section">
+                <div class="task-header">
+                    <h3>Equipos Bajo Mi Responsabilidad</h3>
+                    <span style="color: var(--dark-gray);">12 equipos asignados</span>
+                </div>
+                
+                <div class="equipment-grid">
+                    <div class="equipment-item">
+                        <h4 style="color: var(--primary-blue); margin-bottom: 0.5rem;">PC-LAB-A-15</h4>
+                        <p><strong>Estado:</strong> En reparación</p>
+                        <p><strong>Problema:</strong> Disco duro defectuoso</p>
+                        <p><strong>Tiempo:</strong> 2h 15min trabajando</p>
+                    </div>
+                    
+                    <div class="equipment-item maintenance">
+                        <h4 style="color: var(--primary-blue); margin-bottom: 0.5rem;">PROJ-AULA-201</h4>
+                        <p><strong>Estado:</strong> Mantenimiento programado</p>
+                        <p><strong>Fecha:</strong> Mañana 10:00 AM</p>
+                        <p><strong>Tipo:</strong> Limpieza preventiva</p>
+                    </div>
+                    
+                    <div class="equipment-item">
+                        <h4 style="color: var(--primary-blue); margin-bottom: 0.5rem;">IMP-BIBLIO-01</h4>
+                        <p><strong>Estado:</strong> Funcionando</p>
+                        <p><strong>Último mantenimiento:</strong> 15/09/2025</p>
+                        <p><strong>Próximo:</strong> 15/12/2025</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Work Log Section -->
+        <div class="content-section" id="work-log">
+            <div class="task-section">
+                <div class="task-header">
+                    <h3>Mi Registro de Trabajo</h3>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Nueva Entrada
+                    </button>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <strong style="color: var(--primary-blue);">#TK-002 - Reparación PC-LAB-A-15</strong>
+                        <span style="color: var(--dark-gray); font-size: 0.85rem;">Hoy, 08:00 - En curso</span>
+                    </div>
+                    <p>Iniciada reparación: diagnóstico inicial completado, disco duro defectuoso confirmado. Solicitando repuesto al almacén.</p>
+                    <div style="margin-top: 0.5rem; color: var(--success); font-weight: 500;">
+                        ⏱️ Tiempo trabajado: 2h 15min
+                    </div>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <strong style="color: var(--primary-blue);">#TK-001 - Mantenimiento Impresora</strong>
+                        <span style="color: var(--dark-gray); font-size: 0.85rem;">Ayer, 14:00 - 16:30</span>
+                    </div>
+                    <p>Mantenimiento preventivo completado. Cambio de tóner, limpieza interna y calibración. Impresora funcionando correctamente.</p>
+                    <div style="margin-top: 0.5rem; color: var(--success); font-weight: 500;">
+                        ✅ Completado - Tiempo: 2h 30min
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule Section -->
+        <div class="content-section" id="schedule">
+            <div class="task-section">
+                <div class="task-header">
+                    <h3>Mi Horario de Trabajo</h3>
+                    <span style="color: var(--dark-gray);">Semana del 23-27 Septiembre 2025</span>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; border-left: 4px solid var(--warning);">
+                        <h5 style="color: var(--primary-blue);">Hoy - Jueves</h5>
+                        <p>08:00 - Reparación PC-LAB-A-15</p>
+                        <p>11:00 - Mantenimiento Impresoras</p>
+                        <p>14:00 - Revisión Proyectores</p>
+                    </div>
+                    
+                    <div style="background: #d4edda; padding: 1rem; border-radius: 8px; border-left: 4px solid var(--success);">
+                        <h5 style="color: var(--primary-blue);">Mañana - Viernes</h5>
+                        <p>09:00 - Instalación Software Lab B</p>
+                        <p>13:00 - Mantenimiento Preventivo</p>
+                        <p>15:00 - Inventario Repuestos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simple sections for other menu items -->
+        <div class="content-section" id="equipment-status">
+            <div class="card">
+                <h3 style="color: var(--primary-blue); margin-bottom: 1rem;">Estado General de Equipos</h3>
+                <p>Vista general del estado de todos los equipos del campus y su estado de funcionamiento.</p>
+            </div>
+        </div>
+
+        <div class="content-section" id="inventory">
+            <div class="card">
+                <h3 style="color: var(--primary-blue); margin-bottom: 1rem;">Inventario de Repuestos</h3>
+                <p>Control de repuestos disponibles, solicitudes de materiales y stock bajo.</p>
+            </div>
+        </div>
+
+        <div class="content-section" id="my-reports">
+            <div class="card">
+                <h3 style="color: var(--primary-blue); margin-bottom: 1rem;">Mis Estadísticas</h3>
+                <p>Reportes personalizados de productividad, tiempo trabajado y tareas completadas.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isTimerRunning = true;
+        let timerSeconds = 8130; // 2:15:30 in seconds
+
+        function updateTimer() {
+            if (isTimerRunning) {
+                timerSeconds++;
+                const hours = Math.floor(timerSeconds / 3600);
+                const minutes = Math.floor((timerSeconds % 3600) / 60);
+                const seconds = timerSeconds % 60;
+                
+                const display = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                document.getElementById('currentTimer').textContent = display;
+            }
+        }
+
+        function toggleTimer() {
+            isTimerRunning = !isTimerRunning;
+            const button = document.querySelector('.timer-widget button');
+            if (isTimerRunning) {
+                button.innerHTML = '<i class="fas fa-pause"></i> Pausar';
+            } else {
+                button.innerHTML = '<i class="fas fa-play"></i> Reanudar';
+            }
+        }
+
+        // Update timer every second
+        setInterval(updateTimer, 1000);
+
+        // Sidebar Toggle
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        });
+
+        // Content Section Management
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update page title
+            updatePageTitle(sectionId);
+            
+            // Update active nav item
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            const activeNav = document.querySelector(`[data-section="${sectionId}"]`);
+            if (activeNav) {
+                activeNav.classList.add('active');
+            }
+        }
+
+        function updatePageTitle(sectionId) {
+            const titles = {
+                'dashboard': 'Panel Principal - Técnico',
+                'my-tasks': 'Mis Tareas',
+                'assigned-tickets': 'Solicitudes Asignadas',
+                'urgent-tickets': 'Solicitudes Urgentes',
+                'new-request': 'Nueva Solicitud',
+                'my-equipment': 'Mis Equipos Asignados',
+                'equipment-status': 'Estado de Equipos',
+                'inventory': 'Inventario',
+                'work-log': 'Registro de Trabajo',
+                'schedule': 'Mi Horario',
+                'my-reports': 'Mis Estadísticas'
+            };
+            
+            document.querySelector('.page-title').textContent = titles[sectionId] || 'Panel Principal';
+        }
+
+        // Navigation Active State with content switching
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const sectionId = this.getAttribute('data-section');
+                if (sectionId) {
+                    showSection(sectionId);
+                }
+            });
+        });
+
+        // User Profile Dropdown
+        document.getElementById('userProfile').addEventListener('click', function(e) {
+            e.stopPropagation();
+            const dropdown = document.getElementById('userDropdown');
+            const profile = document.getElementById('userProfile');
+            
+            dropdown.classList.toggle('active');
+            profile.classList.toggle('active');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('userDropdown');
+            const profile = document.getElementById('userProfile');
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('sidebarToggle');
+            
+            // Close user dropdown
+            if (!profile.contains(e.target)) {
+                dropdown.classList.remove('active');
+                profile.classList.remove('active');
+            }
+            
+            // Close sidebar on mobile
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+
+        // Handle responsive behavior
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            const dropdown = document.getElementById('userDropdown');
+            const profile = document.getElementById('userProfile');
+            
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+            }
+            
+            dropdown.classList.remove('active');
+            profile.classList.remove('active');
+        });
+
+        // Notification Bell Animation
+        document.querySelector('.notification-bell').addEventListener('click', function() {
+            this.style.animation = 'bounce 0.5s';
+            setTimeout(() => {
+                this.style.animation = '';
+            }, 500);
+        });
+
+        // Add bounce animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes bounce {
+                0%, 20%, 60%, 100% { transform: translateY(0); }
+                40% { transform: translateY(-10px); }
+                80% { transform: translateY(-5px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

@@ -1,0 +1,996 @@
+
+<!-- Main Content -->
+    <div class="main-content">
+        <!-- Dashboard Section (Default) -->
+        <div class="content-section active" id="dashboard">
+            <!-- Dashboard Cards -->
+            <div class="dashboard-cards">
+                <div class="card stat-card pending">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-label">Solicitudes Pendientes</div>
+                            <div class="stat-number">24</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> +12% esta semana
+                            </div>
+                        </div>
+                        <div class="stat-icon pending">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card stat-card in-progress">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-label">En Reparación</div>
+                            <div class="stat-number">18</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> +8% esta semana
+                            </div>
+                        </div>
+                        <div class="stat-icon in-progress">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card stat-card completed">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-label">Completadas Hoy</div>
+                            <div class="stat-number">12</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> +25% vs ayer
+                            </div>
+                        </div>
+                        <div class="stat-icon completed">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card stat-card urgent">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-label">Urgentes</div>
+                            <div class="stat-number">5</div>
+                            <div class="stat-change negative">
+                                <i class="fas fa-arrow-down"></i> -2 desde ayer
+                            </div>
+                        </div>
+                        <div class="stat-icon urgent">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="recent-activity">
+                <div class="activity-header">
+                    <h3>Actividad Reciente</h3>
+                    <a href="#" style="color: var(--primary-blue); text-decoration: none; font-size: 0.9rem;">Ver todo</a>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon repair">
+                        <i class="fas fa-desktop"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Reparación Computadora Lab-A-15</div>
+                        <div class="activity-description">Reemplazo de disco duro - Aula de Informática A</div>
+                        <div class="activity-time">Hace 15 minutos</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon urgent">
+                        <i class="fas fa-print"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Impresora Biblioteca - URGENTE</div>
+                        <div class="activity-description">Atasco de papel y error de tóner - Biblioteca Central</div>
+                        <div class="activity-time">Hace 32 minutos</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon completed">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Proyector Aula Magna - COMPLETADO</div>
+                        <div class="activity-description">Calibración y limpieza de lentes - Aula Magna</div>
+                        <div class="activity-time">Hace 1 hora</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon maintenance">
+                        <i class="fas fa-tv"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Mantenimiento Monitor Lab-B-08</div>
+                        <div class="activity-description">Limpieza preventiva - Laboratorio de Física</div>
+                        <div class="activity-time">Hace 2 horas</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon repair">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Reparación Portátil Profesor Martinez</div>
+                        <div class="activity-description">Actualización de software y antivirus - Decanatura</div>
+                        <div class="activity-time">Hace 3 horas</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users List Section -->
+        <div class="content-section" id="users-list">
+            <div class="section-header">
+                <h2 class="section-title">Lista de Usuarios</h2>
+                <p class="section-subtitle">Gestión de usuarios del sistema de soporte técnico</p>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">
+                    <h3 class="table-title">Usuarios Registrados</h3>
+                    <a href="#" class="btn btn-primary" onclick="showSection('user-register')">
+                        <i class="fas fa-user-plus"></i>
+                        Nuevo Usuario
+                    </a>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Último Acceso</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <div style="width: 35px; height: 35px; background: linear-gradient(45deg, var(--primary-blue), var(--primary-red)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 10px;">JD</div>
+                                    Juan Díaz
+                                </div>
+                            </td>
+                            <td>juan.diaz@universidad.edu</td>
+                            <td>Técnico Senior</td>
+                            <td><span class="status-badge status-active">Activo</span></td>
+                            <td>Hace 5 min</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">Editar</button>
+                                <button class="btn btn-sm btn-danger">Desactivar</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <div style="width: 35px; height: 35px; background: linear-gradient(45deg, var(--orange), var(--bright-orange)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 10px;">MG</div>
+                                    María García
+                                </div>
+                            </td>
+                            <td>maria.garcia@universidad.edu</td>
+                            <td>Técnico Junior</td>
+                            <td><span class="status-badge status-active">Activo</span></td>
+                            <td>Hace 1 hora</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">Editar</button>
+                                <button class="btn btn-sm btn-danger">Desactivar</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <div style="width: 35px; height: 35px; background: linear-gradient(45deg, var(--dark-blue), var(--primary-blue)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 10px;">CP</div>
+                                    Carlos Pérez
+                                </div>
+                            </td>
+                            <td>carlos.perez@universidad.edu</td>
+                            <td>Administrador</td>
+                            <td><span class="status-badge status-active">Activo</span></td>
+                            <td>Hace 2 horas</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">Editar</button>
+                                <button class="btn btn-sm btn-danger">Desactivar</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <div style="width: 35px; height: 35px; background: linear-gradient(45deg, #6c757d, #495057); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 10px;">LR</div>
+                                    Luis Rodríguez
+                                </div>
+                            </td>
+                            <td>luis.rodriguez@universidad.edu</td>
+                            <td>Técnico</td>
+                            <td><span class="status-badge status-inactive">Inactivo</span></td>
+                            <td>Hace 3 días</td>
+                            <td>
+                                <button class="btn btn-sm btn-success">Activar</button>
+                                <button class="btn btn-sm btn-primary">Editar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- User Register Section -->
+        <div class="content-section" id="user-register">
+            <div class="section-header">
+                <h2 class="section-title">Registrar Nuevo Usuario</h2>
+                <p class="section-subtitle">Crear una nueva cuenta de usuario para el sistema</p>
+            </div>
+
+            <div class="form-container">
+                <form>
+                    <div class="form-group">
+                        <label class="form-label" for="firstName">Nombre</label>
+                        <input type="text" class="form-control" id="firstName" placeholder="Ingrese el nombre">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="lastName">Apellido</label>
+                        <input type="text" class="form-control" id="lastName" placeholder="Ingrese el apellido">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="email">Correo Electrónico</label>
+                        <input type="email" class="form-control" id="email" placeholder="usuario@universidad.edu">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="role">Rol del Usuario</label>
+                        <select class="form-control form-select" id="role">
+                            <option value="">Seleccionar rol</option>
+                            <option value="admin">Administrador</option>
+                            <option value="senior">Técnico Senior</option>
+                            <option value="junior">Técnico Junior</option>
+                            <option value="tech">Técnico</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="department">Departamento</label>
+                        <select class="form-control form-select" id="department">
+                            <option value="">Seleccionar departamento</option>
+                            <option value="it">Tecnología de la Información</option>
+                            <option value="maintenance">Mantenimiento</option>
+                            <option value="support">Soporte Técnico</option>
+                            <option value="admin">Administración</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="password">Contraseña Temporal</label>
+                        <input type="password" class="form-control" id="password" placeholder="Contraseña temporal">
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i>
+                            Registrar Usuario
+                        </button>
+                        <button type="button" class="btn" style="background: #6c757d; color: white; margin-left: 10px;" onclick="showSection('users-list')">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Computers Section -->
+        <div class="content-section" id="computers">
+            <div class="section-header">
+                <h2 class="section-title">Gestión de Computadoras</h2>
+                <p class="section-subtitle">Inventario y estado de equipos de cómputo</p>
+            </div>
+
+            <div class="equipment-grid">
+                <div class="equipment-card">
+                    <div class="equipment-header">
+                        <div class="equipment-icon">
+                            <i class="fas fa-desktop"></i>
+                        </div>
+                        <div class="equipment-info">
+                            <h4>PC-LAB-A-01</h4>
+                            <p>Dell OptiPlex 7090</p>
+                            <span class="status-badge status-active">Funcionando</span>
+                        </div>
+                    </div>
+                    <p><strong>Ubicación:</strong> Laboratorio A - Puesto 1</p>
+                    <p><strong>Último mantenimiento:</strong> 15/03/2025</p>
+                </div>
+
+                <div class="equipment-card">
+                    <div class="equipment-header">
+                        <div class="equipment-icon">
+                            <i class="fas fa-desktop"></i>
+                        </div>
+                        <div class="equipment-info">
+                            <h4>PC-LAB-A-02</h4>
+                            <p>HP EliteDesk 800</p>
+                            <span class="status-badge status-pending">En reparación</span>
+                        </div>
+                    </div>
+                    <p><strong>Ubicación:</strong> Laboratorio A - Puesto 2</p>
+                    <p><strong>Problema:</strong> Falla en disco duro</p>
+                </div>
+
+                <div class="equipment-card">
+                    <div class="equipment-header">
+                        <div class="equipment-icon">
+                            <i class="fas fa-desktop"></i>
+                        </div>
+                        <div class="equipment-info">
+                            <h4>PC-BIBLIO-01</h4>
+                            <p>Lenovo ThinkCentre M920</p>
+                            <span class="status-badge status-active">Funcionando</span>
+                        </div>
+                    </div>
+                    <p><strong>Ubicación:</strong> Biblioteca - Mesa de consulta</p>
+                    <p><strong>Último mantenimiento:</strong> 10/03/2025</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Printers Section -->
+        <div class="content-section" id="printers">
+            <div class="section-header">
+                <h2 class="section-title">Gestión de Impresoras</h2>
+                <p class="section-subtitle">Control de impresoras y equipos de impresión</p>
+            </div>
+
+            <div class="equipment-grid">
+                <div class="equipment-card">
+                    <div class="equipment-header">
+                        <div class="equipment-icon" style="background: linear-gradient(45deg, var(--orange), var(--bright-orange));">
+                            <i class="fas fa-print"></i>
+                        </div>
+                        <div class="equipment-info">
+                            <h4>IMP-BIBLIO-01</h4>
+                            <p>HP LaserJet Pro 404dn</p>
+                            <span class="status-badge status-pending">Atasco papel</span>
+                        </div>
+                    </div>
+                    <p><strong>Ubicación:</strong> Biblioteca Central</p>
+                    <p><strong>Nivel tóner:</strong> 15% - Necesita reemplazo</p>
+                </div>
+
+                <div class="equipment-card">
+                    <div class="equipment-header">
+                        <div class="equipment-icon" style="background: linear-gradient(45deg, var(--orange), var(--bright-orange));">
+                            <i class="fas fa-print"></i>
+                        </div>
+                        <div class="equipment-info">
+                            <h4>IMP-ADMIN-01</h4>
+                            <p>Canon imageRUNNER 1643iF</p>
+                            <span class="status-badge status-active">Funcionando</span>
+                        </div>
+                    </div>
+                    <p><strong>Ubicación:</strong> Oficina Administrativa</p>
+                    <p><strong>Nivel tóner:</strong> 75%</p>
+                </div>
+
+                <div class="equipment-card">
+                    <div class="equipment-header">
+                        <div class="equipment-icon" style="background: linear-gradient(45deg, var(--orange), var(--bright-orange));">
+                            <i class="fas fa-print"></i>
+                        </div>
+                        <div class="equipment-info">
+                            <h4>IMP-LAB-A-01</h4>
+                            <p>Epson EcoTank L3250</p>
+                            <span class="status-badge status-active">Funcionando</span>
+                        </div>
+                    </div>
+                    <p><strong>Ubicación:</strong> Laboratorio A</p>
+                    <p><strong>Nivel tinta:</strong> Color: 60%, Negro: 45%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Request Section -->
+        <div class="content-section" id="new-request">
+            <div class="section-header">
+                <h2 class="section-title">Nueva Solicitud de Soporte</h2>
+                <p class="section-subtitle">Registrar una nueva solicitud de reparación o mantenimiento</p>
+            </div>
+
+            <div class="form-container">
+                <form>
+                    <div class="form-group">
+                        <label class="form-label" for="equipmentType">Tipo de Equipo</label>
+                        <select class="form-control form-select" id="equipmentType">
+                            <option value="">Seleccionar tipo de equipo</option>
+                            <option value="computer">Computadora</option>
+                            <option value="printer">Impresora</option>
+                            <option value="monitor">Monitor</option>
+                            <option value="projector">Proyector</option>
+                            <option value="laptop">Portátil</option>
+                            <option value="other">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="equipmentId">ID del Equipo</label>
+                        <input type="text" class="form-control" id="equipmentId" placeholder="Ej: PC-LAB-A-01">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="location">Ubicación</label>
+                        <input type="text" class="form-control" id="location" placeholder="Ej: Laboratorio A - Puesto 5">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="priority">Prioridad</label>
+                        <select class="form-control form-select" id="priority">
+                            <option value="">Seleccionar prioridad</option>
+                            <option value="low">Baja</option>
+                            <option value="medium">Media</option>
+                            <option value="high">Alta</option>
+                            <option value="urgent">Urgente</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="requestType">Tipo de Solicitud</label>
+                        <select class="form-control form-select" id="requestType">
+                            <option value="">Seleccionar tipo</option>
+                            <option value="repair">Reparación</option>
+                            <option value="maintenance">Mantenimiento preventivo</option>
+                            <option value="installation">Instalación</option>
+                            <option value="upgrade">Actualización</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="description">Descripción del Problema</label>
+                        <textarea class="form-control" id="description" rows="4" placeholder="Describa detalladamente el problema o solicitud..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="requestedBy">Solicitado por</label>
+                        <input type="text" class="form-control" id="requestedBy" placeholder="Nombre del solicitante">
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus-circle"></i>
+                            Crear Solicitud
+                        </button>
+                        <button type="button" class="btn" style="background: #6c757d; color: white; margin-left: 10px;" onclick="showSection('dashboard')">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Repairs Section -->
+        <div class="content-section" id="repairs">
+            <div class="section-header">
+                <h2 class="section-title">Reparaciones en Proceso</h2>
+                <p class="section-subtitle">Estado actual de las reparaciones</p>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">
+                    <h3 class="table-title">Solicitudes de Reparación</h3>
+                    <a href="#" class="btn btn-primary" onclick="showSection('new-request')">
+                        <i class="fas fa-plus"></i>
+                        Nueva Reparación
+                    </a>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Equipo</th>
+                            <th>Ubicación</th>
+                            <th>Problema</th>
+                            <th>Técnico</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#REP-001</td>
+                            <td>PC-LAB-A-15</td>
+                            <td>Laboratorio A</td>
+                            <td>Falla disco duro</td>
+                            <td>Juan Díaz</td>
+                            <td><span class="status-badge status-pending">En proceso</span></td>
+                            <td>20/09/2025</td>
+                        </tr>
+                        <tr>
+                            <td>#REP-002</td>
+                            <td>IMP-BIBLIO-01</td>
+                            <td>Biblioteca</td>
+                            <td>Atasco papel</td>
+                            <td>María García</td>
+                            <td><span class="status-badge" style="background: #fff3cd; color: #856404;">Urgente</span></td>
+                            <td>21/09/2025</td>
+                        </tr>
+                        <tr>
+                            <td>#REP-003</td>
+                            <td>PROJ-AULA-01</td>
+                            <td>Aula Magna</td>
+                            <td>Calibración lentes</td>
+                            <td>Carlos Pérez</td>
+                            <td><span class="status-badge" style="background: #d4edda; color: #155724;">Completado</span></td>
+                            <td>19/09/2025</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="content-section" id="statistics">
+            <div class="section-header">
+                <h2 class="section-title">Estadísticas del Sistema</h2>
+                <p class="section-subtitle">Métricas y reportes del soporte técnico</p>
+            </div>
+
+            <div class="dashboard-cards">
+                <div class="card">
+                    <h4 style="color: var(--primary-blue); margin-bottom: 1rem;">Resumen Mensual</h4>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Reparaciones completadas:</span>
+                        <strong>127</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Tiempo promedio:</span>
+                        <strong>2.3 horas</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Satisfacción cliente:</span>
+                        <strong>94%</strong>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4 style="color: var(--primary-blue); margin-bottom: 1rem;">Equipos por Tipo</h4>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Computadoras:</span>
+                        <strong>45</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Impresoras:</span>
+                        <strong>12</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Proyectores:</span>
+                        <strong>8</strong>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4 style="color: var(--primary-blue); margin-bottom: 1rem;">Técnicos Activos</h4>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Total técnicos:</span>
+                        <strong>4</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Disponibles:</span>
+                        <strong>3</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>En campo:</span>
+                        <strong>1</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other sections with minimal content -->
+        <div class="content-section" id="monitors">
+            <div class="section-header">
+                <h2 class="section-title">Gestión de Monitores</h2>
+                <p class="section-subtitle">Inventario de monitores y pantallas</p>
+            </div>
+            <div class="card">
+                <p>Esta sección está en desarrollo. Aquí se mostrará el inventario completo de monitores, su estado y ubicación.</p>
+            </div>
+        </div>
+
+        <div class="content-section" id="projectors">
+            <div class="section-header">
+                <h2 class="section-title">Gestión de Proyectores</h2>
+                <p class="section-subtitle">Control de proyectores y equipos audiovisuales</p>
+            </div>
+            <div class="card">
+                <p>Esta sección mostrará el estado de todos los proyectores, programación de mantenimientos y reportes de uso.</p>
+            </div>
+        </div>
+
+        <div class="content-section" id="laptops">
+            <div class="section-header">
+                <h2 class="section-title">Gestión de Portátiles</h2>
+                <p class="section-subtitle">Inventario de equipos portátiles</p>
+            </div>
+            <div class="card">
+                <p>Control de laptops asignados a docentes y personal administrativo, incluyendo estado y asignaciones.</p>
+            </div>
+        </div>
+
+        <div class="content-section" id="maintenance">
+            <div class="section-header">
+                <h2 class="section-title">Mantenimiento Preventivo</h2>
+                <p class="section-subtitle">Programación y seguimiento de mantenimientos</p>
+            </div>
+            <div class="card">
+                <p>Sistema de programación automática de mantenimientos preventivos y seguimiento de tareas completadas.</p>
+            </div>
+        </div>
+
+        <div class="content-section" id="inventory">
+            <div class="section-header">
+                <h2 class="section-title">Stock de Repuestos</h2>
+                <p class="section-subtitle">Control de inventario de repuestos y componentes</p>
+            </div>
+            <div class="card">
+                <p>Gestión de inventario de repuestos, alertas de stock bajo y solicitudes de compra automáticas.</p>
+            </div>
+        </div>
+
+        <div class="content-section" id="assignments">
+            <div class="section-header">
+                <h2 class="section-title">Asignaciones de Equipos</h2>
+                <p class="section-subtitle">Control de asignación de equipos a usuarios</p>
+            </div>
+            <div class="card">
+                <p>Sistema de asignación de equipos a docentes y personal, con seguimiento de responsabilidades.</p>
+            </div>
+        </div>
+
+        <div class="content-section" id="reports">
+            <div class="section-header">
+                <h2 class="section-title">Reportes Técnicos</h2>
+                <p class="section-subtitle">Generación de reportes y documentación técnica</p>
+            </div>
+            <div class="card">
+                <p>Generación automática de reportes mensuales, estadísticas de rendimiento y documentación técnica.</p>
+            </div>
+        </div>
+
+        <div class="content-section" id="schedule">
+            <div class="section-header">
+                <h2 class="section-title">Programación de Tareas</h2>
+                <p class="section-subtitle">Calendario de actividades y asignación de técnicos</p>
+            </div>
+            <div class="card">
+                <p>Sistema de calendario para programar mantenimientos, reparaciones y asignar técnicos disponibles.</p>
+            </div>
+        </div>
+
+        <div class="content-section" id="user-roles">
+            <div class="section-header">
+                <h2 class="section-title">Roles y Permisos</h2>
+                <p class="section-subtitle">Configuración de permisos de usuario</p>
+            </div>
+            <div class="card">
+                <p>Gestión de roles de usuario, permisos de acceso y configuración de niveles de autorización del sistema.</p>
+            </div>
+        </div>
+    </div>
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} {% endblock %}
+{% block extra_css %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/dashboard/dashboard_admin.css' %}">
+{% endblock %}
+
+{% csrf_token %}
+
+
+{% block auth_content %}
+    {% if user.is_authenticated %}
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <i class="fas fa-tools"></i>
+                    <span></span>
+                </a>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Usuarios</div>
+                    <a href="#" class="nav-item" data-section="users-list">
+                        <i class="fas fa-users"></i>
+                        Lista de Usuarios
+                    </a>
+                    <a href="#" class="nav-item" data-section="user-register">
+                        <i class="fas fa-user-plus"></i>
+                        Registrar Usuario
+                    </a>
+                    <a href="#" class="nav-item" data-section="user-roles">
+                        <i class="fas fa-user-tag"></i>
+                        Roles y Permisos
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Dashboard</div>
+                    <a href="#" class="nav-item active" data-section="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Panel Principal
+                    </a>
+                    <a href="#" class="nav-item" data-section="statistics">
+                        <i class="fas fa-chart-line"></i>
+                        Estadísticas
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Gestión de Equipos</div>
+                    <a href="#" class="nav-item" data-section="computers">
+                        <i class="fas fa-desktop"></i>
+                        Computadoras
+                    </a>
+                    <a href="#" class="nav-item" data-section="printers">
+                        <i class="fas fa-print"></i>
+                        Impresoras
+                    </a>
+                    <a href="#" class="nav-item" data-section="monitors">
+                        <i class="fas fa-tv"></i>
+                        Monitores
+                    </a>
+                    <a href="#" class="nav-item" data-section="projectors">
+                        <i class="fas fa-video"></i>
+                        Proyectores
+                    </a>
+                    <a href="#" class="nav-item" data-section="laptops">
+                        <i class="fas fa-laptop"></i>
+                        Portátiles
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Servicios</div>
+                    <a href="#" class="nav-item" data-section="repairs">
+                        <i class="fas fa-wrench"></i>
+                        Reparaciones
+                    </a>
+                    <a href="#" class="nav-item" data-section="maintenance">
+                        <i class="fas fa-cogs"></i>
+                        Mantenimiento
+                    </a>
+                    <a href="#" class="nav-item" data-section="new-request">
+                        <i class="fas fa-plus-circle"></i>
+                        Nueva Solicitud
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Inventario</div>
+                    <a href="#" class="nav-item" data-section="inventory">
+                        <i class="fas fa-boxes"></i>
+                        Stock Repuestos
+                    </a>
+                    <a href="#" class="nav-item" data-section="assignments">
+                        <i class="fas fa-clipboard-list"></i>
+                        Asignaciones
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Reportes</div>
+                    <a href="#" class="nav-item" data-section="reports">
+                        <i class="fas fa-file-alt"></i>
+                        Reportes Técnicos
+                    </a>
+                    <a href="#" class="nav-item" data-section="schedule">
+                        <i class="fas fa-calendar-alt"></i>
+                        Programación
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">Soporte Técnico</h1>
+            </div>
+            
+            <div class="topbar-right">
+                <div class="notification-bell">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">10</span>
+                </div>
+                
+                <div class="user-profile" id="userProfile">
+                    <div class="user-avatar">ADM</div>
+                    <div class="user-info">
+                        <h4>{{user.username}}</h4>
+                        {% comment %} vamos a colocar un indicardor de estado del usaurio{% endcomment %}
+                        {% if user.is_active %}
+                            <span style="color: #28a745; font-size: 1rem;">&#9679;</span>
+                        {% else %}
+                            <span style="color: #dc3545; font-size: 1rem;">&#9679;</span>
+                        {% endif %}
+                        <span>{{user.rol}}</span>
+                    </div>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                    
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-user"></i>
+                            Mi Perfil
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            Configuración
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-bell"></i>
+                            Notificaciones
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-question-circle"></i>
+                            Ayuda
+                        </a>
+                        <a href="{% url 'authentication:logout' %}" class="dropdown-item logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Cerrar Sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Cards -->
+            <div class="dashboard-cards">
+                <div class="card stat-card pending">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-label">Solicitudes Pendientes</div>
+                            <div class="stat-number">24</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> +12% esta semana
+                            </div>
+                        </div>
+                        <div class="stat-icon pending">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card stat-card in-progress">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-label">En Reparación</div>
+                            <div class="stat-number">18</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> +8% esta semana
+                            </div>
+                        </div>
+                        <div class="stat-icon in-progress">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card stat-card completed">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-label">Completadas Hoy</div>
+                            <div class="stat-number">12</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> +25% vs ayer
+                            </div>
+                        </div>
+                        <div class="stat-icon completed">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card stat-card urgent">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-label">Urgentes</div>
+                            <div class="stat-number">5</div>
+                            <div class="stat-change negative">
+                                <i class="fas fa-arrow-down"></i> -2 desde ayer
+                            </div>
+                        </div>
+                        <div class="stat-icon urgent">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="recent-activity">
+                <div class="activity-header">
+                    <h3>Actividad Reciente</h3>
+                    <a href="#" style="color: var(--primary-blue); text-decoration: none; font-size: 0.9rem;">Ver todo</a>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon repair">
+                        <i class="fas fa-desktop"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Reparación Computadora Lab-A-15</div>
+                        <div class="activity-description">Reemplazo de disco duro - Aula de Informática A</div>
+                        <div class="activity-time">Hace 15 minutos</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon urgent">
+                        <i class="fas fa-print"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Impresora Biblioteca - URGENTE</div>
+                        <div class="activity-description">Atasco de papel y error de tóner - Biblioteca Central</div>
+                        <div class="activity-time">Hace 32 minutos</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon completed">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Proyector Aula Magna - COMPLETADO</div>
+                        <div class="activity-description">Calibración y limpieza de lentes - Aula Magna</div>
+                        <div class="activity-time">Hace 1 hora</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon maintenance">
+                        <i class="fas fa-tv"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Mantenimiento Monitor Lab-B-08</div>
+                        <div class="activity-description">Limpieza preventiva - Laboratorio de Física</div>
+                        <div class="activity-time">Hace 2 horas</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon repair">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Reparación Portátil Profesor Martinez</div>
+                        <div class="activity-description">Actualización de software y antivirus - Decanatura</div>
+                        <div class="activity-time">Hace 3 horas</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="{% static 'js/dashboard_admin.js'%}"></script>
+    {% else %}
+        <p>Por favor, <a href="{% url 'authentication:login' %}">inicia sesión</a> para acceder al panel de administración.</p>
+    {% endif %}
+{% endblock %}

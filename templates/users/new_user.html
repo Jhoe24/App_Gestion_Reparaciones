@@ -1,0 +1,206 @@
+{% extends 'dashboard/admin.html' %}
+
+{% block title %}Registro de Usuario{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-container {
+        max-width: 50%;
+        margin: 40px auto;
+        padding: 0 10px;
+    }
+    .profile-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 2rem 2rem 1.5rem 2rem;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.09);
+        border: 1px solid #e3e6ee;
+        transition: box-shadow 0.3s;
+    }
+    .profile-card:hover {
+        box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+    }
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid #e3e6ee;
+        padding-bottom: 1rem;
+    }
+    .card-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #2d3a4a;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+    }
+    .card-title i {
+        color: #f7c948;
+        font-size: 1.7rem;
+    }
+    .form-group {
+        margin-bottom: 1.2rem;
+        width: 80%;
+    }
+    .form-label {
+        display: block;
+        margin-bottom: 0.4rem;
+        font-weight: 600;
+        color: #2d3a4a;
+        font-size: 0.97rem;
+    }
+    .form-input, select, input[type="text"], input[type="email"], input[type="password"] {
+        width: 100%;
+        padding: 0.7rem 1rem;
+        border: 1.5px solid #d2d6dc;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: #f9fafb;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-input:focus, select:focus, input:focus {
+        border-color: #3b82f6;
+        background: #fff;
+        box-shadow: 0 0 0 2px #3b82f633;
+        outline: none;
+    }
+    .form-select {
+        padding-right: 2.2rem;
+        appearance: none;
+        background: #f9fafb;
+    }
+    .save-btn {
+        background: #3b82f6;
+        color: #fff;
+        border: none;
+        padding: 0.7rem 2rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, box-shadow 0.2s;
+        box-shadow: 0 2px 8px rgba(59,130,246,0.08);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .save-btn:hover {
+        background: #2563eb;
+    }
+    .cancel-btn {
+        background: #e5e7eb;
+        color: #374151;
+        border: none;
+        padding: 0.7rem 1.5rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-left: 1rem;
+        transition: background 0.2s;
+    }
+    .cancel-btn:hover {
+        background: #d1d5db;
+    }
+    .form-text.text-muted {
+        color: #6b7280;
+        font-size: 0.92rem;
+    }
+    .password-strength {
+        margin-top: 0.5rem;
+        height: 5px;
+        background: #e5e7eb;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+    .password-strength-bar {
+        height: 100%;
+        width: 0%;
+        transition: all 0.3s;
+        border-radius: 3px;
+    }
+    .strength-weak { background: #ef4444; width: 30%; }
+    .strength-medium { background: #f59e42; width: 60%; }
+    .strength-strong { background: #22c55e; width: 100%; }
+    /* Errores */
+    .form-group div[style*="color:var(--primary-red)"] {
+        color: #ef4444 !important;
+        font-size: 0.92em;
+        margin-top: 0.2em;
+    }
+</style>
+{% endblock %}
+
+{% block main_content %}
+<div class="profile-container">
+    <div class="profile-card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-user-plus"></i>
+                Registro de Usuario
+            </h3>
+        </div>
+        <form id="registrationForm" method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label class="form-label" for="{{ field.id_for_label }}">
+                    {{ field.label }}{% if field.field.required %} <span style="color:var(--primary-red);">*</span>{% endif %}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <div style="color:var(--primary-red); font-size:0.85em;">{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <div style="margin-top: 1.5rem;">
+                <button type="submit" class="save-btn">
+                    <i class="fas fa-save"></i>
+                    Registrar
+                </button>
+                <button type="button" class="cancel-btn" onclick="window.location.href='{% url 'users:list_user_admin' %}'">
+                    Cancelar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Password strength checker para el campo password1
+    document.addEventListener('DOMContentLoaded', function() {
+        var pwdInput = document.getElementById('id_password1');
+        var strengthBar = document.createElement('div');
+        strengthBar.className = 'password-strength-bar';
+        var strengthContainer = document.createElement('div');
+        strengthContainer.className = 'password-strength';
+        strengthContainer.appendChild(strengthBar);
+
+        if (pwdInput) {
+            pwdInput.parentNode.appendChild(strengthContainer);
+            pwdInput.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+                if (password.length >= 8) strength++;
+                if (/[A-Z]/.test(password)) strength++;
+                if (/[0-9]/.test(password)) strength++;
+                if (/[^A-Za-z0-9]/.test(password)) strength++;
+                strengthBar.className = 'password-strength-bar';
+                if (strength <= 1) {
+                    strengthBar.classList.add('strength-weak');
+                } else if (strength <= 2) {
+                    strengthBar.classList.add('strength-medium');
+                } else {
+                    strengthBar.classList.add('strength-strong');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,1165 @@
+<!-- Lista de Usuarios - Para usar con Django extends -->
+{% extends 'dashboard/admin.html' %}
+<!-- Block para el título de la página -->
+{% block title %}Lista de Usuarios{% endblock %}
+
+<!-- Block para estilos específicos de la página -->
+{% block extra_css %}
+<style>
+    .users-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .section-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: var(--white);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .section-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 20px,
+            rgba(255, 255, 255, 0.05) 20px,
+            rgba(255, 255, 255, 0.05) 40px
+        );
+        animation: diagonalMove 20s linear infinite;
+    }
+
+    @keyframes diagonalMove {
+        0% { transform: translateX(-100%) translateY(-100%); }
+        100% { transform: translateX(0) translateY(0); }
+    }
+
+    .section-header-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: var(--white);
+    }
+
+    .section-title i {
+        color: var(--primary-yellow);
+        font-size: 2.5rem;
+    }
+
+    .add-user-btn {
+        background: var(--primary-yellow);
+        color: var(--primary-blue);
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .add-user-btn:hover {
+        background: var(--bright-yellow);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(251, 164, 1, 0.3);
+    }
+
+    .filters-card {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow);
+    }
+
+    .filters-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--primary-blue);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .filters-row {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 1.5rem;
+        align-items: end;
+    }
+
+    .search-group {
+        position: relative;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 3rem;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        background: #fafafa;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        background: var(--white);
+        box-shadow: 0 0 0 3px rgba(2, 2, 135, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--dark-gray);
+        transition: color 0.3s ease;
+    }
+
+    .search-input:focus + .search-icon {
+        color: var(--primary-blue);
+    }
+
+    .filter-checkboxes {
+        display: flex;
+        gap: 3rem;
+        flex-wrap: wrap;
+        margin-left: 3rem;
+    }
+
+    .filter-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        padding: 0.5rem;
+        border-radius: 8px;
+    }
+
+    .filter-checkbox:hover {
+        background: rgba(2, 2, 135, 0.05);
+    }
+
+    .filter-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary-blue);
+    }
+
+    .filter-checkbox label {
+        font-weight: 500;
+        color: var(--primary-blue);
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+
+    .users-table-card {
+        background: var(--white);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+    }
+
+    .table-header {
+        background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+        color: var(--white);
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .table-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .users-count {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+    }
+
+    .table-responsive {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .table-responsive::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f8f9fa;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: var(--primary-blue);
+        border-radius: 4px;
+    }
+
+    .users-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+
+    .users-table thead th {
+        background: #f8f9fa;
+        color: var(--primary-blue);
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 2px solid #e9ecef;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .users-table tbody tr {
+        border-bottom: 1px solid #f8f9fa;
+        transition: all 0.3s ease;
+    }
+
+    .users-table tbody tr:hover {
+        background: rgba(2, 2, 135, 0.03);
+        transform: translateX(3px);
+    }
+
+    .users-table td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, var(--primary-blue), var(--primary-red));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+        font-weight: bold;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+
+    .user-details h6 {
+        margin: 0;
+        font-weight: 600;
+        color: var(--primary-blue);
+        font-size: 0.9rem;
+    }
+
+    .user-details small {
+        color: var(--dark-gray);
+        font-size: 0.8rem;
+    }
+
+    .status-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .status-inactive {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .role-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .role-administrador {
+        background: rgba(251, 3, 1, 0.1);
+        color: var(--primary-red);
+        border: 1px solid rgba(251, 3, 1, 0.2);
+    }
+
+    .role-tecnico {
+        background: rgba(251, 164, 1, 0.1);
+        color: var(--orange);
+        border: 1px solid rgba(251, 164, 1, 0.2);
+    }
+
+    .role-usuario {
+        background: rgba(2, 2, 135, 0.1);
+        color: var(--primary-blue);
+        border: 1px solid rgba(2, 2, 135, 0.2);
+    }
+
+    .actions-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    .btn-view {
+        background: var(--primary-blue);
+        color: var(--white);
+    }
+
+    .btn-view:hover {
+        background: var(--dark-blue);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(2, 2, 135, 0.3);
+    }
+
+    .btn-edit {
+        background: var(--orange);
+        color: var(--white);
+    }
+
+    .btn-edit:hover {
+        background: var(--bright-orange);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(251, 164, 1, 0.3);
+    }
+
+    .btn-delete {
+        background: var(--primary-red);
+        color: var(--white);
+    }
+
+    .btn-delete:hover {
+        background: #dc3545;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(251, 3, 1, 0.3);
+    }
+
+    /* Modal Styles */
+    .modal-content {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        color: var(--white);
+        border-radius: 16px 16px 0 0;
+        padding: 1.5rem;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .modal-body {
+        padding: 2rem;
+    }
+
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+
+    .detail-item:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: var(--primary-blue);
+    }
+
+    .detail-value {
+        color: var(--dark-gray);
+        text-align: right;
+    }
+
+    .modal-footer {
+        padding: 1.5rem;
+        border-top: 1px solid #f8f9fa;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--dark-gray);
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: var(--primary-blue);
+        opacity: 0.3;
+        margin-bottom: 1rem;
+    }
+
+    .loading-row {
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .loading-spinner {
+        width: 2rem;
+        height: 2rem;
+        border: 3px solid #f8f9fa;
+        border-top: 3px solid var(--primary-blue);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .filters-row {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .filter-checkboxes {
+            gap: 2rem;
+        }
+
+        .section-header-content {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .users-table {
+            font-size: 0.8rem;
+        }
+
+        .users-table th,
+        .users-table td {
+            padding: 0.75rem 0.5rem;
+        }
+
+        .actions-group {
+            flex-direction: column;
+        }
+
+        .btn {
+            font-size: 0.7rem;
+            padding: 0.375rem 0.75rem;
+        }
+
+        .user-info {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .users-container {
+            margin: 0 1rem;
+        }
+
+        .section-header {
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+        }
+
+        .table-responsive {
+            font-size: 0.7rem;
+        }
+    }
+</style>
+{% endblock %}
+
+<!-- Block para el contenido principal -->
+{% block main_content %}
+<div class="users-container">
+    <!-- Section Header -->
+    <div class="section-header">
+        <div class="section-header-content">
+            <h1 class="section-title">
+                <i class="fas fa-users"></i>
+                Lista de Usuarios Registrados
+            </h1>
+            <a href="{% url 'users:new_user' %}" class="add-user-btn">
+                <i class="fas fa-user-plus"></i>
+                Nuevo Usuario
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters Card -->
+    <div class="filters-card">
+        <h3 class="filters-title">
+            <i class="fas fa-filter"></i>
+            Filtros y Búsqueda
+        </h3>
+        
+        <div class="filters-row">
+            <!-- Search Input -->
+            <div class="search-group">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    class="search-input" 
+                    placeholder="Buscar por nombre, cédula o usuario..."
+                    autocomplete="off"
+                >
+                <i class="fas fa-search search-icon"></i>
+            </div>
+
+            <!-- Role Filters -->
+            <div class="filter-checkboxes">
+                <div class="filter-checkbox">
+                    <input 
+                        class="rol-filter" 
+                        type="checkbox" 
+                        value="administrador" 
+                        id="filtroAdministrador"
+                    >
+                    <label for="filtroAdministrador">
+                        <i class="fas fa-user-shield"></i>
+                        Administrador
+                    </label>
+                </div>
+                <div class="filter-checkbox">
+                    <input 
+                        class="rol-filter" 
+                        type="checkbox" 
+                        value="tecnico" 
+                        id="filtroTecnico"
+                    >
+                    <label for="filtroTecnico">
+                        <i class="fas fa-tools"></i>
+                        Técnico
+                    </label>
+                </div>
+                <div class="filter-checkbox">
+                    <input 
+                        class="rol-filter" 
+                        type="checkbox" 
+                        value="usuario" 
+                        id="filtroUsuario"
+                    >
+                    <label for="filtroUsuario">
+                        <i class="fas fa-user"></i>
+                        Usuario
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="users-table-card">
+        <div class="table-header">
+            <h3 class="table-title">
+                <i class="fas fa-list"></i>
+                Usuarios Registrados
+            </h3>
+            <div class="users-count" id="usersCount">
+                Total: {{ users|length }} usuarios
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="users-table" id="tablaUsuarios">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Usuario</th>
+                        <th>Información Personal</th>
+                        <th>Contacto</th>
+                        <th>Cargo</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="usuariosTbody">
+                    {% for user in users %}
+                    <tr data-rol="{{ user.rol }}" class="user-row" 
+                        data-user='{
+                            "id": "{{ user.id }}",
+                            "username": "{{ user.username }}",
+                            "full_name": "{{ user.get_full_name|default:"No especificado" }}",
+                            "cedula": "{{ user.cedula|default:"No registrada" }}",
+                            "celular": "{{ user.telefono|default:"No registrado" }}",
+                            "email": "{{ user.email|default:"No especificado" }}",
+                            "cargo": "{% if user.cargo == 'docente' %}Docente{% else %}{{ user.get_cargo_display|default:"No especificado" }}{% endif %}",
+                            "rol": "{{ user.get_rol_display }}",
+                            "activo": "{{ user.activo }}",
+                            "fecha_creacion": "{{ user.fecha_creacion|date:'d/m/Y H:i' }}",
+                            "fecha_actualizacion": "{{ user.fecha_actualizacion|date:'d/m/Y H:i' }}"
+                        }'>
+                        <td>
+                            <strong style="color: var(--primary-blue);">
+                                {{ forloop.counter }}
+                            </strong>
+                        </td>
+                        
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">
+                                    {{ user.first_name.0|default:"U" }}{{ user.last_name.0|default:"" }}
+                                </div>
+                                <div class="user-details">
+                                    <h6>{{ user.username }}</h6>
+                                    <small>{{ user.get_full_name }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        
+                        <td>
+                            <div>
+                                <strong>{{ user.get_full_name|default:"Sin nombre" }}</strong><br>
+                                <small style="color: var(--dark-gray);">
+                                    CI: {{ user.cedula|default:"No registrada" }}
+                                </small>
+                            </div>
+                        </td>
+                        
+                        <td>
+                            <div>
+                                <i class="fas fa-mobile-alt" style="color: var(--primary-blue); margin-right: 0.25rem;"></i>
+                                {{ user.telefono|default:"No registrado" }}<br>
+                                <small style="color: var(--dark-gray);">
+                                    <i class="fas fa-envelope" style="margin-right: 0.25rem;"></i>
+                                    {{ user.email|truncatechars:20 }}
+                                </small>
+                            </div>
+                        </td>
+                        
+                        <td>
+                            <span style="color: var(--primary-blue); font-weight: 500;">
+                                {% if user.cargo == 'docente' %}
+                                    <i class="fas fa-chalkboard-teacher"></i> Docente
+                                {% else %}
+                                    <i class="fas fa-briefcase"></i> {{ user.get_cargo_display|default:"No especificado" }}
+                                {% endif %}
+                            </span>
+                        </td>
+                        
+                        <td>
+                            <span class="role-badge role-{{ user.rol }}">
+                                {% if user.rol == 'administrador' %}
+                                    <i class="fas fa-user-shield"></i> {{ user.get_rol_display }}
+                                {% elif user.rol == 'tecnico' %}
+                                    <i class="fas fa-tools"></i> {{ user.get_rol_display }}
+                                {% else %}
+                                    <i class="fas fa-user"></i> {{ user.get_rol_display }}
+                                {% endif %}
+                            </span>
+                        </td>
+                        
+                        <td>
+                            {% if user.activo %}
+                                <span class="status-badge status-active">
+                                    <i class="fas fa-check-circle"></i> Activo
+                                </span>
+                            {% else %}
+                                <span class="status-badge status-inactive">
+                                    <i class="fas fa-times-circle"></i> Inactivo
+                                </span>
+                            {% endif %}
+                        </td>
+                        
+                        <td>
+                            <div class="actions-group">
+                                <button 
+                                    class="btn btn-view btn-ver-usuario" 
+                                    data-user-id="{{ user.id }}"
+                                    title="Ver detalles"
+                                >
+                                    <i class="fas fa-eye"></i>
+                                    Ver
+                                </button>
+                                <a 
+                                    {% comment %} href="{% url 'users:user_edit' user.id %}"  {% endcomment %}
+                                    class="btn btn-edit"
+                                    href="#"
+                                    title="Editar usuario"
+                                >
+                                    <i class="fas fa-edit"></i>
+                                    Editar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <!-- Estado vacío -->
+                    <tr>
+                        <td colspan="8" class="empty-state">
+                            <i class="fas fa-users-slash"></i>
+                            <h4 style="color: var(--primary-blue); margin-bottom: 0.5rem;">No hay usuarios registrados</h4>
+                            <p>Comienza agregando el primer usuario al sistema.</p>
+                            <a href="{% url 'users:user_create' %}" class="btn btn-view">
+                                <i class="fas fa-user-plus"></i>
+                                Agregar Primer Usuario
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Block para JavaScript específico -->
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const tbody = document.getElementById('usuariosTbody');
+        const checkboxes = document.querySelectorAll('.rol-filter');
+        const usersCount = document.getElementById('usersCount');
+        const allRows = tbody.getElementsByClassName('user-row');
+
+        function updateUsersCount() {
+            const visibleRows = Array.from(allRows).filter(row => row.style.display !== 'none');
+            const total = allRows.length;
+            const visible = visibleRows.length;
+            
+            if (visible === total) {
+                usersCount.textContent = `Total: ${total} usuarios`;
+            } else {
+                usersCount.textContent = `Mostrando: ${visible} de ${total} usuarios`;
+            }
+        }
+
+        function filtrarTabla() {
+            const texto = searchInput.value.toLowerCase().trim();
+            const rolesSeleccionados = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+            
+            // Mostrar loading si hay muchos usuarios
+            if (allRows.length > 100) {
+                showLoadingState();
+            }
+
+            setTimeout(() => {
+                for (let i = 0; i < allRows.length; i++) {
+                    const row = allRows[i];
+                    const text = row.textContent.toLowerCase();
+                    const rol = row.getAttribute('data-rol');
+                    
+                    const visiblePorTexto = !texto || text.includes(texto);
+                    const visiblePorRol = rolesSeleccionados.length === 0 || rolesSeleccionados.includes(rol);
+                    
+                    const shouldShow = visiblePorTexto && visiblePorRol;
+                    row.style.display = shouldShow ? '' : 'none';
+                    
+                    // Animación suave
+                    if (shouldShow) {
+                        row.style.opacity = '0';
+                        row.style.transform = 'translateX(-10px)';
+                        setTimeout(() => {
+                            row.style.transition = 'all 0.3s ease';
+                            row.style.opacity = '1';
+                            row.style.transform = 'translateX(0)';
+                        }, i * 10); // Delay escalonado
+                    }
+                }
+                
+                updateUsersCount();
+                hideLoadingState();
+            }, 100);
+        }
+
+        function showLoadingState() {
+            // Crear indicador de carga si no existe
+            if (!document.getElementById('loadingIndicator')) {
+                const loadingRow = document.createElement('tr');
+                loadingRow.id = 'loadingIndicator';
+                loadingRow.innerHTML = `
+                    <td colspan="8" class="loading-row">
+                        <div class="loading-spinner"></div>
+                        <p style="margin-top: 1rem; color: var(--dark-gray);">Filtrando usuarios...</p>
+                    </td>
+                `;
+                tbody.appendChild(loadingRow);
+            }
+        }
+
+        function hideLoadingState() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            if (loadingIndicator) {
+                loadingIndicator.remove();
+            }
+        }
+
+        function highlightText(text, search) {
+            if (!search) return text;
+            const regex = new RegExp(`(${search})`, 'gi');
+            return text.replace(regex, '<mark style="background: var(--primary-yellow); color: var(--primary-blue); padding: 0.1rem 0.2rem; border-radius: 3px;">$1</mark>');
+        }
+
+        function resetFilters() {
+            searchInput.value = '';
+            checkboxes.forEach(cb => cb.checked = false);
+            filtrarTabla();
+        }
+
+        // Event listeners
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                // Debounce para mejor performance
+                clearTimeout(this.searchTimeout);
+                this.searchTimeout = setTimeout(filtrarTabla, 300);
+            });
+            
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    resetFilters();
+                }
+            });
+        }
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', filtrarTabla);
+        });
+
+        // Atajos de teclado
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                searchInput.focus();
+            }
+            
+            if (e.ctrlKey && e.key === 'r') {
+                e.preventDefault();
+                resetFilters();
+            }
+        });
+
+        // Tooltip para atajos
+        searchInput.setAttribute('title', 'Ctrl+F para enfocar, Esc para limpiar');
+
+        // Exportar funciones globalmente por si se necesitan
+        window.userListFunctions = {
+            filtrarTabla,
+            resetFilters,
+            updateUsersCount
+        };
+
+        // Inicializar contador
+        updateUsersCount();
+
+        // Auto-refresh cada 5 minutos (opcional)
+        // setInterval(() => {
+        //     if (confirm('¿Actualizar la lista de usuarios?')) {
+        //         location.reload();
+        //     }
+        // }, 300000);
+    });
+
+    // Función para exportar usuarios (opcional)
+    function exportUsers(format = 'csv') {
+        const visibleRows = Array.from(document.querySelectorAll('#usuariosTbody .user-row'))
+            .filter(row => row.style.display !== 'none');
+        
+        if (visibleRows.length === 0) {
+            alert('No hay usuarios visibles para exportar');
+            return;
+        }
+
+        let data = [];
+        let headers = ['#', 'Usuario', 'Nombre', 'Cédula', 'Celular', 'Email', 'Cargo', 'Rol', 'Estado'];
+        
+        visibleRows.forEach((row, index) => {
+            const cells = row.querySelectorAll('td');
+            data.push([
+                index + 1,
+                cells[1].textContent.trim(),
+                cells[2].textContent.trim().split('\n')[0],
+                cells[2].textContent.trim().split('CI: ')[1] || 'No registrada',
+                cells[3].textContent.trim().split('\n')[0],
+                cells[3].textContent.trim().split('\n')[1] || 'No especificado',
+                cells[4].textContent.trim(),
+                cells[5].textContent.trim(),
+                cells[6].textContent.trim()
+            ]);
+        });
+
+        if (format === 'csv') {
+            exportToCSV(headers, data);
+        } else if (format === 'json') {
+            exportToJSON(headers, data);
+        }
+    }
+
+    function exportToCSV(headers, data) {
+        let csvContent = headers.join(',') + '\n';
+        data.forEach(row => {
+            csvContent += row.map(field => `"${field}"`).join(',') + '\n';
+        });
+        
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `usuarios_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+    }
+
+    function exportToJSON(headers, data) {
+        const jsonData = data.map(row => {
+            const obj = {};
+            headers.forEach((header, index) => {
+                obj[header] = row[index];
+            });
+            return obj;
+        });
+        
+        const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `usuarios_${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+    }
+
+    // Función para imprimir lista de usuarios
+    function printUserList() {
+        const printWindow = window.open('', '_blank');
+        const visibleRows = Array.from(document.querySelectorAll('#usuariosTbody .user-row'))
+            .filter(row => row.style.display !== 'none');
+        
+        let tableHTML = `
+            <html>
+            <head>
+                <title>Lista de Usuarios - ${new Date().toLocaleDateString()}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    h1 { color: #020287; text-align: center; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #020287; color: white; }
+                    tr:nth-child(even) { background-color: #f9f9f9; }
+                    .header-info { text-align: center; margin-bottom: 20px; color: #6c757d; }
+                </style>
+            </head>
+            <body>
+                <h1>Lista de Usuarios Registrados</h1>
+                <div class="header-info">
+                    <p>Fecha de generación: ${new Date().toLocaleString()}</p>
+                    <p>Total de usuarios: ${visibleRows.length}</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Usuario</th>
+                            <th>Nombre</th>
+                            <th>Cédula</th>
+                            <th>Celular</th>
+                            <th>Cargo</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        visibleRows.forEach((row, index) => {
+            const cells = row.querySelectorAll('td');
+            tableHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${cells[1].textContent.trim()}</td>
+                    <td>${cells[2].textContent.trim().split('\n')[0]}</td>
+                    <td>${cells[2].textContent.trim().split('CI: ')[1] || 'No registrada'}</td>
+                    <td>${cells[3].textContent.trim().split('\n')[0]}</td>
+                    <td>${cells[4].textContent.trim()}</td>
+                    <td>${cells[5].textContent.trim()}</td>
+                    <td>${cells[6].textContent.trim()}</td>
+                </tr>
+            `;
+        });
+        
+        tableHTML += `
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+        
+        printWindow.document.write(tableHTML);
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 250);
+    }
+
+    // Agregar botones de exportación al header (opcional)
+    document.addEventListener('DOMContentLoaded', function() {
+        const tableHeader = document.querySelector('.table-header');
+        if (tableHeader && document.querySelectorAll('.user-row').length > 0) {
+            const exportButtons = document.createElement('div');
+            exportButtons.style.display = 'flex';
+            exportButtons.style.gap = '0.5rem';
+            exportButtons.innerHTML = `
+                <button onclick="exportUsers('csv')" class="btn" style="background: var(--success); color: white; font-size: 0.7rem; padding: 0.375rem 0.75rem;">
+                    <i class="fas fa-file-csv"></i> CSV
+                </button>
+                <button onclick="printUserList()" class="btn" style="background: var(--dark-gray); color: white; font-size: 0.7rem; padding: 0.375rem 0.75rem;">
+                    <i class="fas fa-print"></i> Imprimir
+                </button>
+            `;
+            tableHeader.appendChild(exportButtons);
+        }
+    });
+
+    // Modal dinámico
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = new bootstrap.Modal(document.getElementById('modalUsuarioGlobal'));
+        const modalBody = document.getElementById('modalUsuarioBody');
+        const modalFooter = document.getElementById('modalUsuarioFooter');
+
+        document.querySelectorAll('.btn-ver-usuario').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tr = btn.closest('tr');
+                const user = JSON.parse(tr.getAttribute('data-user'));
+
+                // Llena el modal con los datos del usuario
+                modalBody.innerHTML = `
+                    <div class="detail-item"><span class="detail-label"><i class="fas fa-user"></i> Nombre de usuario:</span><span class="detail-value">${user.username}</span></div>
+                    <div class="detail-item"><span class="detail-label"><i class="fas fa-id-card"></i> Nombre completo:</span><span class="detail-value">${user.full_name}</span></div>
+                    <div class="detail-item"><span class="detail-label"><i class="fas fa-id-badge"></i> Cédula:</span><span class="detail-value">${user.cedula}</span></div>
+                    <div class="detail-item"><span class="detail-label"><i class="fas fa-mobile-alt"></i> Celular:</span><span class="detail-value">${user.telefono}</span></div>
+                    <div class="detail-item"><span class="detail-label"><i class="fas fa-envelope"></i> Email:</span><span class="detail-value">${user.email}</span></div>
+                    <div class="detail-item"><span class="detail-label"><i class="fas fa-briefcase"></i> Cargo:</span><span class="detail-value">${user.cargo}</span></div>
+                    <div class="detail-item"><span class="detail-label"><i class="fas fa-user-tag"></i> Rol:</span><span class="detail-value">${user.rol}</span></div>
+                    <div class="detail-item"><span class="detail-label"><i class="fas fa-toggle-on"></i> Estado:</span><span class="detail-value">${user.activo === "True" ? '<span style="color: var(--success);"><i class="fas fa-check-circle"></i> Activo</span>' : '<span style="color: var(--primary-red);"><i class="fas fa-times-circle"></i> Inactivo</span>'}</span></div>
+                    <div class="detail-item"><span class="detail-label"><i class="fas fa-calendar-plus"></i> Fecha de creación:</span><span class="detail-value">${user.fecha_creacion}</span></div>
+                    <div class="detail-item"><span class="detail-label"><i class="fas fa-calendar-edit"></i> Última actualización:</span><span class="detail-value">${user.fecha_actualizacion}</span></div>
+                `;
+                modalFooter.innerHTML = `
+                    <button type="button" class="btn" style="background: var(--dark-gray); color: var(--white);" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        Cerrar
+                    </button>
+                    {% comment %} /users/edit/${user.id}/ {% endcomment %}
+                    <a href="#" class="btn btn-edit">
+                        <i class="fas fa-edit"></i>
+                        Editar Usuario
+                    </a>
+                `;
+                modal.show();
+            });
+        });
+    });
+</script>
+{% endblock %}
+
+<!-- Modal único fuera del for -->
+<div class="modal fade" id="modalUsuarioGlobal" tabindex="-1" aria-labelledby="modalUsuarioGlobalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalUsuarioGlobalLabel">
+                    <i class="fas fa-user-circle"></i>
+                    Detalles de Usuario
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="modalUsuarioBody">
+                <!-- Aquí se llenan los datos por JS -->
+            </div>
+            <div class="modal-footer" id="modalUsuarioFooter">
+                <!-- Aquí se llenan los botones por JS -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Mejoras para evitar desbordamiento */
+.users-table-card, .table-responsive {
+    max-width: 100vw;
+    overflow-x: auto;
+}
+.modal-lg {
+    max-width: 700px;
+}
+.modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+</style>

@@ -17,7 +17,7 @@ SECRET_KEY = 'django-insecure-s9v$#l6z8*@u%+d5hq!1ikm+$#me!5dpluz$5y2_b4teuy2-kn
 
 # ADVERTENCIA DE SEGURIDAD: ¡no ejecutes con debug activado en producción!
 DEBUG = False
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '*']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.10.121', '*']
 
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 # Definición de la aplicación
@@ -63,9 +63,10 @@ MIDDLEWARE = [
 # Configuración de AXES (ejemplo)
 AXES_FAILURE_LIMIT = 3  # Bloquear después de 3 intentos fallidos
 AXES_COOLOFF_TIME = timedelta(minutes=3)  # Bloquear por 6 minutos
+
+AXES_ONLY_ONE_SESSION_PER_USER = True  # Opcional: Limitar a una sesión por usuario
+AXES_LOCKOUT_PARAMETERS = ['username']  # Bloquear por nombre de usuario e IP
 AXES_LOCKOUT_TEMPLATE = 'authentication/lockout.html' # Crea esta plantilla
-AXES_ONLY_USER_FAILURES = True  # Solo contar fallos por usuario, no por IP
-AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = False
 
 ROOT_URLCONF = 'config.urls'
 
@@ -121,7 +122,10 @@ AUTH_USER_MODEL = 'users.CustomUser'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
+# en un terminal nuevo coloca ipconfig
+# luego verifica tu ip en la red local
+# como vamos a distribuir archivos staticos pues lo vamos a ser de la siguiente manera
+# http://192.168.10.121:8888/              http://192.168.10.121:8888/
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 

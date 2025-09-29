@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Soporte Técnico UPT "Jose Felix Ribas"{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/dashboard/dashboard_admin.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+
+</head>
+<body>
+    {% csrf_token %}
+    <!-- Sidebar -->
+
+        
+    {% block auth_content %}
+        {% if user.is_authenticated %}
+        
+            <div class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <a href="{% url 'equipment:admin_panel'%}" class="logo">
+                        <i class="fas fa-tools"></i>
+                        <span>Soporte Tecnico UPT</span>
+                    </a>
+                </div>
+                
+                <nav class="sidebar-nav">
+                    <div class="nav-section">
+                        <div class="nav-section-title">Usuarios</div>
+                        <a href="{% url 'users:list_user_admin' %}" class="nav-item" data-section="users-list">
+                            <i class="fas fa-users"></i>
+                            Lista de Usuarios
+                        </a>
+                        <a href="{% url 'users:new_user' %}" class="nav-item" data-section="user-register">
+                            <i class="fas fa-user-plus"></i>
+                            Registrar Usuario
+                        </a>
+                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="user-roles">
+                            <i class="fas fa-user-tag"></i>
+                            Roles y Permisos
+                        </a>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <div class="nav-section-title">Dashboard</div>
+                        <a href="{% url 'equipment:admin_panel'%}" class="nav-item active" data-section="dashboard">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Panel Principal
+                        </a>
+                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="statistics">
+                            <i class="fas fa-chart-line"></i>
+                            Estadísticas
+                        </a>
+                    </div>
+                    
+                    {% comment %} <div class="nav-section">
+                        <div class="nav-section-title">Gestión de Equipos</div>
+                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="computers">
+                            <i class="fas fa-desktop"></i>
+                            Computadoras
+                        </a>
+                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="printers">
+                            <i class="fas fa-print"></i>
+                            Impresoras
+                        </a>
+                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="monitors">
+                            <i class="fas fa-tv"></i>
+                            Monitores
+                        </a>
+                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="projectors">
+                            <i class="fas fa-video"></i>
+                            Proyectores
+                        </a>
+                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="laptops">
+                            <i class="fas fa-laptop"></i>
+                            Portátiles
+                        </a>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <div class="nav-section-title">Servicios</div>
+                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="repairs">
+                            <i class="fas fa-wrench"></i>
+                            Reparaciones
+                        </a>
+                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="maintenance">
+                            <i class="fas fa-cogs"></i>
+                            Mantenimiento
+                        </a>
+                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="new-request">
+                            <i class="fas fa-plus-circle"></i>
+                            Nueva Solicitud
+                        </a>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <div class="nav-section-title">Inventario</div>
+                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="inventory">
+                            <i class="fas fa-boxes"></i>
+                            Stock Repuestos
+                        </a>
+                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="assignments">
+                            <i class="fas fa-clipboard-list"></i>
+                            Asignaciones
+                        </a>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <div class="nav-section-title">Reportes</div>
+                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="reports">
+                            <i class="fas fa-file-alt"></i>
+                            Reportes Técnicos
+                        </a>
+                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="schedule">
+                            <i class="fas fa-calendar-alt"></i>
+                            Programación
+                        </a>
+                    </div> {% endcomment %}
+                </nav>
+            </div>
+
+            <!-- Top Bar -->
+            <div class="topbar">
+                <div class="topbar-left">
+                    <button class="sidebar-toggle" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">Panel de Control - Soporte Técnico</h1>
+                </div>
+                
+                <div class="topbar-right">
+                    <div class="notification-bell" id="notificationBell">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">4</span>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="notification-item">
+                            <i class="fas fa-desktop"></i> Reparación Lab-A-15 completada
+                            <span class="notification-time">Hace 15 min</span>
+                        </div>
+                        <div class="notification-item">
+                            <i class="fas fa-print"></i> Atasco de papel en Biblioteca
+                            <span class="notification-time">Hace 32 min</span>
+                        </div>
+                        <div class="notification-item">
+                            <i class="fas fa-video"></i> Proyector calibrado
+                            <span class="notification-time">Hace 1 hora</span>
+                        </div>
+                        <div class="notification-item">
+                            <i class="fas fa-tv"></i> Mantenimiento monitor Lab-B-08
+                            <span class="notification-time">Hace 2 horas</span>
+                        </div>
+                        <a href="{% url 'maintenance:maintenance' %}" class="btn btn-primary btn-sm notification-more">Ver más notificaciones</a>
+                    </div>
+                </div>
+                    
+                    <div class="user-profile" id="userProfile">
+                        <div class="user-avatar"></div>
+                        <div class="user-info">
+                            <h4>{{user.username}}</h4>
+                            {% if user.is_active %}
+                                <span style="color: #28a745; font-size: 1rem;">&#9679;</span>
+                            {% else %}
+                                <span style="color: #dc3545; font-size: 1rem;">&#9679;</span>
+                            {% endif %}
+                            <span>{{user.rol}}</span>
+                        </div>
+                        <i class="fas fa-chevron-down dropdown-arrow"></i>
+                        
+                        <div class="user-dropdown" id="userDropdown">
+                            <a href="{% url 'users:profile' %}" class="dropdown-item">
+                                <i class="fas fa-user"></i>
+                                Mi Perfil
+                            </a>
+                            <a href="{% url 'maintenance:maintenance' %}" class="dropdown-item">
+                                <i class="fas fa-cog"></i>
+                                Configuración
+                            </a>
+                            <a href="{% url 'maintenance:maintenance' %}" class="dropdown-item">
+                                <i class="fas fa-bell"></i>
+                                Notificaciones
+                            </a>
+                            <a href="{% url 'maintenance:maintenance' %}" class="dropdown-item">
+                                <i class="fas fa-question-circle"></i>
+                                Ayuda
+                            </a>
+                            <a href="{% url 'authentication:logout'%}" class="dropdown-item logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Cerrar Sesión
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+
+                {% block main_content %}
+                {% endblock %}
+
+            </div>
+
+            <script src="{% static 'js/dashboard_admin.js' %}"></script>
+            
+            
+            {% block extra_js %}
+                                
+                <!-- Bootstrap JS antes de cerrar el </body> -->
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+            {% endblock %}
+        {% else %}
+                <p>Por favor, <a href="{% url 'authentication:login' %}">inicia sesión</a> para acceder al panel de administración.</p>
+            {% endif %}
+    {% endblock %}
+</body>
+</html>
