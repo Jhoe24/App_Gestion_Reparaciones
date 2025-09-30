@@ -3,3 +3,33 @@
 
 waitress-serve --listen=0.0.0.0:8000 config.wsgi:application
 
+
+
+
+------------------------------------------
+
+Elimina el archivo llamado db.sqlite3
+
+Luego en la terminal ejecutas
+
+    python manage.py makemigrations
+
+luego
+
+    python manage.py migrate
+
+en caso de errores me avisas
+
+luego 
+
+    python manage.py createsuperuser
+
+este comando creara el superusuario
+luego te tienes que ir al navegador
+al localhost:8000/admin/  inicias con las credenciales
+que creaste y luego te vas para el apartado de Usuario
+elegiges el superusuario y te vas a la parte final, donde 
+dice activacion de correo activas las dos casillas
+
+tambien completa los datos del superusuario 
+como nombre, apellido, telefono, cedula ...etc
