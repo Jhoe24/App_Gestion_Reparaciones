@@ -8,4 +8,6 @@ urlpatterns = [
     path('user/dashboard/', views.UserReportsDashboardView.as_view(), name='user_dashboard'),
     path('nuevo/', views.ReporteCreateView.as_view(), name='reporte_create'),
     path('<int:pk>/', views.ReporteDetailView.as_view(), name='reporte_detail'),
+    
+    path('ficha_entrada/', views.ficha_entrada_view, name='ficha_entrada'),
 ]

@@ -12,10 +12,6 @@
 
 </head>
 <body>
-    {% csrf_token %}
-    <!-- Sidebar -->
-
-        
     {% block auth_content %}
         {% if user.is_authenticated %}
         
@@ -28,57 +24,74 @@
                 </div>
                 
                 <nav class="sidebar-nav">
-                    <div class="nav-section">
-                        <div class="nav-section-title">Usuarios</div>
-                        <a href="{% url 'users:list_user_admin' %}" class="nav-item" data-section="users-list">
-                            <i class="fas fa-users"></i>
-                            Lista de Usuarios
-                        </a>
-                        <a href="{% url 'users:new_user' %}" class="nav-item" data-section="user-register">
-                            <i class="fas fa-user-plus"></i>
-                            Registrar Usuario
-                        </a>
-                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="user-roles">
-                            <i class="fas fa-user-tag"></i>
-                            Roles y Permisos
-                        </a>
-                    </div>
-                    
-                    <div class="nav-section">
-                        <div class="nav-section-title">Dashboard</div>
-                        <a href="{% url 'equipment:admin_panel'%}" class="nav-item active" data-section="dashboard">
-                            <i class="fas fa-tachometer-alt"></i>
-                            Panel Principal
-                        </a>
-                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="statistics">
-                            <i class="fas fa-chart-line"></i>
-                            Estadísticas
-                        </a>
-                    </div>
 
-                    <div class="nav-section">
-                        <div class="nav-section-title">Ficha de Entrada</div>
-                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="computers">
-                            <i class="fas fa-desktop"></i>
-                            Solicitud
-                        </a>
-                        {% comment %} <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="printers">
-                            <i class="fas fa-print"></i>
-                            Impresoras
-                        </a>
-                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="monitors">
-                            <i class="fas fa-tv"></i>
-                            Monitores
-                        </a>
-                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="projectors">
-                            <i class="fas fa-video"></i>
-                            Proyectores
-                        </a>
-                        <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="laptops">
-                            <i class="fas fa-laptop"></i>
-                            Portátiles
-                        </a> {% endcomment %}
-                    </div>
+                    {% if user.rol == "administrador" or user.is_superuser %}
+                        <div class="nav-section">
+                            <div class="nav-section-title">Usuarios</div>
+                            <a href="{% url 'users:list_user_admin' %}" class="nav-item" data-section="users-list">
+                                <i class="fas fa-users"></i>
+                                Lista de Usuarios
+                            </a>
+                            <a href="{% url 'users:new_user' %}" class="nav-item" data-section="user-register">
+                                <i class="fas fa-user-plus"></i>
+                                Registrar Usuario
+                            </a>
+                            <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="user-roles">
+                                <i class="fas fa-user-tag"></i>
+                                Roles y Permisos
+                            </a>
+                        </div>
+                        
+                        <div class="nav-section">
+                            <div class="nav-section-title">Dashboard</div>
+                            <a href="{% url 'equipment:admin_panel'%}" class="nav-item active" data-section="dashboard">
+                                <i class="fas fa-tachometer-alt"></i>
+                                Panel Principal
+                            </a>
+                            <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="statistics">
+                                <i class="fas fa-chart-line"></i>
+                                Estadísticas
+                            </a>
+                        </div>
+
+                        <div class="nav-section">
+                            <div class="nav-section-title">Ficha de Entrada</div>
+                            <a href="{% url 'reports:ficha_entrada' %}" class="nav-item" data-section="computers">
+                                <i class="fas fa-desktop"></i>
+                                Solicitud
+                            </a>
+                            {% comment %} <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="printers">
+                                <i class="fas fa-print"></i>
+                                Impresoras
+                            </a>
+                            <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="monitors">
+                                <i class="fas fa-tv"></i>
+                                Monitores
+                            </a>
+                            <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="projectors">
+                                <i class="fas fa-video"></i>
+                                Proyectores
+                            </a>
+                            <a href="{% url 'maintenance:maintenance' %}" class="nav-item" data-section="laptops">
+                                <i class="fas fa-laptop"></i>
+                                Portátiles
+                            </a> {% endcomment %}
+                        </div>
+                    {% elif user.rol == "tecnico" %}
+                        <div class="nav-section">
+                            <div class="nav-section-title">Mi Panel</div>
+                            <a href="{% url 'equipment:tech_dashboard'%}" class="nav-item active" data-section="dashboard">
+                                <i class="fas fa-tachometer-alt"></i>
+                                Panel Principal
+                            </a>
+                            {% comment %} <a href="#" class="nav-item" data-section="my-tasks">
+                                <i class="fas fa-tasks"></i>
+                                Mis Tareas
+                                <span class="nav-badge">7</span>
+                            </a> {% endcomment %}
+                        </div>
+
+                    {% endif %}
                     
                     {% comment %} <div class="nav-section">
                         <div class="nav-section-title">Gestión de Equipos</div>
@@ -220,6 +233,14 @@
             </div>
 
             <div class="main-content">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message|safe }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
 
                 {% block main_content %}
                 {% endblock %}

@@ -27,10 +27,7 @@ def under_development_view(request):
 def maintenance_view(request):
     
     
-    if request.user.is_superuser or request.user.role == 'admin':
-        template_name = 'errors/chamba.html'
-    else:
-        template_name = 'errors/chamba_tech.html'
+    template_name = 'errors/chamba.html'
 
     context = {
         'page_type': 'maintenance',
