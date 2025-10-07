@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soporte Técnico UPT - Rastrea tus Equipos</title>
+    <link rel="stylesheet" href="{% static 'css/home/root.css' %}">
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/png">   
+</head>
+
+<body>
+
+    <div class="header-banner">
+        {% load static %}
+        <img class="cintillo-banner" src="{% static 'img/cintillo.png' %}" alt="cintillo">
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo"><img src="{% static 'img/logo2.png'%}"/></div>
+                <div class="logo-text">
+                    <h1>Soporte Técnico UPT</h1>
+                    <p>Centro de Mantenimiento y Reparación</p>
+                </div>
+            </div>
+            <a href="{% url 'authentication:login' %}" class="login-btn">Iniciar Sesión</a>
+        </div>
+    </header>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Rastrea tus Equipos</h2>
+            <p>Ingresa tu número de cédula para conocer el estado en tiempo real de tus equipos en reparación</p>
+            <div class="tracking-box">
+                <div class="tracking-input-wrapper">
+                    <input
+                        type="text"
+                        id="cedulaInput"
+                        class="tracking-input"
+                        placeholder="Número de cédula (Ej: 12345678)"
+                        maxlength="10"
+                    >
+                    <button class="track-btn" onclick="buscarEquipos()">
+                        🔍 Rastrear
+                    </button>
+                </div>
+                <div class="tracking-help">
+                    💡 Ingresa tu cédula sin puntos ni guiones
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="info-cards">
+            <div class="info-card">
+                <div class="info-card-icon">📍</div>
+                <h3>Seguimiento en Tiempo Real</h3>
+                <p>Consulta en cualquier momento el estado actual de tus equipos, desde la recepción hasta la entrega final.</p>
+            </div>
+            <div class="info-card">
+                <div class="info-card-icon">⚡</div>
+                <h3>Reparación Profesional</h3>
+                <p>Tu equipo será atendido por el personal técnico de la universidad, siguiendo los procedimientos establecidos para cada caso.</p>
+            </div>
+            <div class="info-card">
+                <div class="info-card-icon">🔔</div>
+                <h3>Actualizaciones Constantes</h3>
+                <p>Mantente informado sobre cada etapa del proceso de reparación de tu equipo tecnológico.</p>
+            </div>
+        </div>
+    </main>
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="cerrarModal()">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div>
+                    <h2>Estado de tus Equipos</h2>
+                    <div class="cedula-info" id="cedulaInfo"></div>
+                </div>
+                <button class="close-modal" onclick="cerrarModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 Universidad Politécnica Territorial "Jose Felix Ribas" del estado Barinas - Todos los derechos reservados</p>
+    </footer>
+
+    <script src="{% static 'js/home/root.js' %}"></script>
+
+</body>
+</html>
+
+
+
+

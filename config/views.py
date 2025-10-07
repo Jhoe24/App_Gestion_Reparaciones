@@ -47,6 +47,9 @@ ERROR_CONFIG = {
     },
 }
 
+def rootpage_view(request):
+    return render(request, 'home/root.html')
+
 def generic_error_view(request, exception=None, status_code=500):
     config = ERROR_CONFIG.get(status_code, ERROR_CONFIG[500])
     context = {

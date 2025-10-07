@@ -10,8 +10,11 @@ from django.conf import settings  # <--- Importa settings
 from django.conf.urls.static import static
 from . import views
 
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.rootpage_view, name='rootpage'),  # Página de inicio
     path('auth/', include('apps.authentication.urls')),
     path('users/', include('apps.users.urls')),
     path('dashboard/', include('apps.equipment.urls')),  # Dashboard principal

@@ -18,6 +18,7 @@ body {
     width: 100%;
     height: auto;
     position: relative;
+    background-color: white;
     /* Para controlar el apilamiento */
     z-index: 10;
     /* Un valor alto para traerlo al frente */
@@ -27,6 +28,7 @@ body {
     width: 100%;
     height: auto;
     object-fit: cover;
+    background-color: white;
     /* Evita que la imagen se distorsione */
 }
 
@@ -88,7 +90,7 @@ body {
 
 .login-container {
     min-height: 100vh;
-    background: linear-gradient(100deg, transparent 0%, #020287 100%);
+    background: linear-gradient(135deg, #010186 0%, #0501c9 100%);
 }
 
 .login-card {
@@ -112,3 +114,16 @@ select#nacionalidad {
         width: auto;
         flex: none;
     }
+
+
+    /* Footer */
+.footer {
+    background: #1f2937;
+    color: white;
+    padding: 40px;
+    text-align: center;
+    margin-top: none;
+}
+.footer p {
+    opacity: 0.8;
+}

@@ -1,0 +1,370 @@
+{% extends 'dashboard/admin.html' %}
+{% block title %}Historial de Equipos{% endblock %}
+{% load static %}
+{% block extra_css %}
+<style>
+    /* Content Sections */
+    .content-section {
+        animation: fadeInUp 0.4s ease forwards;
+        background: var(--white);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+    }
+    .content-section.active {
+        display: block;
+    }
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .section-header {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    .section-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--primary-blue);
+        margin-bottom: 0.5rem;
+    }
+    .section-subtitle {
+        color: var(--dark-gray);
+        font-size: 1rem;
+    }
+    /* Tables */
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 1rem;
+    }
+    .table th, .table td {
+        padding: 0.75rem;
+        border: 1px solid #dee2e6;
+        text-align: left;
+    }
+    .table th {
+        background-color: var(--primary-blue);
+        color: var(--white);
+    }
+    .table tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+    .table tr:hover {
+        background-color: #e9ecef;
+    }
+    /* Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+        justify-content: center;
+        align-items: center;
+    }
+    .modal-content {
+        background-color: #fefefe;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .close:hover {
+        color: black;
+    }
+    .btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .btn-primary {
+        background: var(--primary-yellow);
+        color: var(--primary-blue);
+    }
+    .btn-primary:hover {
+        background: var(--bright-yellow);
+        transform: translateY(-1px);
+    }
+    .btn-secondary {
+        background: var(--secondary-gray);
+        color: var(--white);
+    }
+    .btn-secondary:hover {
+        background: var(--dark-gray);
+        transform: translateY(-1px);
+    }
+    /* Estilos para el contenido del modal */
+    .modal-content h2 {
+        margin-top: 0;
+        color: var(--primary-blue);
+    }
+    .modal-content p {
+        margin: 10px 0;
+    }
+    .modal-content form {
+        margin-top: 20px;
+    }
+    .modal-content form label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    .modal-content form select {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    /* Estilos responsivos */
+    @media (max-width: 768px) {
+        .modal-content {
+            width: 90%;
+            padding: 15px;
+        }
+    }
+    /* Estilos para el formulario de filtrado simplificado */
+    .search-card {
+        background: var(--white);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        margin-bottom: 2rem;
+    }
+    .search-form {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        width: 60%;
+    }
+    .search-form input {
+        flex: 1;
+        padding: 0.75rem;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: border 0.3s ease;
+    }
+    .search-form input:focus {
+        border-color: var(--primary-yellow);
+        outline: none;
+    }
+    .search-form button {
+        background: var(--primary-yellow);
+        color: var(--primary-blue);
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .search-form button:hover {
+        background: var(--bright-yellow);
+        transform: translateY(-1px);
+    }
+    .export-button {
+        background: var(--primary-blue);
+        color: var(--white);
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .export-button:hover {
+        background: var(--dark-blue);
+        transform: translateY(-1px);
+    }
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        width: 100%;
+    }
+    /* Estilos para la tabla de resultados */
+    .table-container {
+        position: relative;
+    }
+    .no-results {
+        text-align: center;
+        padding: 2rem;
+        color: var(--dark-gray);
+        font-style: italic;
+    }
+</style>
+{% endblock %}
+{% block main_content %}
+    <div class="content-section active" id="historial-equipos">
+        <div class="section-header">
+            <h2 class="section-title">Historial de Equipos</h2>
+            <p class="section-subtitle">Lista de todos los equipos registrados</p>
+        </div>
+
+        <!-- Tarjeta de búsqueda simplificada -->
+        <div class="search-card">
+            <div class="action-buttons">
+                <form class="search-form" method="get" action="{% url 'reports:historial_equipos' %}">
+                    <input type="text" name="search" placeholder="Ingrese nombre, marca, departamento, modelo, etc." value="{{ request.GET.search }}">
+                    <button type="submit">Buscar</button>
+                </form>
+                <form method="get" action="{% url 'reports:exportar_datos' %}">
+                    <input type="hidden" name="search" value="{{ request.GET.search }}">
+                    <button type="submit" class="export-button">Exportar</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="table" id="equiposTable">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Tipo de Equipo</th>
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th>Cliente</th>
+                        <th>Tipo de Falla</th>
+                        <th>Fecha de Creación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="equiposTableBody">
+                    {% for registro in registros %}
+                    <tr>
+                        <td>{{ registro.codigo }}</td>
+                        <td>{{ registro.get_tipo_equipo_display }}</td>
+                        <td>{{ registro.marca }}</td>
+                        <td>{{ registro.modelo }}</td>
+                        <td>{{ registro.nombre_cliente }} {{ registro.apellido_cliente }}</td>
+                        <td>{{ registro.get_tipo_falla_display }}</td>
+                        <td>{{ registro.fecha_creacion }}</td>
+                        <td>
+                            {% if registro.tecnico_asignado %}
+                                <button class="btn btn-primary" onclick="openModal('{{ registro.id }}', '{{ registro.tecnico_asignado.id }}')">Ver más</button>
+                            {% else %}
+                                <button class="btn btn-primary" onclick="openModal('{{ registro.id }}', '')">Ver más</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="no-results" id="noResults" style="display: none;">
+                No se encontraron resultados que coincidan con los criterios de búsqueda.
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para detalles del equipo -->
+    <div id="equipoModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Detalles del Equipo</h2>
+            <div id="modalContent">
+                <!-- Contenido dinámico aquí -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lista de técnicos cargada directamente en la página
+        var tecnicos = [
+            {% for user in users %}
+                {
+                    id: "{{ user.id }}",
+                    name: "{{ user.get_full_name }}"
+                }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        function openModal(registroId, tecnicoAsignadoId) {
+            fetch(`/reports/get_equipo_details/${registroId}/`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('modalContent').innerHTML = `<p>Error: ${data.error}</p>`;
+                    } else {
+                        // Crear el HTML para el select de técnicos
+                        var tecnicoSelect = '<select id="tecnico" name="tecnico" required>\n';
+                        tecnicoSelect += '<option value="">Seleccione un técnico</option>\n';
+                        for (var i = 0; i < tecnicos.length; i++) {
+                            var selected = tecnicoAsignadoId && tecnicoAsignadoId == tecnicos[i].id ? ' selected' : '';
+                            tecnicoSelect += '<option value="' + tecnicos[i].id + '"' + selected + '>' + tecnicos[i].name + '</option>\n';
+                        }
+                        tecnicoSelect += '</select>';
+
+                        document.getElementById('modalContent').innerHTML = `
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <p><strong>Código:</strong> ${data.codigo}</p>
+                                <p><strong>Tipo de Equipo:</strong> ${data.tipo_equipo}</p>
+                                <p><strong>Marca:</strong> ${data.marca}</p>
+                                <p><strong>Modelo:</strong> ${data.modelo}</p>
+                                <p><strong>Número de Serie:</strong> ${data.numero_serie}</p>
+                                <p><strong>Ubicación:</strong> ${data.ubicacion}</p>
+                                <p><strong>Dependencia:</strong> ${data.dependencia}</p>
+                                <p><strong>Descripción:</strong> ${data.descripcion}</p>
+                                <p><strong>Nombre del Cliente:</strong> ${data.nombre_cliente}</p>
+                                <p><strong>Apellido del Cliente:</strong> ${data.apellido_cliente}</p>
+                                <p><strong>Departamento del Cliente:</strong> ${data.departamento_cliente}</p>
+                                <p><strong>Teléfono del Cliente:</strong> ${data.telefono_cliente}</p>
+                                <p><strong>Correo del Cliente:</strong> ${data.correo_cliente}</p>
+                                <p><strong>Descripción de la Falla:</strong> ${data.descripcion_falla}</p>
+                                <p><strong>Tipo de Falla:</strong> ${data.tipo_falla}</p>
+                                <p><strong>Observaciones:</strong> ${data.observaciones}</p>
+                                <p><strong>Fecha de Creación:</strong> ${data.fecha_creacion}</p>
+                            </div>
+                            <form method="post" action="/reports/asignar_tecnico/${registroId}/">
+                                {% csrf_token %}
+                                <label for="tecnico">Asignar Personal:</label>
+                                ${tecnicoSelect}
+                                <button type="submit" class="btn btn-primary">Guardar</button>
+                            </form>
+                        `;
+                    }
+                    document.getElementById('equipoModal').style.display = 'flex';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('modalContent').innerHTML = `<p>Error al cargar los detalles del equipo: ${error.message}</p>`;
+                    document.getElementById('equipoModal').style.display = 'flex';
+                });
+        }
+
+        function closeModal() {
+            document.getElementById('equipoModal').style.display = 'none';
+        }
+    </script>
+{% endblock %}

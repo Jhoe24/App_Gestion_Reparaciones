@@ -1,4 +1,7 @@
 from django.db import models
+from django.contrib.auth import get_user_model
+
+CustomUser = get_user_model()
 
 class FichaEntrada(models.Model):
     # Información del Equipo
@@ -43,14 +46,12 @@ class FichaEntrada(models.Model):
     )
     dependencia = models.CharField("Dependencia", max_length=100, blank=True)
     descripcion = models.TextField("Descripción", blank=True)
-
     # Información del Cliente
     nombre_cliente = models.CharField("Nombre del Cliente", max_length=50)
     apellido_cliente = models.CharField("Apellido del Cliente", max_length=50)
     departamento_cliente = models.CharField("Departamento del Cliente", max_length=100, blank=True)
     telefono_cliente = models.CharField("Teléfono del Cliente", max_length=20, blank=True)
     correo_cliente = models.EmailField("Correo Electrónico del Cliente", blank=True)
-
     # Información del Reporte
     descripcion_falla = models.TextField("Descripción de la Falla")
     tipo_falla = models.CharField(
@@ -70,6 +71,13 @@ class FichaEntrada(models.Model):
     )
     observaciones = models.TextField("Observaciones", blank=True)
     fecha_creacion = models.DateTimeField("Fecha de Creación", auto_now_add=True)
-
+    tecnico_asignado = models.ForeignKey(
+            CustomUser,
+            on_delete=models.SET_NULL,
+            null=True,
+            blank=True,
+            related_name='fichas_asignadas',
+            verbose_name="Técnico Asignado"
+        )
     def __str__(self):
         return f"{self.codigo} - {self.nombre_cliente} {self.apellido_cliente}"
