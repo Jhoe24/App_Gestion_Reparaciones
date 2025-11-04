@@ -46,12 +46,15 @@ class FichaEntrada(models.Model):
     )
     dependencia = models.CharField("Dependencia", max_length=100, blank=True)
     descripcion = models.TextField("Descripción", blank=True)
+    # Campo opcional para cuando el usuario elija "otro" en tipo_equipo
+    tipo_equipo_otro = models.CharField("Tipo de Equipo (otro)", max_length=100, blank=True)
     # Información del Cliente
     nombre_cliente = models.CharField("Nombre del Cliente", max_length=50)
     apellido_cliente = models.CharField("Apellido del Cliente", max_length=50)
+    cedula_cliente = models.CharField("Cédula del Cliente", max_length=20, blank=True)
     departamento_cliente = models.CharField("Departamento del Cliente", max_length=100, blank=True)
     telefono_cliente = models.CharField("Teléfono del Cliente", max_length=20, blank=True)
-    correo_cliente = models.EmailField("Correo Electrónico del Cliente", blank=True)
+    correo_cliente = models.EmailField("Correo del Cliente", blank=True)
     # Información del Reporte
     descripcion_falla = models.TextField("Descripción de la Falla")
     tipo_falla = models.CharField(
@@ -69,6 +72,7 @@ class FichaEntrada(models.Model):
             ("otro", "Otro"),
         ]
     )
+    tipo_falla_otro = models.CharField("Tipo de Falla (otro)", max_length=100, blank=True)
     observaciones = models.TextField("Observaciones", blank=True)
     fecha_creacion = models.DateTimeField("Fecha de Creación", auto_now_add=True)
     tecnico_asignado = models.ForeignKey(
@@ -80,4 +84,70 @@ class FichaEntrada(models.Model):
             verbose_name="Técnico Asignado"
         )
     def __str__(self):
-        return f"{self.codigo} - {self.nombre_cliente} {self.apellido_cliente}"
+        # Mostrar el tipo de equipo personalizado si existe
+        tipo = self.get_tipo_equipo_display()
+        if self.tipo_equipo == 'otro' and self.tipo_equipo_otro:
+            tipo = self.tipo_equipo_otro
+        return f"{self.codigo} - {self.nombre_cliente} {self.apellido_cliente} ({tipo})"
+
+
+class Seguimiento(models.Model):
+    """Modelo para llevar el seguimiento / reporte del equipo relacionado con una FichaEntrada.
+
+    Se utiliza un JSONField llamado `timeline` para almacenar una lista de eventos
+    (fecha, título, descripción, estado, icono), tal como en el ejemplo provisto.
+    """
+    ESTADO_CHOICES = [
+        ("recepcion", "Recepción"),
+        ("diagnostico", "Diagnóstico"),
+        ("reparacion", "Reparación"),
+        ("pruebas", "Pruebas de Calidad"),
+        ("listo", "Listo para Entrega"),
+        ("entregado", "Entregado"),
+        ("otro", "Otro"),
+    ]
+
+    ficha = models.ForeignKey(
+        FichaEntrada,
+        on_delete=models.CASCADE,
+        related_name="seguimientos",
+        verbose_name="Ficha de Entrada",
+    )
+    estado = models.CharField("Estado", max_length=30, choices=ESTADO_CHOICES, default="recepcion")
+    progreso = models.PositiveSmallIntegerField("Progreso (%)", default=0)
+    fecha_ingreso = models.DateTimeField("Fecha de Ingreso", auto_now_add=True)
+    fecha_estimada = models.DateField("Fecha Estimada", null=True, blank=True)
+    tecnico = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="seguimientos_asignados",
+        verbose_name="Técnico asignado",
+    )
+    descripcion = models.TextField("Descripción general", blank=True)
+    # Usamos JSONField para guardar el timeline como una lista de objetos
+    timeline = models.JSONField("Timeline", default=list, blank=True)
+
+    class Meta:
+        verbose_name = "Seguimiento"
+        verbose_name_plural = "Seguimientos"
+        ordering = ["-fecha_ingreso"]
+
+    def __str__(self):
+        codigo = self.ficha.codigo if self.ficha else "-"
+        return f"Seguimiento {codigo} - {self.get_estado_display()} ({self.progreso}%)"
+
+    def add_event(self, fecha, titulo, descripcion, estado="pending", icono=""):
+        """Conveniencia para añadir un evento al timeline y guardar el modelo."""
+        evento = {
+            "fecha": fecha,
+            "titulo": titulo,
+            "descripcion": descripcion,
+            "estado": estado,
+            "icono": icono,
+        }
+        timeline = list(self.timeline or [])
+        timeline.append(evento)
+        self.timeline = timeline
+        self.save()

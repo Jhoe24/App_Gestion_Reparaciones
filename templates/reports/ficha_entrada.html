@@ -4,15 +4,15 @@
 {% load static %}
 {% block extra_css %}
 <style>
-
     /* Content Sections */
     .content-section {
         animation: fadeInUp 0.4s ease forwards;
-
         background: var(--white);
         border-radius: 12px;
-        padding: 1.5rem;
+        padding: 1.5rem 2rem;
         box-shadow: var(--shadow);
+        max-width: 100%;
+        margin: 0;
     }
 
     .content-section.active {
@@ -53,22 +53,67 @@
         border-radius: 12px;
         margin: auto;
         box-shadow: none;
+        padding: 0;
+    }
+
+    /* Sección de formulario */
+    .form-section {
+        margin-bottom: 2.5rem;
+        padding-bottom: 2rem;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .form-section:last-of-type {
+        border-bottom: none;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--primary-blue);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-section-title i {
+        font-size: 1.1rem;
+    }
+
+    /* Grid horizontal para campos */
+    .form-fields-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem 1.2rem;
+    }
+
+    /* Para campos que ocupen 2 columnas */
+    .form-group.span-2 {
+        grid-column: span 2;
+    }
+
+    /* Para campos que ocupen 3 columnas (ancho completo) */
+    .form-group.span-3 {
+        grid-column: span 3;
     }
 
     .form-group {
-        margin-bottom: 1.5rem;
+        margin-bottom: 0;
     }
 
     .form-label {
         display: block;
         margin-bottom: 0.5rem;
-        font-weight: 600;
+        font-weight: 500;
         color: var(--primary-blue);
+        font-size: 0.9rem;
     }
 
     .form-control {
         width: 100%;
-        padding: 0.75rem 1rem;
+        padding: 0.65rem 0.9rem;
         border: 2px solid #e9ecef;
         border-radius: 8px;
         font-size: 0.9rem;
@@ -90,11 +135,16 @@
         appearance: none;
     }
 
+    textarea.form-control {
+        resize: vertical;
+        min-height: 80px;
+    }
+
     .btn {
-        padding: 0.5rem 1rem;
+        padding: 0.7rem 1.5rem;
         border: none;
-        border-radius: 6px;
-        font-size: 0.85rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
         font-weight: 500;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -112,6 +162,7 @@
     .btn-primary:hover {
         background: var(--bright-yellow);
         transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .btn-danger {
@@ -119,32 +170,36 @@
         color: var(--white);
     }
 
-    .form-check {
-        display: block;
-        position: relative;
-        padding-left: 1.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .form-check-input {
-        position: absolute;
-        top: 0.25rem;
-        left: 0;
-        margin-left: -1.5rem;
-    }
-
-    .form-check-label {
-        color: var(--dark-gray);
-        font-weight: 500;
-    }
-
-    .form-row {
+    .form-actions {
         display: flex;
         gap: 1rem;
+        justify-content: flex-start;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 2px solid #f0f0f0;
     }
 
-    .form-col {
-        flex: 1;
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .form-fields-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .form-group.span-2,
+        .form-group.span-3 {
+            grid-column: span 2;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .form-fields-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-group.span-2,
+        .form-group.span-3 {
+            grid-column: span 1;
+        }
     }
 </style>
 {% endblock %}
@@ -156,29 +211,197 @@
                 <h2 class="section-title">Ficha de Entrada</h2>
                 <p class="section-subtitle">Registrar un nuevo reporte de mantenimiento</p>
             </div>
+            
             <form method="post">
                 {% csrf_token %}
-                <div class="form-group">
-                    <h3 class="form-label">Información del Equipo</h3>
-                </div>
                 {{ form.non_field_errors }}
 
-                {% for field in form %}
-                    <div class="form-group">
-                        {{ field.label_tag }}
-                        {{ field }}
-                        {{ field.errors }}
+                <!-- Sección: Información del Equipo -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-laptop"></i>
+                        Información del Equipo
+                    </h3>
+                    <div class="form-fields-grid">
+                        <div class="form-group">
+                            {{ form.codigo.label_tag }}
+                            {{ form.codigo }}
+                            {{ form.codigo.errors }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.tipo_equipo.label_tag }}
+                            {{ form.tipo_equipo }}
+                            {{ form.tipo_equipo.errors }}
+                        </div>
+                        <div class="form-group" id="div_tipo_equipo_otro" style="display:none;">
+                            {{ form.tipo_equipo_otro.label_tag }}
+                            {{ form.tipo_equipo_otro }}
+                            {{ form.tipo_equipo_otro.errors }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.marca.label_tag }}
+                            {{ form.marca }}
+                            {{ form.marca.errors }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.modelo.label_tag }}
+                            {{ form.modelo }}
+                            {{ form.modelo.errors }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.numero_serie.label_tag }}
+                            {{ form.numero_serie }}
+                            {{ form.numero_serie.errors }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.ubicacion.label_tag }}
+                            {{ form.ubicacion }}
+                            {{ form.ubicacion.errors }}
+                        </div>
+                        <div class="form-group span-3">
+                            {{ form.dependencia.label_tag }}
+                            {{ form.dependencia }}
+                            {{ form.dependencia.errors }}
+                        </div>
+                        <div class="form-group span-3">
+                            {{ form.descripcion.label_tag }}
+                            {{ form.descripcion }}
+                            {{ form.descripcion.errors }}
+                        </div>
                     </div>
-                {% endfor %}
+                </div>
 
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i>
-                    Guardar
-                </button>
-                    {% comment %} <button type="button" class="btn btn-danger" style="margin-left: 10px;" onclick="showSection('dashboard')">
+                <!-- Sección: Datos del Cliente -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-user"></i>
+                        Datos del Cliente
+                    </h3>
+                    <div class="form-fields-grid">
+                        <div class="form-group">
+                            {{ form.nombre_cliente.label_tag }}
+                            {{ form.nombre_cliente }}
+                            {{ form.nombre_cliente.errors }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.apellido_cliente.label_tag }}
+                            {{ form.apellido_cliente }}
+                            {{ form.apellido_cliente.errors }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.cedula_cliente.label_tag }}
+                            {{ form.cedula_cliente }}
+                            {{ form.cedula_cliente.errors }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.departamento_cliente.label_tag }}
+                            {{ form.departamento_cliente }}
+                            {{ form.departamento_cliente.errors }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.telefono_cliente.label_tag }}
+                            {{ form.telefono_cliente }}
+                            {{ form.telefono_cliente.errors }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.correo_cliente.label_tag }}
+                            {{ form.correo_cliente }}
+                            {{ form.correo_cliente.errors }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección: Descripción de la Falla -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-tools"></i>
+                        Descripción de la Falla
+                    </h3>
+                    <div class="form-fields-grid">
+                        <div class="form-group span-2">
+                            {{ form.descripcion_falla.label_tag }}
+                            {{ form.descripcion_falla }}
+                            {{ form.descripcion_falla.errors }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.tipo_falla.label_tag }}
+                            {{ form.tipo_falla }}
+                            {{ form.tipo_falla.errors }}
+                        </div>
+                        <div class="form-group" id="div_tipo_falla_otro" style="display:none;">
+                            {{ form.tipo_falla_otro.label_tag }}
+                            {{ form.tipo_falla_otro }}
+                            {{ form.tipo_falla_otro.errors }}
+                        </div>
+                        <div class="form-group span-3">
+                            {{ form.observaciones.label_tag }}
+                            {{ form.observaciones }}
+                            {{ form.observaciones.errors }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Guardar Ficha
+                    </button>
+                    {% comment %}
+                    <button type="button" class="btn btn-danger" onclick="showSection('dashboard')">
+                        <i class="fas fa-times"></i>
                         Cancelar
-                    </button> {% endcomment %}
+                    </button>
+                    {% endcomment %}
+                </div>
             </form>
         </div>
     </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function(){
+        function toggleOtro(){
+            var select = document.querySelector('[name="tipo_equipo"]');
+            var selectFalla = document.querySelector('[name="tipo_falla"]');
+
+            var divOtro = document.getElementById('div_tipo_equipo_otro');
+            var divFalla = document.getElementById('div_tipo_falla_otro');
+
+            // tipo_equipo
+            if(select && divOtro){
+                if(select.value === 'otro'){
+                    divOtro.style.display = '';
+                } else {
+                    divOtro.style.display = 'none';
+                    var input = divOtro.querySelector('input');
+                    if(input) input.value = '';
+                }
+            }
+
+            // tipo_falla
+            if(selectFalla && divFalla){
+                if(selectFalla.value === 'otro'){
+                    divFalla.style.display = '';
+                } else {
+                    divFalla.style.display = 'none';
+                    var inputFalla = divFalla.querySelector('input');
+                    if(inputFalla) inputFalla.value = '';
+                }
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function(){
+            var select = document.querySelector('[name="tipo_equipo"]');
+            var selectFalla = document.querySelector('[name="tipo_falla"]');
+            if(select){
+                select.addEventListener('change', toggleOtro);
+            }
+            if(selectFalla){
+                selectFalla.addEventListener('change', toggleOtro);
+            }
+            // llamar una vez para inicializar (útil en edición)
+            toggleOtro();
+        });
+    })();
+</script>
 {% endblock %}

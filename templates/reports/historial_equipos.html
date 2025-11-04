@@ -114,7 +114,7 @@
         transform: translateY(-1px);
     }
     .btn-secondary {
-        background: var(--secondary-gray);
+        background: orange;
         color: var(--white);
     }
     .btn-secondary:hover {
@@ -251,6 +251,7 @@
                         <th>Marca</th>
                         <th>Modelo</th>
                         <th>Cliente</th>
+                        <th>Cedula</th>
                         <th>Tipo de Falla</th>
                         <th>Fecha de Creación</th>
                         <th>Acciones</th>
@@ -264,12 +265,15 @@
                         <td>{{ registro.marca }}</td>
                         <td>{{ registro.modelo }}</td>
                         <td>{{ registro.nombre_cliente }} {{ registro.apellido_cliente }}</td>
+                        <td>{{ registro.cedula_cliente }}</td>
                         <td>{{ registro.get_tipo_falla_display }}</td>
                         <td>{{ registro.fecha_creacion }}</td>
                         <td>
                             {% if registro.tecnico_asignado %}
                                 <button class="btn btn-primary" onclick="openModal('{{ registro.id }}', '{{ registro.tecnico_asignado.id }}')">Ver más</button>
-                            {% else %}
+                                <button class="btn btn-secondary">Reportar</button>
+
+                                {% else %}
                                 <button class="btn btn-primary" onclick="openModal('{{ registro.id }}', '')">Ver más</button>
                             {% endif %}
                         </td>
@@ -338,6 +342,7 @@
                                 <p><strong>Descripción:</strong> ${data.descripcion}</p>
                                 <p><strong>Nombre del Cliente:</strong> ${data.nombre_cliente}</p>
                                 <p><strong>Apellido del Cliente:</strong> ${data.apellido_cliente}</p>
+                                <p><strong>Cédula del Cliente:</strong> ${data.cedula_cliente}</p>
                                 <p><strong>Departamento del Cliente:</strong> ${data.departamento_cliente}</p>
                                 <p><strong>Teléfono del Cliente:</strong> ${data.telefono_cliente}</p>
                                 <p><strong>Correo del Cliente:</strong> ${data.correo_cliente}</p>

@@ -89,11 +89,15 @@ def historial_equipos(request):
             Q(codigo__icontains=search_query) |
             Q(nombre_cliente__icontains=search_query) |
             Q(apellido_cliente__icontains=search_query) |
+            Q(cedula_cliente__icontains=search_query) |
             Q(marca__icontains=search_query) |
             Q(modelo__icontains=search_query) |
+            Q(dependencia__icontains=search_query) |
+            Q(departamento_cliente__icontains=search_query) |
             Q(numero_serie__icontains=search_query) |
             Q(descripcion_falla__icontains=search_query) |
-            Q(tipo_falla__icontains=search_query)
+            Q(tipo_falla__icontains=search_query) |
+            Q(fecha_creacion__icontains=search_query)
         ).distinct()
     else:
         registros = FichaEntrada.objects.all()
@@ -117,6 +121,7 @@ def get_equipo_details(request, registro_id):
             'descripcion': registro.descripcion,
             'nombre_cliente': registro.nombre_cliente,
             'apellido_cliente': registro.apellido_cliente,
+            'cedula_cliente': registro.cedula_cliente,
             'departamento_cliente': registro.departamento_cliente,
             'telefono_cliente': registro.telefono_cliente,
             'correo_cliente': registro.correo_cliente,

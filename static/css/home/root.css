@@ -400,15 +400,51 @@ body::before {
     background: #10b981;
     border-color: #10b981;
 }
+.timeline-item.pending .timeline-dot{
+    background: #f59e0b; /* amber-500 - más fuerte */
+    border-color: #f59e0b;
+}
 .timeline-content {
     background: white;
     padding: 20px;
     border-radius: 12px;
-    border: 1px solid #e5e7eb;
+    border: 4px solid #e5e7eb;
 }
 .timeline-item.active .timeline-content {
     border-color: #010186;
     box-shadow: 0 2px 8px rgba(1,1,134,0.1);
+}
+/* Colores de borde por estado del timeline */
+/* Estado completado - verde */
+.timeline-item.completed .timeline-content {
+    border-color: #10b981; /* verde */
+}
+
+/* Estado pendiente - amarillo/naranja más fuerte/oscuro */
+.timeline-item.pending .timeline-content,
+.timeline-item.pending-task .timeline-content {
+    border-color: #f59e0b; /* amber-500 - más fuerte */
+    box-shadow: 0 2px 8px rgba(245,158,11,0.12);
+}
+
+/* Estado en reparación / progreso - naranja */
+.timeline-item.reparacion .timeline-content,
+.timeline-item.repair .timeline-content,
+.timeline-item.in-progress .timeline-content {
+    border-color: #f97316; /* naranja */
+    box-shadow: 0 2px 8px rgba(249,115,22,0.08);
+}
+
+/* Estado de diagnóstico - azul claro */
+.timeline-item.diagnostico .timeline-content,
+.timeline-item.diagnosis .timeline-content {
+    border-color: #0ea5e9; /* sky-500 */
+}
+
+/* Estado recibido / info - gris azulado */
+.timeline-item.recibido .timeline-content,
+.timeline-item.received .timeline-content {
+    border-color: #6366f1; /* indigo-ish, para distinguir */
 }
 .timeline-date {
     color: #010186;
