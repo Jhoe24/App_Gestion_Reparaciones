@@ -64,27 +64,20 @@ class FichaEntradaForm(forms.ModelForm):
         return cleaned
 
 
-class SeguimientoForm(forms.ModelForm):
+class  SeguimientoForm(forms.ModelForm):
     """Formulario para crear/actualizar un Seguimiento.
 
     Expone el campo `timeline` como un textarea JSON editable llamado `timeline_json`.
     """
-    timeline_json = forms.CharField(
-        widget=forms.Textarea(attrs={"class": "form-control", "rows": 4}),
-        required=False,
-        label="Timeline (JSON)",
-        help_text="Ingresa una lista JSON de eventos. Ej: [{\"fecha\": \"01 Oct 2025\", \"titulo\": \"Equipo Recibido\", ... }]",
-    )
-
     class Meta:
         model = Seguimiento
         fields = [
-            "ficha",
             "estado",
             "progreso",
             "fecha_estimada",
             "tecnico",
             "descripcion",
+            "video",
         ]
         widgets = {
             "estado": forms.Select(attrs={"class": "form-control form-select"}),
@@ -92,35 +85,22 @@ class SeguimientoForm(forms.ModelForm):
             "fecha_estimada": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
             "tecnico": forms.Select(attrs={"class": "form-control form-select"}),
             "descripcion": forms.Textarea(attrs={"class": "form-control", "rows": 2}),
+            "video": forms.ClearableFileInput(attrs={"class": "form-control", "accept": "video/*"}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Si existe instancia, pre-llenar timeline_json con el JSON formateado
-        if self.instance and getattr(self.instance, "timeline", None):
-            try:
-                self.fields["timeline_json"].initial = json.dumps(self.instance.timeline, ensure_ascii=False, indent=2)
-            except Exception:
-                # en caso de que el contenido no sea serializable, dejar en blanco
-                self.fields["timeline_json"].initial = ""
+        # Inicialización normal del formulario
 
-    def clean_timeline_json(self):
-        data = self.cleaned_data.get("timeline_json", "")
-        if not data:
-            return []
-        try:
-            parsed = json.loads(data)
-            if not isinstance(parsed, list):
-                raise forms.ValidationError("El timeline debe ser una lista JSON de eventos.")
-            return parsed
-        except json.JSONDecodeError as e:
-            raise forms.ValidationError(f"JSON inválido: {e}")
+    # No manejamos timeline desde el formulario; se rellenará automáticamente en la vista.
 
-    def save(self, commit=True):
-        instancia = super().save(commit=False)
-        # Asignar timeline parseado (si existe)
-        timeline = self.cleaned_data.get("timeline_json", [])
-        instancia.timeline = timeline
-        if commit:
-            instancia.save()
-        return instancia
+    def clean_video(self):
+        video = self.cleaned_data.get('video')
+        if not video:
+            return video
+        # Validaciones básicas: tamaño máximo (ej: 50MB) y tipo (por extensión simple)
+        max_size = 50 * 1024 * 1024  # 50 MB
+        if video.size > max_size:
+            raise forms.ValidationError('El video supera el tamaño máximo permitido (50 MB).')
+        # Opcional: validar tipo por content_type
+        return video

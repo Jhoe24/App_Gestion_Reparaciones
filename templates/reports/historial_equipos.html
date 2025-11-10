@@ -271,7 +271,7 @@
                         <td>
                             {% if registro.tecnico_asignado %}
                                 <button class="btn btn-primary" onclick="openModal('{{ registro.id }}', '{{ registro.tecnico_asignado.id }}')">Ver más</button>
-                                <button class="btn btn-secondary">Reportar</button>
+                                <button class="btn btn-secondary" onclick="openReportModal('{{ registro.id }}')">Reportar</button>
 
                                 {% else %}
                                 <button class="btn btn-primary" onclick="openModal('{{ registro.id }}', '')">Ver más</button>
@@ -297,6 +297,19 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal para reportar / Seguimiento -->
+    <div id="reportModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeReportModal()">&times;</span>
+            <h2>Nuevo Seguimiento</h2>
+            <div id="reportModalBody">
+            <!-- Aquí inyectaremos el HTML del formulario devuelto por el servidor -->
+            <div style="text-align:center;color:var(--dark-gray);">Cargando formulario...</div>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         // Lista de técnicos cargada directamente en la página
@@ -371,5 +384,151 @@
         function closeModal() {
             document.getElementById('equipoModal').style.display = 'none';
         }
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+        function openReportModal(registroId) {
+            const modal = document.getElementById('reportModal');
+            const body = document.getElementById('reportModalBody');
+            modal.style.display = 'flex';
+            body.innerHTML = '<div style="text-align:center;color:var(--dark-gray);">Cargando formulario...</div>';
+
+            fetch(`/reports/ficha/${registroId}/seguimiento/`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',   
+                },
+                credentials: 'same-origin',
+            })
+            .then(resp => resp.json())
+            .then(data => {
+                    if (data.html) {
+                        body.innerHTML = data.html;
+
+                        // Buscar el formulario recién inyectado y añadir listener de forma defensiva
+                        const form = document.getElementById('seguimientoForm');
+                        if (!form) {
+                            console.error('No se encontró el formulario de seguimiento después de inyectarlo');
+                            body.innerHTML = '<p style="color:red;">Error al inicializar el formulario. Refresca la página e intenta de nuevo.</p>';
+                            return;
+                        }
+
+                        // Evitar dobles listeners
+                        form.removeEventListener && form.removeEventListener('submit', submitSeguimientoForm);
+
+                        form.addEventListener('submit', function(e) {
+                            e.preventDefault();
+                            // Desactivar botones para evitar doble envío
+                            const submitBtn = form.querySelector('button[type="submit"]');
+                            if (submitBtn) {
+                                submitBtn.disabled = true;
+                                submitBtn.dataset.origText = submitBtn.innerText;
+                                submitBtn.innerText = 'Guardando...';
+                            }
+                            // Enviar formulario
+                            try {
+                                submitSeguimientoForm(registroId, form).catch(err => {
+                                    console.error('Error en submitSeguimientoForm:', err);
+                                    if (submitBtn) {
+                                        submitBtn.disabled = false;
+                                        submitBtn.innerText = submitBtn.dataset.origText || 'Guardar';
+                                    }
+                                    body.insertAdjacentHTML('afterbegin', '<div class="error" style="color:red;margin-bottom:8px;">Error al enviar el formulario: ' + (err.message || err) + '</div>');
+                                });
+                            } catch (err) {
+                                console.error('Excepción al llamar submitSeguimientoForm:', err);
+                                if (submitBtn) {
+                                    submitBtn.disabled = false;
+                                    submitBtn.innerText = submitBtn.dataset.origText || 'Guardar';
+                                }
+                                body.insertAdjacentHTML('afterbegin', '<div class="error" style="color:red;margin-bottom:8px;">Error inesperado: ' + (err.message || err) + '</div>');
+                            }
+                        });
+                    } else {
+                    body.innerHTML = '<p style="color:red;">Error al cargar el formulario.</p>';
+                }
+            })
+            .catch(err => {
+                body.innerHTML = `<p>Error: ${err.message}</p>`;
+            });
+
+        }
+
+        function submitSeguimientoForm(registroId, form) {
+            const url = `/reports/ficha/${registroId}/seguimiento/`;
+            const formData = new FormData(form);
+            // fetch POST
+            return fetch(url, {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    // Si tu proyecto necesita header CSRF manual, inyecta:
+                    'X-CSRFToken': getCookie('csrftoken') || ''
+                }
+            })
+            .then(async resp => {
+                // Intentar parsear JSON; si falla, obtener texto para diagnosticar
+                let data;
+                try {
+                    data = await resp.json();
+                } catch (err) {
+                    const txt = await resp.text();
+                    console.error('Respuesta no JSON al enviar seguimiento:', txt);
+                    throw new Error('Respuesta inesperada del servidor. Revisa la consola para más detalles.');
+                }
+
+                if (data.success) {
+                    // cerrar modal y actualizar la UI
+                    closeReportModal();
+                    // Opcional: mostrar toast o recargar parte del DOM
+                    try { console.info('Seguimiento guardado:', data.message); } catch (e) {}
+                    // Recargar para reflejar cambios (simplifica la UX)
+                    location.reload();
+                    return;
+                }
+
+                // Si no hay éxito, mostrar el HTML con errores en el modal
+                if (data.html) {
+                    const body = document.getElementById('reportModalBody');
+                    body.innerHTML = data.html;
+                    // Re-enganchar el formulario inyectado
+                    const newForm = document.getElementById('seguimientoForm');
+                    if (newForm) {
+                        newForm.addEventListener('submit', function(e) {
+                            e.preventDefault();
+                            submitSeguimientoForm(registroId, newForm);
+                        });
+                    }
+                } else {
+                    throw new Error(data.message || 'Error al guardar el seguimiento');
+                }
+            })
+            .catch(err => {
+                console.error('Error en la petición de seguimiento:', err);
+                // Mostrar error en el modal
+                const body = document.getElementById('reportModalBody');
+                if (body) {
+                    body.insertAdjacentHTML('afterbegin', '<div class="error" style="color:red;margin-bottom:8px;">' + (err.message || 'Error en la petición') + '</div>');
+                } else {
+                    alert('Error en la petición: ' + (err.message || err));
+                }
+                // Re-habilitar el botón submit si existe
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = submitBtn.dataset.origText || 'Guardar';
+                }
+            });
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').style.display = 'none';
+        }
+
+
     </script>
 {% endblock %}

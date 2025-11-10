@@ -95,12 +95,31 @@ function buscarEquipos() {
         alert('⚠️ Ingresa un número de cédula válido');
         return;
     }
-    const equipos = equiposData[cedula];
-    if (equipos) {
-        mostrarResultados(equipos, cedula);
-    } else {
-        mostrarSinResultados(cedula);
-    }
+    // Llamada al endpoint del backend que devuelve fichas y timelines por cédula
+    fetch(`/reports/timelines/?cedula=${encodeURIComponent(cedula)}`, { method: 'GET', credentials: 'same-origin' })
+        .then(resp => resp.json())
+        .then(data => {
+            if (data && data.success && Array.isArray(data.fichas) && data.fichas.length > 0) {
+                // Adaptar la respuesta al formato que espera mostrarResultados
+                const equipos = data.fichas.map(f => ({
+                    id: f.codigo || `ID-${f.id}`,
+                    nombre: f.tipo_equipo || f.codigo,
+                    modelo: f.modelo || '',
+                    estado: (f.estado || 'recibido').toLowerCase(),
+                    progreso: f.progreso || 0,
+                    fechaIngreso: f.fechaIngreso || '',
+                    fechaEstimada: f.fechaEstimada || '',
+                    timeline: f.timeline || [],
+                }));
+                mostrarResultados(equipos, cedula);
+            } else {
+                mostrarSinResultados(cedula);
+            }
+        })
+        .catch(err => {
+            console.error('Error obteniendo timelines:', err);
+            alert('Ocurrió un error al consultar el estado. Intenta nuevamente.');
+        });
 }
 
 // Función para mostrar resultados
@@ -140,13 +159,18 @@ function mostrarResultados(equipos, cedula) {
                 <div class="timeline">
         `;
         equipo.timeline.forEach(item => {
+            // icono por estado si no viene
+            const estadoIcon = (item.icono) ? item.icono : (item.estado === 'recepcion' ? '📦' : (item.estado === 'diagnostico' ? '🔍' : (item.estado === 'reparacion' ? '🔧' : (item.estado === 'pruebas' ? '✅' : '📌'))));
+            // Mostrar fecha tal cual (backend envía ISO o texto formateado)
+            const fechaTexto = item.fecha || '';
             html += `
                 <div class="timeline-item ${item.estado}">
                     <div class="timeline-dot"></div>
                     <div class="timeline-content">
-                        <div class="timeline-date">${item.fecha}</div>
-                        <div class="timeline-title">${item.icono} ${item.titulo}</div>
-                        <div class="timeline-desc">${item.descripcion}</div>
+                        <div class="timeline-date">${fechaTexto}</div>
+                        <div class="timeline-title">${estadoIcon} ${item.titulo}</div>
+                        <div class="timeline-desc">${item.descripcion || ''}</div>
+                        ${item.video ? (`<div class="timeline-video"><a href="${item.video}" target="_blank">Ver video</a></div>`) : ''}
                     </div>
                 </div>
             `;

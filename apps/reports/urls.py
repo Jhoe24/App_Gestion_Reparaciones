@@ -15,4 +15,10 @@ urlpatterns = [
     path('asignar_tecnico/<int:registro_id>/', views.asignar_tecnico, name='asignar_tecnico'),
     path('exportar_datos/', views.exportar_datos, name='exportar_datos'),
 
+    path('ficha/<int:registro_id>/seguimiento/', views.add_seguimiento, name='add_seguimiento'),
+    path('timelines/', views.timelines_by_cedula, name='timelines_by_cedula'),
+
+    path('estadisticas/', views.reporte_estadisticas, name='reporte_estadisticas')
+
+
 ]

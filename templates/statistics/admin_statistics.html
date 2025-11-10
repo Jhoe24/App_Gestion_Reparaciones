@@ -1,0 +1,365 @@
+{% extends 'dashboard/admin.html' %}
+{% block title %}Estadísticas y Métricas{% endblock %}
+{% load static %}
+{% block extra_css %}
+<style>
+    /* Estilos para las tarjetas de estadísticas */
+    .stats-card {
+        background: var(--white);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        margin-bottom: 2rem;
+        text-align: center;
+        flex: 1;
+        min-width: 200px;
+    }
+    .stats-cards {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+    }
+    .stats-card h3 {
+        font-size: 1.25rem;
+        color: var(--primary-blue);
+        margin-bottom: 1rem;
+    }
+    .stats-card .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--dark-gray);
+    }
+    /* Estilos para los gráficos */
+    .chart-container {
+        background: var(--white);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        margin-bottom: 2rem;
+    }
+    .chart-container canvas {
+        width: 100% !important;
+        height: auto !important;
+    }
+    .chart-row {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .chart-container {
+        flex: 1;
+        min-width: 300px;
+    }
+    /* Estilos para el formulario de filtrado simplificado */
+    .search-card {
+        background: var(--white);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        margin-bottom: 2rem;
+    }
+    .search-form {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        width: 60%;
+    }
+    .search-form input {
+        flex: 1;
+        padding: 0.75rem;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: border 0.3s ease;
+    }
+    .search-form input:focus {
+        border-color: var(--primary-yellow);
+        outline: none;
+    }
+    .search-form button {
+        background: var(--primary-yellow);
+        color: var(--primary-blue);
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .search-form button:hover {
+        background: var(--bright-yellow);
+        transform: translateY(-1px);
+    }
+    .export-button {
+        background: var(--primary-blue);
+        color: var(--white);
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .export-button:hover {
+        background: var(--dark-blue);
+        transform: translateY(-1px);
+    }
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        width: 100%;
+    }
+    /* Estilos para la sección de estadísticas y gráficos */
+    .stats-and-charts {
+        margin-top: 2rem;
+    }
+    /* Estilos para las tablas dentro de las tarjetas de estadísticas */
+    .stats-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0 auto;
+        text-align: left;
+        font-size: 0.95rem;
+    }
+    .stats-table thead th {
+        background: var(--primary-blue);
+        color: #fff;
+        font-weight: 600;
+        padding: 0.6rem 0.75rem;
+        border-radius: 6px 6px 0 0;
+    }
+    .stats-table tbody td {
+        padding: 0.6rem 0.75rem;
+        border-bottom: 1px solid #e9ecef;
+        color: var(--dark-gray);
+    }
+    .stats-table tbody tr:nth-child(even) {
+        background: rgba(0,0,0,0.02);
+    }
+    .stats-table .count-cell {
+        text-align: right;
+        font-weight: 600;
+    }
+    /* Wrapper para tablas con scroll en pantallas pequeñas */
+    .table-wrapper {
+        max-height: 180px;
+        overflow: auto;
+        padding-right: 0.25rem;
+    }
+</style>
+{% endblock %}
+{% block main_content %}
+    <div class="content-section active" id="estadisticas-metricas">
+        <div class="section-header">
+            <h2 class="section-title">Estadísticas y Métricas</h2>
+            <p class="section-subtitle">Resumen de estadísticas y métricas del sistema</p>
+        </div>
+        <!-- Tarjeta de búsqueda simplificada -->
+        <div class="search-card">
+            <div class="action-buttons">
+                <form class="search-form" method="get" action="{% url 'reports:reporte_estadisticas' %}">
+                    <input type="text" name="search" placeholder="Ingrese nombre, marca, departamento, modelo, etc." value="{{ request.GET.search }}">
+                    <button type="submit">Buscar</button>
+                </form>
+                <button type="button" class="export-button" onclick="exportToPDF()">Exportar a PDF</button>
+            </div>
+        </div>
+        <!-- Sección de estadísticas y gráficos -->
+        <div class="stats-and-charts" id="stats-and-charts">
+            <!-- Tarjetas de estadísticas generales -->
+            <div class="stats-cards">
+                <div class="stats-card">
+                    <h3>Total de Equipos</h3>
+                    <div class="stat-value" id="totalEquipos">{{ total_equipos }}</div>
+                </div>
+                <div class="stats-card">
+                    <h3>Equipos por Tipo</h3>
+                    <div class="stat-value table-container" id="equiposPorTipo">
+                        <div class="table-wrapper">
+                            <table class="stats-table" aria-describedby="equipos-por-tipo">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo</th>
+                                        <th style="width:90px; text-align:right;">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for tipo in equipos_por_tipo %}
+                                        <tr>
+                                            <td>{{ tipo.tipo_equipo }}</td>
+                                            <td class="count-cell">{{ tipo.count }}</td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="2">No hay datos disponibles</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats-card">
+                    <h3>Equipos por Estado</h3>
+                    <div class="stat-value table-container" id="equiposPorEstado">
+                        <div class="table-wrapper">
+                            <table class="stats-table" aria-describedby="equipos-por-estado">
+                                <thead>
+                                    <tr>
+                                        <th>Estado</th>
+                                        <th style="width:90px; text-align:right;">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for estado in equipos_por_estado %}
+                                        <tr>
+                                            <td>{{ estado.estado }}</td>
+                                            <td class="count-cell">{{ estado.count }}</td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="2">No hay datos disponibles</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats-card">
+                    <h3>Equipos por Técnico</h3>
+                    <div class="stat-value table-container" id="equiposPorTecnico">
+                        <div class="table-wrapper">
+                            <table class="stats-table" aria-describedby="equipos-por-tecnico">
+                                <thead>
+                                    <tr>
+                                        <th>Técnico</th>
+                                        <th style="width:90px; text-align:right;">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for tecnico in equipos_por_tecnico %}
+                                        <tr>
+                                            <td>{{ tecnico.tecnico }}</td>
+                                            <td class="count-cell">{{ tecnico.count }}</td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="2">No hay datos disponibles</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats-card">
+                    <h3>Tiempo Promedio de Reparación</h3>
+                    <div class="stat-value" id="tiempoPromedioReparacion">{{ tiempo_promedio_reparacion }} días</div>
+                </div>
+            </div>
+            <!-- Gráficos -->
+            <div class="chart-row">
+                <div class="chart-container">
+                    <canvas id="reparacionesPorMes"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="reparacionesPorTecnico"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Scripts para cargar datos y gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.5/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script>
+        // Función para inicializar gráficos usando datos reales pasados desde la vista
+        function inicializarGraficos() {
+            // Parsear los JSON inyectados por Django
+            const reparacionesPorMesData = JSON.parse('{{ reparaciones_por_mes_json|escapejs }}');
+            const reparacionesPorTecnicoData = JSON.parse('{{ reparaciones_por_tecnico_json|escapejs }}');
+
+            // Gráfico de reparaciones por mes (bar)
+            const reparacionesPorMesCtx = document.getElementById('reparacionesPorMes').getContext('2d');
+            new Chart(reparacionesPorMesCtx, {
+                type: 'bar',
+                data: {
+                    labels: reparacionesPorMesData.labels,
+                    datasets: [{
+                        label: 'Número de Reparaciones',
+                        data: reparacionesPorMesData.data,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de reparaciones por técnico (pie)
+            const reparacionesPorTecnicoCtx = document.getElementById('reparacionesPorTecnico').getContext('2d');
+            // Generar paleta dinámica (repite colores si hay más técnicos)
+            const baseColors = [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ];
+            const baseBorders = [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ];
+            const bgColors = reparacionesPorTecnicoData.labels.map((_, i) => baseColors[i % baseColors.length]);
+            const borderColors = reparacionesPorTecnicoData.labels.map((_, i) => baseBorders[i % baseBorders.length]);
+
+            new Chart(reparacionesPorTecnicoCtx, {
+                type: 'pie',
+                data: {
+                    labels: reparacionesPorTecnicoData.labels,
+                    datasets: [{
+                        label: 'Número de Reparaciones',
+                        data: reparacionesPorTecnicoData.data,
+                        backgroundColor: bgColors,
+                        borderColor: borderColors,
+                        borderWidth: 1
+                    }]
+                }
+            });
+        }
+        // Función para exportar a PDF
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('stats-and-charts');
+            html2canvas(element, {
+                scale: 2, // Aumentar la escala para mejorar la calidad
+                logging: true,
+                useCORS: true,
+                allowTaint: true
+            }).then(canvas => {
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 210;
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                pdf.save('estadisticas_metricas.pdf');
+            });
+        }
+        // Cargar datos y inicializar gráficos al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarGraficos();
+        });
+    </script>
+{% endblock %}

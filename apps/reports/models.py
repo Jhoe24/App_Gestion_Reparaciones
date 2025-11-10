@@ -74,6 +74,16 @@ class FichaEntrada(models.Model):
     )
     tipo_falla_otro = models.CharField("Tipo de Falla (otro)", max_length=100, blank=True)
     observaciones = models.TextField("Observaciones", blank=True)
+    # los estados son recivido, en diagnostico, en reparacion, pruebas de calidad, listo para entrega, entregado
+    ESTADOS_CHOICES = [
+        ("recibido", "Recibido"),
+        ("diagnostico", "En Diagnóstico"),
+        ("reparacion", "En Reparación"),
+        ("pruebas_calidad", "Pruebas de Calidad"),
+        ("listo_entrega", "Listo para Entrega"),
+        ("entregado", "Entregado"),
+    ] 
+    estado = models.CharField("Estado", max_length=20, choices=ESTADOS_CHOICES, default="recibido")
     fecha_creacion = models.DateTimeField("Fecha de Creación", auto_now_add=True)
     tecnico_asignado = models.ForeignKey(
             CustomUser,
@@ -128,6 +138,32 @@ class Seguimiento(models.Model):
     descripcion = models.TextField("Descripción general", blank=True)
     # Usamos JSONField para guardar el timeline como una lista de objetos
     timeline = models.JSONField("Timeline", default=list, blank=True)
+    # Ejemplo de como se guardaria en el timeline:
+    # [
+    #     {
+    #         "fecha": "2025-10-01T10:00:00",
+    #         "titulo": "Equipo Recibido",
+    #         "descripcion": "El equipo ha sido recibido en el taller.",
+    #         "estado": "completed",
+    #         "icono": "check-circle"
+    #     },
+    #     {
+    #         "fecha": "2025-10-02T14:30:00",
+    #         "titulo": "Diagnóstico Realizado",
+    #         "descripcion": "Se ha completado el diagnóstico y se identificaron los problemas.",
+    #         "estado": "completed",
+    #         "icono": "stethoscope"
+    #     },
+    #     ...
+    # ]                     
+    # Video opcional subido junto al seguimiento. Se recortará a los primeros 10 segundos al guardarse.
+    video = models.FileField(
+        "Video (opcional)",
+        upload_to='seguimientos/videos/',
+        null=True,
+        blank=True,
+        help_text='Sube un video opcional. Si es más largo, se recortará a los primeros 10 segundos.'
+    )
 
     class Meta:
         verbose_name = "Seguimiento"
@@ -151,3 +187,4 @@ class Seguimiento(models.Model):
         timeline.append(evento)
         self.timeline = timeline
         self.save()
+        

@@ -159,6 +159,10 @@ else:
     EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() in ('true', '1', 't')
     EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
     EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+    DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL') or EMAIL_HOST_USER or 'no-reply@example.com'
+
+
+# Dirección remitente por defecto. Si no se provee, usar el usuario SMTP o un no-reply
 
 if DEBUG:
     SESSION_COOKIE_AGE = 3600
