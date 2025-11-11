@@ -473,7 +473,6 @@ def add_seguimiento(request, registro_id):
     return JsonResponse({'success': True, 'message': 'Evento añadido al timeline', 'event': evento, 'seguimiento_id': seguimiento.id, 'video_trimmed': video_trimmed, 'video_trim_error': video_trim_error})
 
 
-@login_required
 def timelines_by_cedula(request):
     """Devuelve JSON con las fichas del cliente identificado por `cedula` y sus timelines.
 
