@@ -267,6 +267,39 @@
                     <canvas id="reparacionesPorTecnico"></canvas>
                 </div>
             </div>
+            <!-- Sección separada para filtrar por mes/año (no afecta botones ni gráficos) -->
+            <div class="search-card" style="margin-top:1.5rem;">
+                <h3 style="margin-bottom:0.75rem;">Filtrar por mes y año</h3>
+                <form class="search-form" method="get" action="{% url 'reports:reporte_estadisticas' %}">
+                    {# conservar el search actual para combinar filtros si viene #}
+                    <input type="hidden" name="search" value="{{ request.GET.search }}">
+                    <select name="month">
+                        <option value="">Mes (todos)</option>
+                        <option value="1" {% if selected_month == 1 %}selected{% endif %}>Enero</option>
+                        <option value="2" {% if selected_month == 2 %}selected{% endif %}>Febrero</option>
+                        <option value="3" {% if selected_month == 3 %}selected{% endif %}>Marzo</option>
+                        <option value="4" {% if selected_month == 4 %}selected{% endif %}>Abril</option>
+                        <option value="5" {% if selected_month == 5 %}selected{% endif %}>Mayo</option>
+                        <option value="6" {% if selected_month == 6 %}selected{% endif %}>Junio</option>
+                        <option value="7" {% if selected_month == 7 %}selected{% endif %}>Julio</option>
+                        <option value="8" {% if selected_month == 8 %}selected{% endif %}>Agosto</option>
+                        <option value="9" {% if selected_month == 9 %}selected{% endif %}>Septiembre</option>
+                        <option value="10" {% if selected_month == 10 %}selected{% endif %}>Octubre</option>
+                        <option value="11" {% if selected_month == 11 %}selected{% endif %}>Noviembre</option>
+                        <option value="12" {% if selected_month == 12 %}selected{% endif %}>Diciembre</option>
+                    </select>
+                    <select name="year">
+                        <option value="">Año</option>
+                        {% for y in available_years %}
+                            <option value="{{ y }}" {% if selected_year == y %}selected{% endif %}>{{ y }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit">Aplicar filtro</button>
+                </form>
+                {% if rep_count_for_month is not None %}
+                    <p style="margin-top:.5rem;">Reparaciones en <strong>{% if selected_month %}{{ selected_month }}{% else %}--{% endif %}</strong> / <strong>{{ selected_year }}</strong>: <strong>{{ rep_count_for_month }}</strong></p>
+                {% endif %}
+            </div>
         </div>
     </div>
     <!-- Scripts para cargar datos y gráficos -->
@@ -282,6 +315,23 @@
 
             // Gráfico de reparaciones por mes (bar)
             const reparacionesPorMesCtx = document.getElementById('reparacionesPorMes').getContext('2d');
+            // Resaltar mes seleccionado si existe
+            const selectedMonth = {% if selected_month %}{{ selected_month }}{% else %}null{% endif %};
+            // Construir paleta por mes (uno por etiqueta)
+            const monthBgColors = reparacionesPorMesData.labels.map((_, i) => {
+                // si hay mes seleccionado (1-12) y coincide con i+1, usar color destacado
+                if (selectedMonth && (i + 1) === selectedMonth) {
+                    return 'rgba(255, 99, 132, 0.4)'; // color destacado (rojo claro)
+                }
+                return 'rgba(54, 162, 235, 0.2)';
+            });
+            const monthBorderColors = reparacionesPorMesData.labels.map((_, i) => {
+                if (selectedMonth && (i + 1) === selectedMonth) {
+                    return 'rgba(255, 99, 132, 1)';
+                }
+                return 'rgba(54, 162, 235, 1)';
+            });
+
             new Chart(reparacionesPorMesCtx, {
                 type: 'bar',
                 data: {
@@ -289,8 +339,8 @@
                     datasets: [{
                         label: 'Número de Reparaciones',
                         data: reparacionesPorMesData.data,
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: monthBgColors,
+                        borderColor: monthBorderColors,
                         borderWidth: 1
                     }]
                 },

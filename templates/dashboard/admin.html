@@ -17,9 +17,17 @@
         
             <div class="sidebar" id="sidebar">
                 <div class="sidebar-header">
-                    <a href="{% url 'equipment:admin_panel'%}" class="logo">
+                    <a href="{% if user.rol == "administrador" or user.is_superuser %}{% url 'equipment:admin_panel' %}{% else %}{% url 'equipment:tech_dashboard' %}{% endif %}" class="logo">
                         <i class="fas fa-tools"></i>
-                        <span>Soporte Tecnico UPT</span>
+                        <span>
+                            {% if user.rol == "administrador" or user.is_superuser %}
+                                Panel de Administración
+                            {% elif user.rol == "tecnico" %}
+                                Panel de Tecnico
+                            {% else %}
+                                Soporte Técnico UPT
+                            {% endif %} 
+                        </span>
                     </a>
                 </div>
                 
@@ -87,6 +95,19 @@
                             <a href="{% url 'equipment:tech_dashboard'%}" class="nav-item active" data-section="dashboard">
                                 <i class="fas fa-tachometer-alt"></i>
                                 Panel Principal
+                            </a>
+                            <div class="nav-section-title">Ficha de Entrada</div>
+                            <a href="{% url 'reports:ficha_entrada' %}" class="nav-item" data-section="computers">
+                                <i class="fas fa-desktop"></i>
+                                Solicitud
+                            </a>
+                            <a href="{% url 'reports:historial_equipos' %}" class="nav-item" data-section="history">
+                                <i class="fas fa-history"></i>
+                                Historial de Equipos
+                            </a>
+                            <a href="{% url 'reports:reporte_estadisticas' %}" class="nav-item" data-section="statistics">
+                                <i class="fas fa-chart-line"></i>
+                                Reportes
                             </a>
                             {% comment %} <a href="#" class="nav-item" data-section="my-tasks">
                                 <i class="fas fa-tasks"></i>

@@ -20,10 +20,10 @@
     <header class="header">
         <div class="header-content">
             <div class="logo-section">
-                <div class="logo"><img src="{% static 'img/logo2.png'%}"/></div>
+                {% comment %} <div class="logo"><img src="{% static 'img/logo2.png'%}"/></div> {% endcomment %}
                 <div class="logo-text">
-                    <h1>Soporte Técnico UPT</h1>
-                    <p>Centro de Mantenimiento y Reparación</p>
+                    <h1>Centro de Mantenimiento y Reparación</h1>
+                    <p></p>
                 </div>
             </div>
             <a href="{% url 'authentication:login' %}" class="login-btn">Iniciar Sesión</a>

@@ -24,7 +24,7 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.562);
     z-index: -1;
 }
 
@@ -93,7 +93,7 @@ body::before {
 }
 /* Hero Section */
 .hero {
-    background: transparent;
+    background: transparent ;
     padding: 60px 40px;
     text-align: center;
     border-bottom: 1px solid #e5e7eb;
@@ -109,7 +109,7 @@ body::before {
     font-weight: 700;
 }
 .hero p {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     color: #000000;
     margin-bottom: 40px;
 }

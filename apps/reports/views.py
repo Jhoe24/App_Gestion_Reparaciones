@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
+from apps.authentication.decorators import tech_required
 from django.views.decorators.http import require_http_methods
 from .forms import FichaEntradaForm, SeguimientoForm
 from django.contrib import messages
@@ -17,6 +18,7 @@ from django.template.loader import render_to_string
 from django.db.models import Q, Count
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
+from datetime import datetime
 import calendar
 import openpyxl
 from openpyxl.styles import Font, Alignment
@@ -28,6 +30,7 @@ from uuid import uuid4
 from django.db import transaction
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
+from django.core.mail import send_mail
 from django.utils.html import strip_tags
 
 logger = logging.getLogger(__name__)
@@ -79,7 +82,7 @@ class ReporteDetailView(LoginRequiredMixin, DetailView):
         raise PermissionDenied('No tienes permiso para ver este reporte.')
 
 
-@login_required
+@tech_required
 def ficha_entrada_view(request):
     try:
         if request.method == 'POST':
@@ -96,7 +99,7 @@ def ficha_entrada_view(request):
         messages.error(request, f"Ocurrió un error al procesar la ficha de entrada: {e}")
         return render(request, 'reports/ficha_entrada.html', {'form': FichaEntradaForm()})
 
-@login_required
+@tech_required
 def historial_equipos(request):
     search_query = request.GET.get('search', '')
     if search_query:
@@ -233,13 +236,53 @@ def exportar_datos(request):
 
 @login_required
 def reporte_estadisticas(request):
-    # Obtenemos estadisticas y metricas relevantes
-    
-    total_equipos = FichaEntrada.objects.count()
-    equipos_por_tipo = FichaEntrada.objects.values('tipo_equipo').annotate(count=Count('tipo_equipo'))
-    equipos_por_estado = FichaEntrada.objects.values('estado').annotate(count=Count('estado'))
+    # Construir queryset base aplicando filtros opcionales provistos en GET
+    def _apply_stats_filters(req):
+        qs = FichaEntrada.objects.all()
+        search = (req.GET.get('search') or '').strip()
+        if not search:
+            return qs
+
+        q = Q()
+        # Búsqueda libre sobre campos relevantes
+        q |= Q(codigo__icontains=search)
+        q |= Q(nombre_cliente__icontains=search)
+        q |= Q(apellido_cliente__icontains=search)
+        q |= Q(cedula_cliente__icontains=search)
+        q |= Q(marca__icontains=search)
+        q |= Q(modelo__icontains=search)
+        q |= Q(dependencia__icontains=search)
+        q |= Q(departamento_cliente__icontains=search)
+        q |= Q(tipo_equipo__icontains=search)
+        q |= Q(tipo_falla__icontains=search)
+        q |= Q(descripcion_falla__icontains=search)
+        # técnico - buscar por nombre/apellido/username
+        q |= Q(tecnico_asignado__first_name__icontains=search)
+        q |= Q(tecnico_asignado__last_name__icontains=search)
+        q |= Q(tecnico_asignado__username__icontains=search)
+
+        # Intentar interpretar search como fecha (yyyy-mm-dd o dd/mm/yyyy)
+        try:
+            # primero yyyy-mm-dd
+            fecha = datetime.strptime(search, '%Y-%m-%d').date()
+            q |= Q(fecha_creacion__date=fecha)
+        except Exception:
+            try:
+                fecha = datetime.strptime(search, '%d/%m/%Y').date()
+                q |= Q(fecha_creacion__date=fecha)
+            except Exception:
+                pass
+
+        return qs.filter(q).distinct()
+
+    base_qs = _apply_stats_filters(request)
+
+    # Obtenemos estadisticas y metricas relevantes sobre el queryset filtrado
+    total_equipos = base_qs.count()
+    equipos_por_tipo = base_qs.values('tipo_equipo').annotate(count=Count('tipo_equipo'))
+    equipos_por_estado = base_qs.values('estado').annotate(count=Count('estado'))
     # Conteo por técnico (usamos nombre completo cuando esté disponible)
-    equipos_por_tecnico_qs = FichaEntrada.objects.values(
+    equipos_por_tecnico_qs = base_qs.values(
         'tecnico_asignado__id',
         'tecnico_asignado__first_name',
         'tecnico_asignado__last_name'
@@ -247,14 +290,36 @@ def reporte_estadisticas(request):
 
     # Preparar datos para los gráficos
     # Reparaciones por mes (año actual, meses 1-12)
+    # Permitir seleccionar año/mes desde GET (para ver reparaciones en un mes específico)
     current_year = timezone.now().year
+    # leer parámetros opcionales
+    month_param = request.GET.get('month')
+    year_param = request.GET.get('year')
+    try:
+        year_int = int(year_param) if year_param else current_year
+    except Exception:
+        year_int = current_year
+
+    # Usar base_qs para calcular reparaciones por mes del año seleccionado
     reparaciones_mes_qs = (
-        FichaEntrada.objects.filter(fecha_creacion__year=current_year)
+        base_qs.filter(fecha_creacion__year=year_int)
         .annotate(month=TruncMonth('fecha_creacion'))
         .values('month')
         .annotate(count=Count('id'))
         .order_by('month')
     )
+
+    # Si se seleccionó mes específico, calcular el conteo para ese mes
+    rep_count_for_month = None
+    selected_month = None
+    try:
+        if month_param:
+            month_int = int(month_param)
+            if 1 <= month_int <= 12:
+                selected_month = month_int
+                rep_count_for_month = base_qs.filter(fecha_creacion__year=year_int, fecha_creacion__month=month_int).count()
+    except Exception:
+        rep_count_for_month = None
 
     # Mapeo de mes (1-12) a conteo
     meses_map = {item['month'].month: item['count'] for item in reparaciones_mes_qs}
@@ -293,6 +358,11 @@ def reporte_estadisticas(request):
             'labels': reparaciones_por_tecnico_labels,
             'data': reparaciones_por_tecnico_data,
         },
+        # selección de mes/año
+        'selected_month': selected_month,
+        'selected_year': year_int,
+        'rep_count_for_month': rep_count_for_month,
+        'available_years': list(range(current_year, current_year-6, -1)),
         # JSON strings para inyectar de forma segura en JS
         'reparaciones_por_mes_json': json.dumps({
             'labels': reparaciones_por_mes_labels,
@@ -438,10 +508,31 @@ def add_seguimiento(request, registro_id):
                     subject = f"Estado de su equipo {ficha_obj.codigo}: {evento_obj.get('titulo', '')}"
                     from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'no-reply@example.com')
                     to_email = [ficha_obj.correo_cliente]
+                    
+                    equipo_ctx = {
+                        'codigo': getattr(ficha_obj, 'codigo', ''),
+                        # usar display() para mostrar la etiqueta legible del choice
+                        'tipo_equipo': ficha_obj.get_tipo_equipo_display() if hasattr(ficha_obj, 'get_tipo_equipo_display') else getattr(ficha_obj, 'tipo_equipo', ''),
+                        'marca': getattr(ficha_obj, 'marca', ''),
+                        'modelo': getattr(ficha_obj, 'modelo', ''),
+                        # campo de estado: preferir el estado del seguimiento si existe, sino el de la ficha
+                        'estado_actual': (seguimiento_obj.estado if seguimiento_obj and getattr(seguimiento_obj, 'estado', None) else getattr(ficha_obj, 'estado', 'En espera de diagnóstico')),
+                    }
+                    # Fecha de entrega: si el seguimiento tiene fecha_estimada/fecha_entrega, usarla; si no, dejar vacío o usar now()
+                    fecha_entrega = None
+                    if seguimiento_obj and getattr(seguimiento_obj, 'fecha_entrega', None):
+                        fecha_entrega = seguimiento_obj.fecha_entrega
+                    elif getattr(ficha_obj, 'fecha_entrega', None):
+                        fecha_entrega = ficha_obj.fecha_entrega
+                    else:
+                        fecha_entrega = None
+                        
                     context = {
                         'ficha': ficha_obj,
                         'seguimiento': seguimiento_obj,
                         'evento': evento_obj,
+                        'equipo': equipo_ctx,
+                        'fecha_entrega': fecha_entrega,
                     }
                     # Pasar el `request` para que los context processors (p.ej. `user`) estén disponibles
                     try:
@@ -453,10 +544,16 @@ def add_seguimiento(request, registro_id):
                     text_content = strip_tags(html_content)
                     try:
                         logger.info('Intentando enviar correo a %s (ficha=%s, estado=%s, plantilla=%s)', ficha_obj.correo_cliente, ficha_obj.id, estado_key, tpl)
-                        msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
-                        msg.attach_alternative(html_content, 'text/html')
-                        sent = msg.send(fail_silently=False)
-                        logger.info('Email.send returned: %s', sent)
+                        # Usar send_mail con html_message; send_mail devuelve el número de mensajes enviados
+                        sent = send_mail(
+                            subject,
+                            text_content,
+                            from_email,
+                            to_email,
+                            fail_silently=False,
+                            html_message=html_content,
+                        )
+                        logger.info('send_mail returned: %s', sent)
                         logger.info('Correo enviado a %s para ficha %s estado=%s', ficha_obj.correo_cliente, ficha_obj.id, estado_key)
                     except Exception as ex:
                         logger.exception('Error enviando correo a %s: %s', ficha_obj.correo_cliente, ex)

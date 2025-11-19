@@ -234,6 +234,10 @@ class RegisterView(CreateView):
         self.object.is_verified = False
         self.object.save()
         
+        # Marcamos el usuario como su rol tecnio
+        self.object.rol = 'tecnico'
+        self.object.save()
+        
         # Enviar email de verificación
         try:
             self.send_verification_email(self.object)

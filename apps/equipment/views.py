@@ -7,7 +7,7 @@ from apps.authentication.mixins import AdminRequiredMixin, TechRequiredMixin
 from datetime import datetime
 
 class CustomDashboardView(LoginRequiredMixin, TemplateView):
-    template_name = 'equipment/dashboard.html'
+    template_name = 'home/home_dashboard_tech.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -27,11 +27,11 @@ class AdminDashboardView(AdminRequiredMixin, CustomDashboardView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['Solicitudes_Pendientes'] = Reporte.objects.filter(estado_reporte='en_espera')
-        context['en_repacion'] = Reporte.objects.filter(estado_reporte='en_mantenimiento').count()
-        context['completadas_hoy'] = Reporte.objects.filter(estado_reporte='reparado', fecha_finalizacion__date=datetime.today()).count()
-        context['urgentes'] = Reporte.objects.filter(prioridad='critica', estado_reporte__in=['en_espera', 'en_mantenimiento']).count()
-        context['actividad_reciente'] = HistorialReparacion.objects.select_related('equipo', 'tecnico').order_by('-fecha_hora')[:5]
+        context['Solicitudes_Pendientes'] = 0
+        context['en_repacion'] = 0
+        context['completadas_hoy'] = 0
+        context['urgentes'] = 0
+        context['actividad_reciente'] = 0
         return context
 
 class TechDashboardView(TechRequiredMixin, CustomDashboardView):
