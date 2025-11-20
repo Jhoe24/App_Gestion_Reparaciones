@@ -16,7 +16,7 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = 'django-insecure-s9v$#l6z8*@u%+d5hq!1ikm+$#me!5dpluz$5y2_b4teuy2-kn'
 
 # ADVERTENCIA DE SEGURIDAD: ¡no ejecutes con debug activado en producción!
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '*']
 
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
@@ -126,7 +126,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # luego verifica tu ip en la red local
 # como vamos a distribuir archivos staticos pues lo vamos a ser de la siguiente manera
 # http://192.168.10.121:8888/              http://192.168.10.121:8888/
-STATIC_URL = '/static/' #'http://192.168.10.114:8888/'
+STATIC_URL = 'http://192.168.10.114:8888/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
