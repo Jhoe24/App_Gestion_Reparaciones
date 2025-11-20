@@ -81,7 +81,7 @@ class  SeguimientoForm(forms.ModelForm):
         ]
         widgets = {
             "estado": forms.Select(attrs={"class": "form-control form-select"}),
-            "progreso": forms.NumberInput(attrs={"class": "form-control", "min": 0, "max": 100}),
+            "progreso": forms.HiddenInput(),
             "fecha_estimada": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
             "tecnico": forms.Select(attrs={"class": "form-control form-select"}),
             "descripcion": forms.Textarea(attrs={"class": "form-control", "rows": 2}),

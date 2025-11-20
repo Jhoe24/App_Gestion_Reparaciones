@@ -41,10 +41,13 @@
                         id="cedulaInput"
                         class="tracking-input"
                         placeholder="Número de cédula (Ej: 12345678)"
-                        maxlength="10"
+                        maxlength="8"
+                        inputmode="numeric"
+                        pattern="\\d*"
+                        oninput="this.value = this.value.replace(/\D/g, '')"
                     >
                     <button class="track-btn" onclick="buscarEquipos()">
-                        🔍 Rastrear
+                        Monitorear
                     </button>
                 </div>
                 <div class="tracking-help">

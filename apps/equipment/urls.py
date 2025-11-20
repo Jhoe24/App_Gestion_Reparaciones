@@ -18,4 +18,7 @@ urlpatterns =[
     # Registro de equipos
     path('create/', views.EquipmentCreateView.as_view(), name='equipment_create'),
     path('admin/panel/', views.AdminPanelView.as_view(), name='admin_panel'),
+
+    path('configuracion/', views.ConfiguracionView.as_view(), name='configuracion'),
+    path('configuracion_tech/', views.CongiguracionViewTech.as_view(), name='configuracion_tech'),
 ]

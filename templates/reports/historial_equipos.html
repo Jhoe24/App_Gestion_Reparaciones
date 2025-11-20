@@ -312,6 +312,13 @@
 
 
     <script>
+        // Indica si el usuario actual tiene rol técnico (backend)
+        {% if is_tech_user %}
+        var isTechUser = true;
+        {% else %}
+        var isTechUser = false;
+        {% endif %}
+
         // Lista de técnicos cargada directamente en la página
         var tecnicos = [
             {% for user in users %}
@@ -334,16 +341,8 @@
                     if (data.error) {
                         document.getElementById('modalContent').innerHTML = `<p>Error: ${data.error}</p>`;
                     } else {
-                        // Crear el HTML para el select de técnicos
-                        var tecnicoSelect = '<select id="tecnico" name="tecnico" required>\n';
-                        tecnicoSelect += '<option value="">Seleccione un técnico</option>\n';
-                        for (var i = 0; i < tecnicos.length; i++) {
-                            var selected = tecnicoAsignadoId && tecnicoAsignadoId == tecnicos[i].id ? ' selected' : '';
-                            tecnicoSelect += '<option value="' + tecnicos[i].id + '"' + selected + '>' + tecnicos[i].name + '</option>\n';
-                        }
-                        tecnicoSelect += '</select>';
-
-                        document.getElementById('modalContent').innerHTML = `
+                        // Construir la parte estática de detalles
+                        var detailsHtml = `
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                                 <p><strong>Código:</strong> ${data.codigo}</p>
                                 <p><strong>Tipo de Equipo:</strong> ${data.tipo_equipo}</p>
@@ -364,13 +363,35 @@
                                 <p><strong>Observaciones:</strong> ${data.observaciones}</p>
                                 <p><strong>Fecha de Creación:</strong> ${data.fecha_creacion}</p>
                             </div>
-                            <form method="post" action="/reports/asignar_tecnico/${registroId}/">
-                                {% csrf_token %}
-                                <label for="tecnico">Asignar Personal:</label>
-                                ${tecnicoSelect}
-                                <button type="submit" class="btn btn-primary">Guardar</button>
-                            </form>
                         `;
+
+                        // Si el usuario NO es técnico, mostrar el formulario de asignación
+                        if (!isTechUser) {
+                            var tecnicoSelect = '<select id="tecnico" name="tecnico" required>\n';
+                            tecnicoSelect += '<option value="">Seleccione un técnico</option>\n';
+                            for (var i = 0; i < tecnicos.length; i++) {
+                                var selected = tecnicoAsignadoId && tecnicoAsignadoId == tecnicos[i].id ? ' selected' : '';
+                                tecnicoSelect += '<option value="' + tecnicos[i].id + '"' + selected + '>' + tecnicos[i].name + '</option>\n';
+                            }
+                            tecnicoSelect += '</select>';
+
+                            detailsHtml += `
+                                <form method="post" action="/reports/asignar_tecnico/${registroId}/">
+                                    {% csrf_token %}
+                                    <label for="tecnico">Asignar Personal:</label>
+                                    ${tecnicoSelect}
+                                    <button type="submit" class="btn btn-primary">Guardar</button>
+                                    <button type="button" class="btn btn-danger" onclick="closeModal()">Cancelar</button>
+
+                                </form>
+                            `;
+                        } else {
+                            // Si es técnico, mostrar el técnico asignado como solo lectura
+                            var asignado = data.tecnico_asignado || 'Sin asignar';
+                            detailsHtml += `<p><strong>Técnico asignado:</strong> ${asignado}</p>`;
+                        }
+
+                        document.getElementById('modalContent').innerHTML = detailsHtml;
                     }
                     document.getElementById('equipoModal').style.display = 'flex';
                 })
@@ -442,6 +463,7 @@
                                 if (submitBtn) {
                                     submitBtn.disabled = false;
                                     submitBtn.innerText = submitBtn.dataset.origText || 'Guardar';
+                                    CancelarBtn.innerText = 'Cancelar';
                                 }
                                 body.insertAdjacentHTML('afterbegin', '<div class="error" style="color:red;margin-bottom:8px;">Error inesperado: ' + (err.message || err) + '</div>');
                             }
@@ -490,22 +512,39 @@
                     location.reload();
                     return;
                 }
-
-                // Si no hay éxito, mostrar el HTML con errores en el modal
-                if (data.html) {
+                    // Si no hay éxito, mostrar el HTML con errores en el modal o al menos el mensaje
                     const body = document.getElementById('reportModalBody');
-                    body.innerHTML = data.html;
-                    // Re-enganchar el formulario inyectado
-                    const newForm = document.getElementById('seguimientoForm');
-                    if (newForm) {
-                        newForm.addEventListener('submit', function(e) {
-                            e.preventDefault();
-                            submitSeguimientoForm(registroId, newForm);
-                        });
+                    // Mostrar un mensaje general (si existe)
+                    if (data.message) {
+                        // eliminar mensajes previos
+                        let prev = document.getElementById('seguimiento_error_alert');
+                        if (prev) prev.remove();
+                        const alert = document.createElement('div');
+                        alert.id = 'seguimiento_error_alert';
+                        alert.style.color = 'white';
+                        alert.style.background = '#d9534f';
+                        alert.style.padding = '8px 12px';
+                        alert.style.borderRadius = '6px';
+                        alert.style.marginBottom = '8px';
+                        alert.innerText = data.message;
+                        if (body) body.insertAdjacentElement('afterbegin', alert);
                     }
-                } else {
-                    throw new Error(data.message || 'Error al guardar el seguimiento');
-                }
+
+                    if (data.html) {
+                        // Reemplazar el contenido del modal con el formulario renderizado (incluye non-field errors)
+                        body.innerHTML = data.html;
+                        // Re-enganchar el formulario inyectado
+                        const newForm = document.getElementById('seguimientoForm');
+                        if (newForm) {
+                            newForm.addEventListener('submit', function(e) {
+                                e.preventDefault();
+                                submitSeguimientoForm(registroId, newForm);
+                            });
+                        }
+                    } else {
+                        // Si no hay HTML devuelto, dejar el mensaje visible y lanzar excepción para registro en consola
+                        throw new Error(data.message || 'Error al guardar el seguimiento');
+                    }
             })
             .catch(err => {
                 console.error('Error en la petición de seguimiento:', err);

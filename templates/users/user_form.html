@@ -1,72 +1,338 @@
-{% extends 'equipment/dashboard.html' %}
+{% extends 'dashboard/admin.html' %}
 
-{% block content %}
-<div class="container mt-4">
-    <h2>{% if form.instance.pk %}Editar Usuario{% else %}Crear Usuario{% endif %}</h2>
-    <form method="post" novalidate>
-        {% csrf_token %}
-        <div class="row">
-            <div class="mb-3 col-md-6">
-                <label class="form-label">Nombre</label>
-                <input type="text" name="first_name" id="first_name" class="form-control capitalize-input" required>
-                <div class="invalid-feedback" id="error_first_name"></div>
-            </div>
-            <div class="mb-3 col-md-6">
-                <label class="form-label">Apellido</label>
-                <input type="text" name="last_name" id="last_name" class="form-control capitalize-input" required>
-                <div class="invalid-feedback" id="error_last_name"></div>
-            </div>
-            <div class="mb-3 col-md-6">
-                <label class="form-label">Cédula</label>
-                <div class="input-group">
-                    <select class="form-select" name="nacionalidad" id="nacionalidad">
-                        <option value="V-">V-</option>
-                        <option value="E-">E-</option>
-                    </select>
-                    <input type="text" name="cedula" id="cedula" class="form-control" maxlength="8" pattern="[0-9]{7,8}" required>
+{% block title %}{% if form.instance.pk %}Editar Usuario{% else %}Crear Usuario{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .form-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: var(--white);
+        position: relative;
+        overflow: hidden;
+    }
+    .form-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 20px,
+            rgba(255, 255, 255, 0.05) 20px,
+            rgba(255, 255, 255, 0.05) 40px
+        );
+        animation: diagonalMove 20s linear infinite;
+    }
+    @keyframes diagonalMove {
+        0% { transform: translateX(-100%) translateY(-100%); }
+        100% { transform: translateX(0) translateY(0); }
+    }
+    .form-title {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: var(--white);
+    }
+    .form-title i {
+        color: var(--primary-yellow);
+        font-size: 2rem;
+    }
+    .form-card {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: var(--shadow);
+        margin-bottom: 2rem;
+    }
+    .form-section-title {
+        color: var(--primary-blue);
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    .form-label {
+        font-weight: 500;
+        color: var(--primary-blue);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .form-control, .form-select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        background: #fafafa;
+    }
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        background: var(--white);
+        box-shadow: 0 0 0 3px rgba(2, 2, 135, 0.1);
+    }
+    .form-control.is-invalid {
+        border-color: var(--primary-red);
+    }
+    .input-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        justify-content: flex-end;
+    }
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+        color: var(--white);
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(2, 2, 135, 0.3);
+    }
+    .btn-secondary {
+        background: var(--dark-gray);
+        color: var(--white);
+    }
+    .btn-secondary:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    .invalid-feedback {
+        color: var(--primary-red);
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        display: none;
+    }
+    .is-invalid + .invalid-feedback {
+        display: block;
+    }
+    .capitalize-input {
+        text-transform: capitalize;
+    }
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        .btn-group {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .btn {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block main_content %}
+<div class="form-container">
+    <!-- Form Header -->
+    <div class="form-header">
+        <h1 class="form-title">
+            <i class="fas fa-user{% if form.instance.pk %}-edit{% else %}-plus{% endif %}"></i>
+            {% if form.instance.pk %}Editar Usuario{% else %}Crear Nuevo Usuario{% endif %}
+        </h1>
+    </div>
+    
+    <!-- Form Card -->
+    <div class="form-card">
+        <h3 class="form-section-title">
+            <i class="fas fa-info-circle"></i>
+            Información Personal
+        </h3>
+        
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
                 </div>
-                <div class="invalid-feedback" id="error_cedula"></div>
+            {% endif %}
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="id_first_name" class="form-label">
+                        <i class="fas fa-user"></i> {{ form.first_name.label }}
+                    </label>
+                    {{ form.first_name }}
+                    {% for err in form.first_name.errors %}
+                        <div class="invalid-feedback" style="display:block;">{{ err }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_last_name" class="form-label">
+                        <i class="fas fa-user"></i> {{ form.last_name.label }}
+                    </label>
+                    {{ form.last_name }}
+                    {% for err in form.last_name.errors %}
+                        <div class="invalid-feedback" style="display:block;">{{ err }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-id-card"></i> Cédula
+                    </label>
+                    <div class="input-group">
+                        {% if form.nacionalidad %}
+                            {{ form.nacionalidad }}
+                        {% endif %}
+                        {% if form.cedula %}
+                            {{ form.cedula }}
+                        {% endif %}
+                    </div>
+                    {% for err in form.cedula.errors %}
+                        <div class="invalid-feedback" style="display:block;">{{ err }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_email" class="form-label">
+                        <i class="fas fa-envelope"></i> {{ form.email.label }}
+                    </label>
+                    {{ form.email }}
+                    {% for err in form.email.errors %}
+                        <div class="invalid-feedback" style="display:block;">{{ err }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_telefono" class="form-label">
+                        <i class="fas fa-mobile-alt"></i> Teléfono
+                    </label>
+                    {% if form.celular %}
+                        {{ form.celular }}
+                        {% for err in form.celular.errors %}
+                            <div class="invalid-feedback" style="display:block;">{{ err }}</div>
+                        {% endfor %}
+                    {% else %}
+                        {{ form.telefono }}
+                        {% for err in form.telefono.errors %}
+                            <div class="invalid-feedback" style="display:block;">{{ err }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_username" class="form-label">
+                        <i class="fas fa-user-tag"></i> {{ form.username.label }}
+                    </label>
+                    {{ form.username }}
+                    {% for err in form.username.errors %}
+                        <div class="invalid-feedback" style="display:block;">{{ err }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_cargo" class="form-label">
+                        <i class="fas fa-briefcase"></i> {{ form.cargo.label }}
+                    </label>
+                    {{ form.cargo }}
+                    {% for err in form.cargo.errors %}
+                        <div class="invalid-feedback" style="display:block;">{{ err }}</div>
+                    {% endfor %}
+                </div>
+
+                {% if form.rol %}
+                <div class="form-group">
+                    <label for="id_rol" class="form-label">
+                        <i class="fas fa-user-cog"></i> {{ form.rol.label }}
+                    </label>
+                    {{ form.rol }}
+                    {% for err in form.rol.errors %}
+                        <div class="invalid-feedback" style="display:block;">{{ err }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if form.activo %}
+                <div class="form-group">
+                    <label class="form-label">
+                        {{ form.activo.label }}
+                    </label>
+                    <div>
+                        {{ form.activo }}
+                    </div>
+                    {% for err in form.activo.errors %}
+                        <div class="invalid-feedback" style="display:block;">{{ err }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
             </div>
-            <div class="mb-3 col-md-6">
-                <label class="form-label">Correo Electrónico</label>
-                <input type="email" name="email" id="email" class="form-control capitalize-input" required>
-                <div class="invalid-feedback" id="error_email"></div>
+
+            <div class="btn-group">
+                <a href="{% url 'users:user_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Guardar Usuario
+                </button>
             </div>
-            <div class="mb-3 col-md-6">
-                <label class="form-label">Celular</label>
-                <input type="text" name="celular" id="celular" class="form-control" maxlength="11" pattern="[0-9]{11}" required>
-                <div class="invalid-feedback" id="error_celular"></div>
-            </div>
-            <div class="mb-3 col-md-6">
-                <label class="form-label">Usuario</label>
-                <input type="text" name="username" id="username" class="form-control capitalize-input" required>
-                <div class="invalid-feedback" id="error_username"></div>
-            </div>
-            <div class="mb-3 col-md-6">
-                <label class="form-label">Cargo</label>
-                <select name="cargo" id="cargo" class="form-select">
-                    <option value="">Selecciona un cargo</option>
-                    <option value="administrador">Administrador</option>
-                    <option value="tecnico">Técnico</option>
-                    <option value="usuario">Usuario</option>
-                    <option value="docente">Docente</option>
-                </select>
-                <div class="invalid-feedback" id="error_cargo"></div>
-            </div>
-        </div>
-        <button type="submit" class="btn btn-primary">Guardar</button>
-        <a href="{% url 'users:user_list' %}" class="btn btn-secondary">Cancelar</a>
-    </form>
+        </form>
+    </div>
 </div>
 
 <script>
-    // Enfocar el campo de nombre de usuario al cargar
     document.addEventListener('DOMContentLoaded', function() {
-        var usernameInput = document.getElementById('username');
+        // Enfocar el campo de nombre de usuario al cargar (soporta distintos ids)
+        var usernameInput = document.getElementById('id_username') || document.getElementById('username') || document.querySelector('input[name="username"]');
         if (usernameInput) {
             usernameInput.focus();
         }
+        
         // Mayúscula automática en inputs de texto
+        // Asegurar que los campos de nombre/apellido tengan la clase para capitalizar
+        ['first_name','last_name'].forEach(function(n) {
+            var el = document.querySelector('input[name="' + n + '"]');
+            if (el && !el.classList.contains('capitalize-input')) el.classList.add('capitalize-input');
+        });
+
         document.querySelectorAll('.capitalize-input').forEach(function(input) {
             input.addEventListener('input', function() {
                 if (input.value.length > 0) {
@@ -74,8 +340,9 @@
                 }
             });
         });
+        
         // Validación en tiempo real
-        document.querySelectorAll('input,select').forEach(function(input) {
+        document.querySelectorAll('input, select').forEach(function(input) {
             input.addEventListener('blur', function() {
                 if (!input.checkValidity()) {
                     input.classList.add('is-invalid');
@@ -83,20 +350,36 @@
                     input.classList.remove('is-invalid');
                 }
             });
+            
+            input.addEventListener('input', function() {
+                if (input.classList.contains('is-invalid') && input.checkValidity()) {
+                    input.classList.remove('is-invalid');
+                }
+            });
         });
+        
+        // Validación especial para cédula: solo aplicar limpieza cuando existe campo 'nacionalidad' (form creación)
+        const nacionalidadElem = document.getElementById('nacionalidad') || document.getElementById('id_nacionalidad') || document.querySelector('select[name="nacionalidad"]');
+        const cedulaInput = document.getElementById('cedula') || document.getElementById('id_cedula') || document.querySelector('input[name="cedula"]');
+        if (cedulaInput && nacionalidadElem) {
+            cedulaInput.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                if (this.value.length > 8) {
+                    this.value = this.value.slice(0, 8);
+                }
+            });
+        }
+
+        // Validación especial para celular/telefono (soporta 'celular' o 'telefono')
+        const celularInput = document.getElementById('celular') || document.getElementById('id_celular') || document.getElementById('id_telefono') || document.querySelector('input[name="celular"]') || document.querySelector('input[name="telefono"]');
+        if (celularInput) {
+            celularInput.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                if (this.value.length > 11) {
+                    this.value = this.value.slice(0, 11);
+                }
+            });
+        }
     });
 </script>
-{% endblock %}
-
-{% block extra_content %}
-<div class="container mt-4">
-    <form method="get" action="" class="row g-3 mb-3">
-        <div class="col-md-4">
-            <input type="text" name="search" class="form-control" placeholder="Buscar por nombre o cédula" value="{{ search }}">
-        </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-outline-primary">Buscar</button>
-        </div>
-    </form>
-</div>
 {% endblock %}

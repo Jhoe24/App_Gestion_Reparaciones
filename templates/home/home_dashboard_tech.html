@@ -193,8 +193,8 @@
                 <div class="card stat-card my-tasks">
                     <div class="stat-header">
                         <div>
-                            <div class="stat-label">Mis Tareas Activas</div>
-                            <div class="stat-number">7</div>
+                            <div class="stat-label">Equipos Pendientes</div>
+                            <div class="stat-number">{{ equipos_pendientes }}</div>
                         </div>
                         <div class="stat-icon my-tasks">
                             <i class="fas fa-tasks"></i>
@@ -205,11 +205,11 @@
                 <div class="card stat-card pending">
                     <div class="stat-header">
                         <div>
-                            <div class="stat-label">Pendientes</div>
-                            <div class="stat-number">5</div>
+                            <div class="stat-label">En Reparación</div>
+                            <div class="stat-number">{{ equipos_en_reparacion }}</div>
                         </div>
                         <div class="stat-icon pending">
-                            <i class="fas fa-clock"></i>
+                            <i class="fas fa-tools"></i>
                         </div>
                     </div>
                 </div>
@@ -217,93 +217,52 @@
                 <div class="card stat-card completed">
                     <div class="stat-header">
                         <div>
-                            <div class="stat-label">Completadas Hoy</div>
-                            <div class="stat-number">3</div>
+                            <div class="stat-label">Completados</div>
+                            <div class="stat-number">{{ equipos_completados }}</div>
                         </div>
                         <div class="stat-icon completed">
                             <i class="fas fa-check-circle"></i>
                         </div>
                     </div>
                 </div>
-
-                {% comment %} <div class="card timer-widget">
-                    <div class="timer-content">
-                        <div class="timer-display" id="currentTimer">02:15:30</div>
-                        <div class="timer-task">Reparación PC-LAB-A-15</div>
-                        <button class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white; margin-top: 0.5rem;" onclick="toggleTimer()">
-                            <i class="fas fa-pause"></i> Pausar
-                        </button>
-                    </div>
-                </div> {% endcomment %}
             </div>
 
-            <!-- Current Tasks -->
+            <!-- Reportes Actuales -->
             <div class="task-section">
                 <div class="task-header">
-                    <h3>Mis Tareas Actuales</h3>
-                    <a href="#" onclick="showSection('my-tasks')" style="color: var(--primary-blue); text-decoration: none; font-size: 0.9rem;">Ver todas</a>
+                    <h3>Reportes Actuales</h3>
+                    <a href="#" style="color: var(--primary-blue); text-decoration: none; font-size: 0.9rem;">Ver todos</a>
                 </div>
-                
-                <div class="task-item urgent">
-                    <div class="task-priority high">
-                        <i class="fas fa-exclamation"></i>
-                    </div>
-                    <div class="task-content">
-                        <div class="task-title">#TK-001 - Impresora Biblioteca Sin Funcionar</div>
-                        <div class="task-description">Error de conexión y atasco de papel - Biblioteca Central</div>
-                        <div class="task-meta">
-                            <span><i class="fas fa-map-marker-alt"></i> Biblioteca</span>
-                            <span><i class="fas fa-user"></i> Prof. Martínez</span>
-                            <span><i class="fas fa-clock"></i> Vence en 2 horas</span>
+                {% if reportes_actuales %}
+                    {% for reporte in reportes_actuales %}
+                        <div class="task-item">
+                            <div class="task-priority {% if reporte.estado == 'reparacion' %}medium{% elif reporte.estado == 'entregado' %}low{% else %}high{% endif %}">
+                                {% if reporte.estado == 'reparacion' %}
+                                    <i class="fas fa-tools"></i>
+                                {% elif reporte.estado == 'entregado' %}
+                                    <i class="fas fa-check-circle"></i>
+                                {% else %}
+                                    <i class="fas fa-exclamation"></i>
+                                {% endif %}
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">{{ reporte.codigo }} - {{ reporte.tipo_equipo }}</div>
+                                <div class="task-description">{{ reporte.descripcion|default:'Sin descripción' }}</div>
+                                <div class="task-meta">
+                                    <span><i class="fas fa-calendar"></i> {{ reporte.fecha|date:'d/m/Y H:i' }}</span>
+                                    <span><i class="fas fa-info-circle"></i> Estado: {{ reporte.estado|title }}</span>
+                                </div>
+                            </div>
+                            <div class="task-actions">
+                                <button class="btn btn-sm btn-primary" onclick="window.location.href='{% url 'reports:historial_equipos' %}' ">
+                                    <i class="fas fa-info"></i> Ver Detalles
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="task-actions">
-                        <button class="btn btn-sm btn-success">
-                            <i class="fas fa-play"></i> Iniciar
-                        </button>
-                    </div>
-                </div>
-
-                <div class="task-item in-progress">
-                    <div class="task-priority medium">
-                        <i class="fas fa-tools"></i>
-                    </div>
-                    <div class="task-content">
-                        <div class="task-title">#TK-002 - Reparación PC Laboratorio A</div>
-                        <div class="task-description">Reemplazo de disco duro y reinstalación de SO</div>
-                        <div class="task-meta">
-                            <span><i class="fas fa-map-marker-alt"></i> Lab A - Puesto 15</span>
-                            <span><i class="fas fa-clock"></i> En progreso - 2h 15min</span>
-                        </div>
-                    </div>
-                    <div class="task-actions">
-                        <button class="btn btn-sm btn-warning">
-                            <i class="fas fa-pause"></i> Pausar
-                        </button>
-                        <button class="btn btn-sm btn-success">
-                            <i class="fas fa-check"></i> Completar
-                        </button>
-                    </div>
-                </div>
-
-                <div class="task-item">
-                    <div class="task-priority low">
-                        <i class="fas fa-cog"></i>
-                    </div>
-                    <div class="task-content">
-                        <div class="task-title">#TK-003 - Mantenimiento Proyector Aula 201</div>
-                        <div class="task-description">Limpieza de lentes y calibración</div>
-                        <div class="task-meta">
-                            <span><i class="fas fa-map-marker-alt"></i> Aula 201</span>
-                            <span><i class="fas fa-calendar"></i> Programado para mañana</span>
-                        </div>
-                    </div>
-                    <div class="task-actions">
-                        <button class="btn btn-sm btn-primary">
-                            <i class="fas fa-info"></i> Ver Detalles
-                        </button>
-                    </div>
-                </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No hay reportes recientes.</p>
+                {% endif %}
             </div>
         </div>
 

@@ -1,6 +1,6 @@
 {% extends 'dashboard/admin.html' %}
 
-{% block main_content %}`
+{% block main_content %}
 
     <!-- Dashboard Cards -->
     <div class="dashboard-cards">
@@ -10,7 +10,7 @@
                     <div class="stat-label">Solicitudes Pendientes</div>
                     <div class="stat-number">{{ solicitudes_pendientes | default:"0" }}</div>
                     <div class="stat-change negative">
-                        <i class="fas fa-arrow-down"></i> -100% esta semana
+                        {% comment %} <i class="fas fa-arrow-down"></i> -100% esta semana {% endcomment %}
                     </div>
                 </div>
                 <div class="stat-icon pending">
@@ -25,7 +25,7 @@
                     <div class="stat-label">En Reparación</div>
                     <div class="stat-number">{{ en_reparacion | default:"0" }}</div>
                     <div class="stat-change negative">
-                        <i class="fas fa-arrow-down"></i> -100% esta semana
+                        {% comment %} <i class="fas fa-arrow-down"></i> -100% esta semana {% endcomment %}
                     </div>
                 </div>
                 <div class="stat-icon in-progress">
@@ -37,10 +37,10 @@
         <div class="card stat-card completed">
             <div class="stat-header">
                 <div>
-                    <div class="stat-label">Completadas Hoy</div>
+                    <div class="stat-label">Completadas</div>
                     <div class="stat-number">{{ completadas_hoy | default:"0" }}</div>
                     <div class="stat-change negative">
-                        <i class="fas fa-arrow-down"></i> -100% vs ayer
+                        {% comment %} <i class="fas fa-arrow-down"></i> -100% vs ayer {% endcomment %}
                     </div>
                 </div>
                 <div class="stat-icon completed">
@@ -59,61 +59,23 @@
             <a href="#" style="color: var(--primary-blue); text-decoration: none; font-size: 0.9rem;">Ver todo</a>
         </div>
         
-        <div class="activity-item">
-            <div class="activity-icon repair">
-                <i class="fas fa-desktop"></i>
-            </div>
-            <div class="activity-content">
-                <div class="activity-title">Reparación Computadora Lab-A-15</div>
-                <div class="activity-description">Reemplazo de disco duro - Aula de Informática A</div>
-                <div class="activity-time">Hace 15 minutos</div>
-            </div>
-        </div>
-        
-        <div class="activity-item">
-            <div class="activity-icon urgent">
-                <i class="fas fa-print"></i>
-            </div>
-            <div class="activity-content">
-                <div class="activity-title">Impresora Biblioteca - URGENTE</div>
-                <div class="activity-description">Atasco de papel y error de tóner - Biblioteca Central</div>
-                <div class="activity-time">Hace 32 minutos</div>
-            </div>
-        </div>
-        
-        <div class="activity-item">
-            <div class="activity-icon completed">
-                <i class="fas fa-video"></i>
-            </div>
-            <div class="activity-content">
-                <div class="activity-title">Proyector Aula Magna - COMPLETADO</div>
-                <div class="activity-description">Calibración y limpieza de lentes - Aula Magna</div>
-                <div class="activity-time">Hace 1 hora</div>
-            </div>
-        </div>
-        
-        <div class="activity-item">
-            <div class="activity-icon maintenance">
-                <i class="fas fa-tv"></i>
-            </div>
-            <div class="activity-content">
-                <div class="activity-title">Mantenimiento Monitor Lab-B-08</div>
-                <div class="activity-description">Limpieza preventiva - Laboratorio de Física</div>
-                <div class="activity-time">Hace 2 horas</div>
-            </div>
-        </div>
-        
-        <div class="activity-item">
-            <div class="activity-icon repair">
-                <i class="fas fa-laptop"></i>
-            </div>
-            <div class="activity-content">
-                <div class="activity-title">Reparación Portátil Profesor Martinez</div>
-                <div class="activity-description">Actualización de software y antivirus - Decanatura</div>
-                <div class="activity-time">Hace 3 horas</div>
-            </div>
-        </div>
+        {% if actividad_reciente %}
+            {% for act in actividad_reciente %}
+                <div class="activity-item">
+                    <div class="activity-icon {{ act.icon }}">
+                        <i class="fas {{ act.fa_icon }}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">{{ act.title }}</div>
+                        <div class="activity-description">{{ act.description }}</div>
+                        <div class="activity-time">{{ act.time }}</div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No hay actividad reciente.</p>
+        {% endif %}
     </div>
             
 
-{% endblock %}`
+{% endblock %}

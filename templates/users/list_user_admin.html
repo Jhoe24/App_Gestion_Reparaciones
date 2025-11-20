@@ -2,7 +2,6 @@
 {% extends 'dashboard/admin.html' %}
 <!-- Block para el título de la página -->
 {% block title %}Lista de Usuarios{% endblock %}
-
 <!-- Block para estilos específicos de la página -->
 {% block extra_css %}
 <style>
@@ -10,7 +9,6 @@
         max-width: 1400px;
         margin: 0 auto;
     }
-
     .section-header {
         background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
         border-radius: 16px;
@@ -20,7 +18,6 @@
         position: relative;
         overflow: hidden;
     }
-
     .section-header::before {
         content: '';
         position: absolute;
@@ -37,12 +34,10 @@
         );
         animation: diagonalMove 20s linear infinite;
     }
-
     @keyframes diagonalMove {
         0% { transform: translateX(-100%) translateY(-100%); }
         100% { transform: translateX(0) translateY(0); }
     }
-
     .section-header-content {
         position: relative;
         z-index: 2;
@@ -50,7 +45,6 @@
         justify-content: space-between;
         align-items: center;
     }
-
     .section-title {
         font-size: 2rem;
         font-weight: bold;
@@ -60,12 +54,10 @@
         gap: 1rem;
         color: var(--white);
     }
-
     .section-title i {
         color: var(--primary-yellow);
         font-size: 2.5rem;
     }
-
     .add-user-btn {
         background: var(--primary-yellow);
         color: var(--primary-blue);
@@ -81,13 +73,11 @@
         align-items: center;
         gap: 0.5rem;
     }
-
     .add-user-btn:hover {
         background: var(--bright-yellow);
         transform: translateY(-2px);
         box-shadow: 0 8px 25px rgba(251, 164, 1, 0.3);
     }
-
     .filters-card {
         background: var(--white);
         border-radius: 16px;
@@ -95,7 +85,6 @@
         margin-bottom: 2rem;
         box-shadow: var(--shadow);
     }
-
     .filters-title {
         font-size: 1.1rem;
         font-weight: 600;
@@ -105,18 +94,15 @@
         align-items: center;
         gap: 0.5rem;
     }
-
     .filters-row {
         display: grid;
         grid-template-columns: 1fr 2fr;
         gap: 1.5rem;
         align-items: end;
     }
-
     .search-group {
         position: relative;
     }
-
     .search-input {
         width: 100%;
         padding: 0.75rem 1rem 0.75rem 3rem;
@@ -126,14 +112,12 @@
         transition: all 0.3s ease;
         background: #fafafa;
     }
-
     .search-input:focus {
         outline: none;
         border-color: var(--primary-blue);
         background: var(--white);
         box-shadow: 0 0 0 3px rgba(2, 2, 135, 0.1);
     }
-
     .search-icon {
         position: absolute;
         left: 1rem;
@@ -142,18 +126,15 @@
         color: var(--dark-gray);
         transition: color 0.3s ease;
     }
-
     .search-input:focus + .search-icon {
         color: var(--primary-blue);
     }
-
     .filter-checkboxes {
         display: flex;
         gap: 3rem;
         flex-wrap: wrap;
         margin-left: 3rem;
     }
-
     .filter-checkbox {
         display: flex;
         align-items: center;
@@ -163,31 +144,26 @@
         padding: 0.5rem;
         border-radius: 8px;
     }
-
     .filter-checkbox:hover {
         background: rgba(2, 2, 135, 0.05);
     }
-
     .filter-checkbox input[type="checkbox"] {
         width: 18px;
         height: 18px;
         accent-color: var(--primary-blue);
     }
-
     .filter-checkbox label {
         font-weight: 500;
         color: var(--primary-blue);
         cursor: pointer;
         font-size: 0.9rem;
     }
-
     .users-table-card {
         background: var(--white);
         border-radius: 16px;
         overflow: hidden;
         box-shadow: var(--shadow);
     }
-
     .table-header {
         background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
         color: var(--white);
@@ -196,7 +172,6 @@
         justify-content: space-between;
         align-items: center;
     }
-
     .table-title {
         font-size: 1.2rem;
         font-weight: 600;
@@ -204,38 +179,31 @@
         align-items: center;
         gap: 0.5rem;
     }
-
     .users-count {
         background: rgba(255, 255, 255, 0.2);
         padding: 0.25rem 0.75rem;
         border-radius: 15px;
         font-size: 0.8rem;
     }
-
     .table-responsive {
         max-height: 70vh;
         overflow-y: auto;
     }
-
     .table-responsive::-webkit-scrollbar {
         width: 8px;
     }
-
     .table-responsive::-webkit-scrollbar-track {
         background: #f8f9fa;
     }
-
     .table-responsive::-webkit-scrollbar-thumb {
         background: var(--primary-blue);
         border-radius: 4px;
     }
-
     .users-table {
         width: 100%;
         border-collapse: collapse;
         margin: 0;
     }
-
     .users-table thead th {
         background: #f8f9fa;
         color: var(--primary-blue);
@@ -247,28 +215,23 @@
         top: 0;
         z-index: 10;
     }
-
     .users-table tbody tr {
         border-bottom: 1px solid #f8f9fa;
         transition: all 0.3s ease;
     }
-
     .users-table tbody tr:hover {
         background: rgba(2, 2, 135, 0.03);
         transform: translateX(3px);
     }
-
     .users-table td {
         padding: 1rem;
         vertical-align: middle;
     }
-
     .user-info {
         display: flex;
         align-items: center;
         gap: 0.75rem;
     }
-
     .user-avatar {
         width: 40px;
         height: 40px;
@@ -282,19 +245,16 @@
         font-size: 0.9rem;
         flex-shrink: 0;
     }
-
     .user-details h6 {
         margin: 0;
         font-weight: 600;
         color: var(--primary-blue);
         font-size: 0.9rem;
     }
-
     .user-details small {
         color: var(--dark-gray);
         font-size: 0.8rem;
     }
-
     .status-badge {
         padding: 0.375rem 0.75rem;
         border-radius: 20px;
@@ -303,19 +263,16 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-
     .status-active {
         background: #d4edda;
         color: #155724;
         border: 1px solid #c3e6cb;
     }
-
     .status-inactive {
         background: #f8d7da;
         color: #721c24;
         border: 1px solid #f5c6cb;
     }
-
     .role-badge {
         padding: 0.375rem 0.75rem;
         border-radius: 20px;
@@ -324,30 +281,25 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-
     .role-administrador {
         background: rgba(251, 3, 1, 0.1);
         color: var(--primary-red);
         border: 1px solid rgba(251, 3, 1, 0.2);
     }
-
     .role-tecnico {
         background: rgba(251, 164, 1, 0.1);
         color: var(--orange);
         border: 1px solid rgba(251, 164, 1, 0.2);
     }
-
     .role-usuario {
         background: rgba(2, 2, 135, 0.1);
         color: var(--primary-blue);
         border: 1px solid rgba(2, 2, 135, 0.2);
     }
-
     .actions-group {
         display: flex;
         gap: 0.5rem;
     }
-
     .btn {
         padding: 0.5rem 1rem;
         border: none;
@@ -361,65 +313,54 @@
         align-items: center;
         gap: 0.375rem;
     }
-
     .btn-view {
         background: var(--primary-blue);
         color: var(--white);
     }
-
     .btn-view:hover {
         background: var(--dark-blue);
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(2, 2, 135, 0.3);
     }
-
     .btn-edit {
         background: var(--orange);
         color: var(--white);
     }
-
     .btn-edit:hover {
         background: var(--bright-orange);
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(251, 164, 1, 0.3);
     }
-
     .btn-delete {
         background: var(--primary-red);
         color: var(--white);
     }
-
     .btn-delete:hover {
         background: #dc3545;
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(251, 3, 1, 0.3);
     }
-
     /* Modal Styles */
     .modal-content {
         border: none;
         border-radius: 16px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
     }
-
     .modal-header {
         background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
         color: var(--white);
         border-radius: 16px 16px 0 0;
         padding: 1.5rem;
     }
-
     .modal-title {
         font-weight: 600;
         display: flex;
         align-items: center;
         gap: 0.5rem;
     }
-
     .modal-body {
         padding: 2rem;
     }
-
     .detail-item {
         display: flex;
         justify-content: space-between;
@@ -427,44 +368,36 @@
         padding: 0.75rem 0;
         border-bottom: 1px solid #f8f9fa;
     }
-
     .detail-item:last-child {
         border-bottom: none;
     }
-
     .detail-label {
         font-weight: 600;
         color: var(--primary-blue);
     }
-
     .detail-value {
         color: var(--dark-gray);
         text-align: right;
     }
-
     .modal-footer {
         padding: 1.5rem;
         border-top: 1px solid #f8f9fa;
     }
-
     .empty-state {
         text-align: center;
         padding: 4rem 2rem;
         color: var(--dark-gray);
     }
-
     .empty-state i {
         font-size: 4rem;
         color: var(--primary-blue);
         opacity: 0.3;
         margin-bottom: 1rem;
     }
-
     .loading-row {
         text-align: center;
         padding: 2rem;
     }
-
     .loading-spinner {
         width: 2rem;
         height: 2rem;
@@ -473,73 +406,93 @@
         border-radius: 50%;
         animation: spin 1s linear infinite;
     }
-
     @keyframes spin {
         to { transform: rotate(360deg); }
     }
-
     /* Responsive */
     @media (max-width: 768px) {
         .filters-row {
             grid-template-columns: 1fr;
             gap: 1rem;
         }
-
         .filter-checkboxes {
             gap: 2rem;
         }
-
         .section-header-content {
             flex-direction: column;
             gap: 1rem;
             text-align: center;
         }
-
         .users-table {
             font-size: 0.8rem;
         }
-
         .users-table th,
         .users-table td {
             padding: 0.75rem 0.5rem;
         }
-
         .actions-group {
             flex-direction: column;
         }
-
         .btn {
             font-size: 0.7rem;
             padding: 0.375rem 0.75rem;
         }
-
         .user-info {
             flex-direction: column;
             text-align: center;
             gap: 0.5rem;
         }
     }
-
     @media (max-width: 480px) {
         .users-container {
             margin: 0 1rem;
         }
-
         .section-header {
             padding: 1.5rem;
         }
-
         .section-title {
             font-size: 1.5rem;
         }
-
         .table-responsive {
             font-size: 0.7rem;
         }
     }
 </style>
 {% endblock %}
-
+<!-- Modal único fuera del for -->
+<div class="modal fade" id="modalUsuarioGlobal" tabindex="-1" aria-labelledby="modalUsuarioGlobalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalUsuarioGlobalLabel">
+                    <i class="fas fa-user-circle"></i>
+                    Detalles de Usuario
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="modalUsuarioBody">
+                <!-- Aquí se llenan los datos por JS -->
+            </div>
+            <div class="modal-footer" id="modalUsuarioFooter">
+                <!-- Aquí se llenan los botones por JS -->
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+/* Mejoras para evitar desbordamiento */
+.users-table-card, .table-responsive {
+    max-width: 100vw;
+    overflow-x: auto;
+}
+.modal-lg {
+    max-width: 700px;
+}
+.modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+</style>
 <!-- Block para el contenido principal -->
 {% block main_content %}
 <div class="users-container">
@@ -556,14 +509,12 @@
             </a>
         </div>
     </div>
-
     <!-- Filters Card -->
     <div class="filters-card">
         <h3 class="filters-title">
             <i class="fas fa-filter"></i>
             Filtros y Búsqueda
         </h3>
-        
         <div class="filters-row">
             <!-- Search Input -->
             <div class="search-group">
@@ -576,7 +527,6 @@
                 >
                 <i class="fas fa-search search-icon"></i>
             </div>
-
             <!-- Role Filters -->
             <div class="filter-checkboxes">
                 <div class="filter-checkbox">
@@ -603,7 +553,7 @@
                         Técnico
                     </label>
                 </div>
-                <div class="filter-checkbox">
+                {% comment %} <div class="filter-checkbox">
                     <input 
                         class="rol-filter" 
                         type="checkbox" 
@@ -614,11 +564,10 @@
                         <i class="fas fa-user"></i>
                         Usuario
                     </label>
-                </div>
+                </div> {% endcomment %}
             </div>
         </div>
     </div>
-
     <!-- Users Table -->
     <div class="users-table-card">
         <div class="table-header">
@@ -630,7 +579,6 @@
                 Total: {{ users|length }} usuarios
             </div>
         </div>
-
         <div class="table-responsive">
             <table class="users-table" id="tablaUsuarios">
                 <thead>
@@ -647,26 +595,26 @@
                 </thead>
                 <tbody id="usuariosTbody">
                     {% for user in users %}
-                    <tr data-rol="{{ user.rol }}" class="user-row" 
-                        data-user='{
-                            "id": "{{ user.id }}",
-                            "username": "{{ user.username }}",
-                            "full_name": "{{ user.get_full_name|default:"No especificado" }}",
-                            "cedula": "{{ user.cedula|default:"No registrada" }}",
-                            "celular": "{{ user.telefono|default:"No registrado" }}",
-                            "email": "{{ user.email|default:"No especificado" }}",
-                            "cargo": "{% if user.cargo == 'docente' %}Docente{% else %}{{ user.get_cargo_display|default:"No especificado" }}{% endif %}",
-                            "rol": "{{ user.get_rol_display }}",
-                            "activo": "{{ user.activo }}",
-                            "fecha_creacion": "{{ user.fecha_creacion|date:'d/m/Y H:i' }}",
-                            "fecha_actualizacion": "{{ user.fecha_actualizacion|date:'d/m/Y H:i' }}"
-                        }'>
+                    <tr class="user-row"
+                        data-id="{{ user.id }}"
+                        data-username="{{ user.username|escapejs }}"
+                        data-first-name="{{ user.first_name|default:''|escapejs }}"
+                        data-last-name="{{ user.last_name|default:''|escapejs }}"
+                        data-full-name="{{ user.get_full_name|default:'No especificado'|escapejs }}"
+                        data-cedula="{{ user.cedula|default:'No registrada'|escapejs }}"
+                        data-telefono="{{ user.telefono|default:'No registrado'|escapejs }}"
+                        data-email="{{ user.email|default:'No especificado'|escapejs }}"
+                        data-cargo="{{ user.get_cargo_display|default:'No especificado'|escapejs }}"
+                        data-rol="{{ user.rol }}"
+                        data-rol-display="{{ user.get_rol_display|escapejs }}"
+                        data-activo="{{ user.activo }}"
+                        data-fecha-creacion="{{ user.fecha_creacion|date:'d/m/Y H:i' }}"
+                        data-fecha-actualizacion="{{ user.fecha_actualizacion|date:'d/m/Y H:i' }}">
                         <td>
                             <strong style="color: var(--primary-blue);">
                                 {{ forloop.counter }}
                             </strong>
                         </td>
-                        
                         <td>
                             <div class="user-info">
                                 <div class="user-avatar">
@@ -678,7 +626,6 @@
                                 </div>
                             </div>
                         </td>
-                        
                         <td>
                             <div>
                                 <strong>{{ user.get_full_name|default:"Sin nombre" }}</strong><br>
@@ -687,7 +634,6 @@
                                 </small>
                             </div>
                         </td>
-                        
                         <td>
                             <div>
                                 <i class="fas fa-mobile-alt" style="color: var(--primary-blue); margin-right: 0.25rem;"></i>
@@ -698,7 +644,6 @@
                                 </small>
                             </div>
                         </td>
-                        
                         <td>
                             <span style="color: var(--primary-blue); font-weight: 500;">
                                 {% if user.cargo == 'docente' %}
@@ -708,7 +653,6 @@
                                 {% endif %}
                             </span>
                         </td>
-                        
                         <td>
                             <span class="role-badge role-{{ user.rol }}">
                                 {% if user.rol == 'administrador' %}
@@ -720,7 +664,6 @@
                                 {% endif %}
                             </span>
                         </td>
-                        
                         <td>
                             {% if user.activo %}
                                 <span class="status-badge status-active">
@@ -732,26 +675,25 @@
                                 </span>
                             {% endif %}
                         </td>
-                        
                         <td>
                             <div class="actions-group">
-                                <button 
+                                {% comment %} <button 
                                     class="btn btn-view btn-ver-usuario" 
                                     data-user-id="{{ user.id }}"
                                     title="Ver detalles"
                                 >
                                     <i class="fas fa-eye"></i>
                                     Ver
-                                </button>
-                                <a 
-                                    {% comment %} href="{% url 'users:user_edit' user.id %}"  {% endcomment %}
-                                    class="btn btn-edit"
-                                    href="#"
+                                </button> {% endcomment %}
+                                <button
+                                    type="button"
+                                    class="btn btn-edit btn-edit-usuario"
+                                    data-user-id="{{ user.id }}"
                                     title="Editar usuario"
                                 >
                                     <i class="fas fa-edit"></i>
                                     Editar
-                                </a>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -775,7 +717,6 @@
     </div>
 </div>
 {% endblock %}
-
 <!-- Block para JavaScript específico -->
 {% block extra_js %}
 <script>
@@ -785,12 +726,16 @@
         const checkboxes = document.querySelectorAll('.rol-filter');
         const usersCount = document.getElementById('usersCount');
         const allRows = tbody.getElementsByClassName('user-row');
+        const modalElement = document.getElementById('modalUsuarioGlobal');
+        const modal = modalElement ? new bootstrap.Modal(modalElement) : null;
+        const modalBody = document.getElementById('modalUsuarioBody');
+        const modalFooter = document.getElementById('modalUsuarioFooter');
 
+        // Función para actualizar el contador de usuarios
         function updateUsersCount() {
             const visibleRows = Array.from(allRows).filter(row => row.style.display !== 'none');
             const total = allRows.length;
             const visible = visibleRows.length;
-            
             if (visible === total) {
                 usersCount.textContent = `Total: ${total} usuarios`;
             } else {
@@ -798,12 +743,13 @@
             }
         }
 
+        // Función para filtrar la tabla
         function filtrarTabla() {
             const texto = searchInput.value.toLowerCase().trim();
             const rolesSeleccionados = Array.from(checkboxes)
                 .filter(cb => cb.checked)
                 .map(cb => cb.value);
-            
+
             // Mostrar loading si hay muchos usuarios
             if (allRows.length > 100) {
                 showLoadingState();
@@ -814,13 +760,10 @@
                     const row = allRows[i];
                     const text = row.textContent.toLowerCase();
                     const rol = row.getAttribute('data-rol');
-                    
                     const visiblePorTexto = !texto || text.includes(texto);
                     const visiblePorRol = rolesSeleccionados.length === 0 || rolesSeleccionados.includes(rol);
-                    
                     const shouldShow = visiblePorTexto && visiblePorRol;
                     row.style.display = shouldShow ? '' : 'none';
-                    
                     // Animación suave
                     if (shouldShow) {
                         row.style.opacity = '0';
@@ -832,12 +775,12 @@
                         }, i * 10); // Delay escalonado
                     }
                 }
-                
                 updateUsersCount();
                 hideLoadingState();
             }, 100);
         }
 
+        // Funciones de loading
         function showLoadingState() {
             // Crear indicador de carga si no existe
             if (!document.getElementById('loadingIndicator')) {
@@ -860,26 +803,21 @@
             }
         }
 
-        function highlightText(text, search) {
-            if (!search) return text;
-            const regex = new RegExp(`(${search})`, 'gi');
-            return text.replace(regex, '<mark style="background: var(--primary-yellow); color: var(--primary-blue); padding: 0.1rem 0.2rem; border-radius: 3px;">$1</mark>');
-        }
-
+        // Función para resetear filtros
         function resetFilters() {
             searchInput.value = '';
             checkboxes.forEach(cb => cb.checked = false);
             filtrarTabla();
         }
 
-        // Event listeners
+        // Event listeners para búsqueda y filtros
         if (searchInput) {
             searchInput.addEventListener('input', function() {
                 // Debounce para mejor performance
                 clearTimeout(this.searchTimeout);
                 this.searchTimeout = setTimeout(filtrarTabla, 300);
             });
-            
+
             searchInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     resetFilters();
@@ -891,13 +829,147 @@
             cb.addEventListener('change', filtrarTabla);
         });
 
+        // Event delegation para botones dinámicos
+        document.body.addEventListener('click', function(e) {
+            // Para botón Ver
+            if (e.target.closest('.btn-ver-usuario')) {
+                e.preventDefault();
+                const button = e.target.closest('.btn-ver-usuario');
+                const tr = button ? button.closest('tr') : null;
+                if (!tr) return;
+
+                // Helper para leer atributos de forma segura
+                const getAttr = (name) => tr.getAttribute('data-' + name) || '';
+
+                let userData = {};
+                try {
+                    userData = {
+                        id: getAttr('id') || '',
+                        username: getAttr('username') || tr.dataset.username || '',
+                        first_name: getAttr('first-name') || getAttr('first_name') || tr.dataset.firstName || tr.dataset.first_name || '',
+                        last_name: getAttr('last-name') || getAttr('last_name') || tr.dataset.lastName || tr.dataset.last_name || '',
+                        full_name: getAttr('full-name') || getAttr('full_name') || tr.dataset.fullName || tr.dataset.full_name || '',
+                        cedula: getAttr('cedula') || tr.dataset.cedula || '',
+                        telefono: getAttr('telefono') || tr.dataset.telefono || '',
+                        email: getAttr('email') || tr.dataset.email || '',
+                        cargo: getAttr('cargo') || tr.dataset.cargo || '',
+                        rol: getAttr('rol-display') || getAttr('rol') || tr.dataset.rolDisplay || tr.dataset.rol || '',
+                        activo: (getAttr('activo') || tr.dataset.activo || '').toString(),
+                        fecha_creacion: getAttr('fecha-creacion') || getAttr('fecha_creacion') || tr.dataset.fechaCreacion || tr.dataset['fecha-creacion'] || tr.dataset['fecha_creacion'] || '',
+                        fecha_actualizacion: getAttr('fecha-actualizacion') || getAttr('fecha_actualizacion') || tr.dataset.fechaActualizacion || tr.dataset['fecha-actualizacion'] || tr.dataset['fecha_actualizacion'] || ''
+                    };
+                } catch (err) {
+                    console.error('Error leyendo atributos de usuario:', err);
+                    try {
+                        const raw = tr.getAttribute('data-user');
+                        if (raw) userData = JSON.parse(raw);
+                    } catch (e) {
+                        console.error('Fallback parse failed', e);
+                        userData = { id: tr.getAttribute('data-user-id') || '', username: '' };
+                    }
+                }
+
+                // Función para escapar texto (usar la definida abajo si disponible)
+                const esc = (v) => {
+                    if (typeof v === 'undefined' || v === null) return '';
+                    return String(v)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#039;');
+                };
+
+                try {
+                    const activoStr = (userData.activo || '').toString().toLowerCase();
+                    const isActive = (activoStr === 'true' || activoStr === '1' || activoStr === 'yes');
+                    const iconClass = isActive ? 'toggle-on text-success' : 'toggle-off text-danger';
+                    const estadoHtml = isActive ? '<span class="status-active">Activo</span>' : '<span class="status-inactive">Inactivo</span>';
+
+                    if (modalBody && modalFooter) {
+                        modalBody.innerHTML = `
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-user"></i> Usuario:</span>
+                                <span class="detail-value">${esc(userData.username)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-id-card"></i> Nombre completo:</span>
+                                <span class="detail-value">${esc(userData.full_name)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-fingerprint"></i> Cédula:</span>
+                                <span class="detail-value">${esc(userData.cedula)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-phone"></i> Teléfono:</span>
+                                <span class="detail-value">${esc(userData.telefono)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-envelope"></i> Email:</span>
+                                <span class="detail-value">${esc(userData.email)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-briefcase"></i> Cargo:</span>
+                                <span class="detail-value">${esc(userData.cargo)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-user-tag"></i> Rol:</span>
+                                <span class="detail-value">${esc(userData.rol)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-${iconClass}"></i> Estado:</span>
+                                <span class="detail-value">${estadoHtml}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-calendar-plus"></i> Fecha de creación:</span>
+                                <span class="detail-value">${esc(userData.fecha_creacion)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-calendar-edit"></i> Última actualización:</span>
+                                <span class="detail-value">${esc(userData.fecha_actualizacion)}</span>
+                            </div>
+                        `;
+
+                        modalFooter.innerHTML = `
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="background: var(--dark-gray); color: white;">
+                                <i class="fas fa-times"></i> Cerrar
+                            </button>
+                            <a href="/users/${esc(userData.id)}/edit/" class="btn btn-edit">
+                                <i class="fas fa-edit"></i> Editar Usuario
+                            </a>
+                        `;
+
+                        if (modal && typeof modal.show === 'function') {
+                            modal.show();
+                        } else {
+                            // Fallback: mostrar alerta con resumen
+                            alert(`Usuario: ${userData.username}\nNombre: ${userData.full_name}`);
+                        }
+                    } else {
+                        // Si no hay modal, fallback a alert
+                        alert(`Usuario: ${userData.username}\nNombre: ${userData.full_name}`);
+                    }
+                } catch (err) {
+                    console.error('Error al mostrar modal de usuario:', err);
+                    alert('No se pudo mostrar los detalles del usuario. Revisa la consola para más información.');
+                }
+            }
+            
+            // Para botón Editar (directamente en la tabla)
+            if (e.target.closest('.btn-edit-usuario')) {
+                e.preventDefault();
+                const button = e.target.closest('.btn-edit-usuario');
+                const userId = button.getAttribute('data-user-id');
+                window.location.href = `/users/${userId}/edit/`;
+            }
+        });
+
         // Atajos de teclado
         document.addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.key === 'f') {
                 e.preventDefault();
                 searchInput.focus();
             }
-            
             if (e.ctrlKey && e.key === 'r') {
                 e.preventDefault();
                 resetFilters();
@@ -917,27 +989,28 @@
         // Inicializar contador
         updateUsersCount();
 
-        // Auto-refresh cada 5 minutos (opcional)
-        // setInterval(() => {
-        //     if (confirm('¿Actualizar la lista de usuarios?')) {
-        //         location.reload();
-        //     }
-        // }, 300000);
+        // Función helper para escapar HTML
+        function escapeHtml(unsafe) {
+            if (unsafe === null || unsafe === undefined) return '';
+            return String(unsafe)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '<')
+                .replace(/>/g, '>')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
     });
 
-    // Función para exportar usuarios (opcional)
+    // Funciones de exportación e impresión (mantenidas como en el original)
     function exportUsers(format = 'csv') {
         const visibleRows = Array.from(document.querySelectorAll('#usuariosTbody .user-row'))
             .filter(row => row.style.display !== 'none');
-        
         if (visibleRows.length === 0) {
             alert('No hay usuarios visibles para exportar');
             return;
         }
-
         let data = [];
         let headers = ['#', 'Usuario', 'Nombre', 'Cédula', 'Celular', 'Email', 'Cargo', 'Rol', 'Estado'];
-        
         visibleRows.forEach((row, index) => {
             const cells = row.querySelectorAll('td');
             data.push([
@@ -965,7 +1038,6 @@
         data.forEach(row => {
             csvContent += row.map(field => `"${field}"`).join(',') + '\n';
         });
-        
         const blob = new Blob([csvContent], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -983,7 +1055,6 @@
             });
             return obj;
         });
-        
         const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -993,12 +1064,10 @@
         window.URL.revokeObjectURL(url);
     }
 
-    // Función para imprimir lista de usuarios
     function printUserList() {
         const printWindow = window.open('', '_blank');
         const visibleRows = Array.from(document.querySelectorAll('#usuariosTbody .user-row'))
             .filter(row => row.style.display !== 'none');
-        
         let tableHTML = `
             <html>
             <head>
@@ -1034,7 +1103,6 @@
                     </thead>
                     <tbody>
         `;
-        
         visibleRows.forEach((row, index) => {
             const cells = row.querySelectorAll('td');
             tableHTML += `
@@ -1050,14 +1118,12 @@
                 </tr>
             `;
         });
-        
         tableHTML += `
                     </tbody>
                 </table>
             </body>
             </html>
         `;
-        
         printWindow.document.write(tableHTML);
         printWindow.document.close();
         printWindow.focus();
@@ -1085,81 +1151,5 @@
             tableHeader.appendChild(exportButtons);
         }
     });
-
-    // Modal dinámico
-    document.addEventListener('DOMContentLoaded', function() {
-        const modal = new bootstrap.Modal(document.getElementById('modalUsuarioGlobal'));
-        const modalBody = document.getElementById('modalUsuarioBody');
-        const modalFooter = document.getElementById('modalUsuarioFooter');
-
-        document.querySelectorAll('.btn-ver-usuario').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const tr = btn.closest('tr');
-                const user = JSON.parse(tr.getAttribute('data-user'));
-
-                // Llena el modal con los datos del usuario
-                modalBody.innerHTML = `
-                    <div class="detail-item"><span class="detail-label"><i class="fas fa-user"></i> Nombre de usuario:</span><span class="detail-value">${user.username}</span></div>
-                    <div class="detail-item"><span class="detail-label"><i class="fas fa-id-card"></i> Nombre completo:</span><span class="detail-value">${user.full_name}</span></div>
-                    <div class="detail-item"><span class="detail-label"><i class="fas fa-id-badge"></i> Cédula:</span><span class="detail-value">${user.cedula}</span></div>
-                    <div class="detail-item"><span class="detail-label"><i class="fas fa-mobile-alt"></i> Celular:</span><span class="detail-value">${user.telefono}</span></div>
-                    <div class="detail-item"><span class="detail-label"><i class="fas fa-envelope"></i> Email:</span><span class="detail-value">${user.email}</span></div>
-                    <div class="detail-item"><span class="detail-label"><i class="fas fa-briefcase"></i> Cargo:</span><span class="detail-value">${user.cargo}</span></div>
-                    <div class="detail-item"><span class="detail-label"><i class="fas fa-user-tag"></i> Rol:</span><span class="detail-value">${user.rol}</span></div>
-                    <div class="detail-item"><span class="detail-label"><i class="fas fa-toggle-on"></i> Estado:</span><span class="detail-value">${user.activo === "True" ? '<span style="color: var(--success);"><i class="fas fa-check-circle"></i> Activo</span>' : '<span style="color: var(--primary-red);"><i class="fas fa-times-circle"></i> Inactivo</span>'}</span></div>
-                    <div class="detail-item"><span class="detail-label"><i class="fas fa-calendar-plus"></i> Fecha de creación:</span><span class="detail-value">${user.fecha_creacion}</span></div>
-                    <div class="detail-item"><span class="detail-label"><i class="fas fa-calendar-edit"></i> Última actualización:</span><span class="detail-value">${user.fecha_actualizacion}</span></div>
-                `;
-                modalFooter.innerHTML = `
-                    <button type="button" class="btn" style="background: var(--dark-gray); color: var(--white);" data-bs-dismiss="modal">
-                        <i class="fas fa-times"></i>
-                        Cerrar
-                    </button>
-                    {% comment %} /users/edit/${user.id}/ {% endcomment %}
-                    <a href="#" class="btn btn-edit">
-                        <i class="fas fa-edit"></i>
-                        Editar Usuario
-                    </a>
-                `;
-                modal.show();
-            });
-        });
-    });
 </script>
 {% endblock %}
-
-<!-- Modal único fuera del for -->
-<div class="modal fade" id="modalUsuarioGlobal" tabindex="-1" aria-labelledby="modalUsuarioGlobalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalUsuarioGlobalLabel">
-                    <i class="fas fa-user-circle"></i>
-                    Detalles de Usuario
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body" id="modalUsuarioBody">
-                <!-- Aquí se llenan los datos por JS -->
-            </div>
-            <div class="modal-footer" id="modalUsuarioFooter">
-                <!-- Aquí se llenan los botones por JS -->
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-/* Mejoras para evitar desbordamiento */
-.users-table-card, .table-responsive {
-    max-width: 100vw;
-    overflow-x: auto;
-}
-.modal-lg {
-    max-width: 700px;
-}
-.modal-body {
-    max-height: 70vh;
-    overflow-y: auto;
-}
-</style>

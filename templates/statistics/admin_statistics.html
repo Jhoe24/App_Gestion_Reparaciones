@@ -156,9 +156,16 @@
         </div>
         <!-- Tarjeta de búsqueda simplificada -->
         <div class="search-card">
+            {% if is_tech_user %}
+                <p style="margin-bottom:0.75rem; color:var(--dark-gray);">Mostrando sólo equipos asignados a ti.</p>
+            {% endif %}
             <div class="action-buttons">
                 <form class="search-form" method="get" action="{% url 'reports:reporte_estadisticas' %}">
-                    <input type="text" name="search" placeholder="Ingrese nombre, marca, departamento, modelo, etc." value="{{ request.GET.search }}">
+                    {% if is_tech_user %}
+                        <input type="text" name="search" placeholder="Buscar sólo en mis equipos (código, marca, modelo, cliente...)" value="{{ request.GET.search }}">
+                    {% else %}
+                        <input type="text" name="search" placeholder="Ingrese nombre, marca, departamento, modelo, etc." value="{{ request.GET.search }}">
+                    {% endif %}
                     <button type="submit">Buscar</button>
                 </form>
                 <button type="button" class="export-button" onclick="exportToPDF()">Exportar a PDF</button>

@@ -1,26 +1,27 @@
 {# templates/reports/seguimiento_form_partial.html #}
 <form id="seguimientoForm" method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.non_field_errors }}
+    {# Campo progreso renderizado como hidden (widget HiddenInput) para que el servidor lo reciba pero no se muestre #}
+    {{ form.progreso }}
+    <div id="seguimiento_non_field_errors">
+        {{ form.non_field_errors }}
+    </div>
     <div class="form-group">
         <label for="{{ form.estado.id_for_label }}">Estado</label>
         {{ form.estado }}
         {{ form.estado.errors }}
     </div>
-    <div class="form-group">
-        <label for="{{ form.progreso.id_for_label }}">Progreso (%)</label>
-        {{ form.progreso }}
-        {{ form.progreso.errors }}
-    </div>
-    <div class="form-group">
-        <label for="{{ form.fecha_estimada.id_for_label }}">Fecha Estimada</label>
-        {{ form.fecha_estimada }}
-        {{ form.fecha_estimada.errors }}
-    </div>
+    {# Progreso oculto en la vista; el valor se actualizará automáticamente según el estado. #}
     <div class="form-group">
         <label for="{{ form.tecnico.id_for_label }}">Técnico</label>
-        {{ form.tecnico }}
-        {{ form.tecnico.errors }}
+        {% if request.user.is_superuser or request.user.rol == 'administrador' %}
+            {{ form.tecnico }}
+            {{ form.tecnico.errors }}
+        {% else %}
+            {# Usuario técnico: ocultamos el select y enviamos el id del técnico en un hidden input #}
+            <input type="hidden" name="tecnico" value="{{ request.user.id }}" />
+            <input type="text" class="form-control" value="{{ request.user.get_full_name }}" readonly />
+        {% endif %}
     </div>
     <div class="form-group">
         <label for="{{ form.descripcion.id_for_label }}">Descripción</label>
@@ -38,3 +39,32 @@
         <button type="button" class="btn btn-secondary" onclick="closeReportModal()">Cancelar</button>
     </div>
 </form>
+<script>
+(function(){
+    var estadoName = '{{ form.estado.html_name }}';
+    var progresoName = '{{ form.progreso.html_name }}';
+    var estadoField = document.querySelector('[name="' + estadoName + '"]');
+    var progresoField = document.querySelector('[name="' + progresoName + '"]');
+    if (!estadoField || !progresoField) return;
+
+    var mapping = {
+        'recepcion': 5,
+        'diagnostico': 20,
+        'reparacion': 60,
+        'pruebas': 85,
+        'listo': 95,
+        'entregado': 100,
+        'otro': 0
+    };
+
+    function setProgressFromEstado() {
+        var v = estadoField.value || '';
+        var p = mapping[v] !== undefined ? mapping[v] : 0;
+        try { progresoField.value = p; progresoField.readOnly = true; } catch (e) {}
+    }
+
+    estadoField.addEventListener('change', setProgressFromEstado);
+    // inicializar
+    setProgressFromEstado();
+})();
+</script>

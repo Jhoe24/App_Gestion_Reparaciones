@@ -1,0 +1,709 @@
+{% extends 'dashboard/admin.html' %}
+
+{% block title %}Registros de Acceso{% endblock %}
+
+{% block extra_css %}
+<style>
+    .logs-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    .section-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: var(--white);
+        position: relative;
+        overflow: hidden;
+    }
+    .section-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 20px,
+            rgba(255, 255, 255, 0.05) 20px,
+            rgba(255, 255, 255, 0.05) 40px
+        );
+        animation: diagonalMove 20s linear infinite;
+    }
+    @keyframes diagonalMove {
+        0% { transform: translateX(-100%) translateY(-100%); }
+        100% { transform: translateX(0) translateY(0); }
+    }
+    .section-header-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .section-title {
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: var(--white);
+    }
+    .section-title i {
+        color: var(--primary-yellow);
+        font-size: 2.5rem;
+    }
+    .filters-card {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow);
+    }
+    .filters-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--primary-blue);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .filters-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+        align-items: end;
+    }
+    .filter-group {
+        margin-bottom: 0.5rem;
+    }
+    .filter-label {
+        font-weight: 500;
+        color: var(--primary-blue);
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    .form-select, .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        background: #fafafa;
+    }
+    .form-select:focus, .form-control:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        background: var(--white);
+        box-shadow: 0 0 0 3px rgba(2, 2, 135, 0.1);
+    }
+    .chart-card {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow);
+    }
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e9ecef;
+        margin-bottom: 1rem;
+    }
+    .chart-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--primary-blue);
+    }
+    .logs-table-card {
+        background: var(--white);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        margin-bottom: 2rem;
+    }
+    .table-header {
+        background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+        color: var(--white);
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .table-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .logs-count {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+    }
+    .table-responsive {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+    .table-responsive::-webkit-scrollbar {
+        width: 8px;
+    }
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f8f9fa;
+    }
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: var(--primary-blue);
+        border-radius: 4px;
+    }
+    .logs-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+    .logs-table thead th {
+        background: #f8f9fa;
+        color: var(--primary-blue);
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 2px solid #e9ecef;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    .logs-table tbody tr {
+        border-bottom: 1px solid #f8f9fa;
+        transition: all 0.3s ease;
+    }
+    .logs-table tbody tr:hover {
+        background: rgba(2, 2, 135, 0.03);
+    }
+    .logs-table td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, var(--primary-blue), var(--primary-red));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+        font-weight: bold;
+        font-size: 0.8rem;
+        flex-shrink: 0;
+    }
+    .action-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+    .action-login {
+        background: rgba(40, 167, 69, 0.15);
+        color: #28a745;
+        border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+    .action-logout {
+        background: rgba(23, 162, 184, 0.15);
+        color: #17a2b8;
+        border: 1px solid rgba(23, 162, 184, 0.3);
+    }
+    .action-failed {
+        background: rgba(220, 53, 69, 0.15);
+        color: #dc3545;
+        border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+    .action-other {
+        background: rgba(108, 117, 125, 0.15);
+        color: #6c757d;
+        border: 1px solid rgba(108, 117, 125, 0.3);
+    }
+    .btn-group {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+    .btn {
+        padding: 0.625rem 1.25rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+        color: var(--white);
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(2, 2, 135, 0.3);
+    }
+    .btn-secondary {
+        background: var(--dark-gray);
+        color: var(--white);
+    }
+    .btn-secondary:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+    }
+    .pagination a, .pagination span {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        text-decoration: none;
+        color: var(--primary-blue);
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .pagination a:hover {
+        background: rgba(2, 2, 135, 0.1);
+    }
+    .pagination .current {
+        background: var(--primary-blue);
+        color: white;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--dark-gray);
+    }
+    .empty-state i {
+        font-size: 4rem;
+        color: var(--primary-blue);
+        opacity: 0.3;
+        margin-bottom: 1rem;
+    }
+    .field-error {
+        color: #dc3545;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        display: none;
+    }
+    .field-error.active {
+        display: block;
+    }
+    @media (max-width: 768px) {
+        .filters-row {
+            grid-template-columns: 1fr;
+        }
+        .section-header-content {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+        .logs-table {
+            font-size: 0.85rem;
+        }
+        .logs-table th,
+        .logs-table td {
+            padding: 0.75rem 0.5rem;
+        }
+        .btn {
+            font-size: 0.8rem;
+            padding: 0.5rem 1rem;
+        }
+    }
+    @media (max-width: 480px) {
+        .logs-container {
+            margin: 0 0.5rem;
+        }
+        .section-header {
+            padding: 1.5rem;
+        }
+        .section-title {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block main_content %}
+<div class="logs-container">
+    <!-- Section Header -->
+    <div class="section-header">
+        <div class="section-header-content">
+            <h1 class="section-title">
+                <i class="fas fa-history"></i>
+                Registros de Acceso del Sistema
+            </h1>
+        </div>
+    </div>
+
+    <!-- Filters Card -->
+    <div class="filters-card">
+        <h3 class="filters-title">
+            <i class="fas fa-filter"></i>
+            Filtros de Búsqueda
+        </h3>
+        <form method="get" id="filtersForm" class="filters-form">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label class="filter-label" for="usuario">
+                        <i class="fas fa-user"></i> Usuario
+                    </label>
+                    <select name="usuario" id="usuario" class="form-select">
+                        <option value="">Todos los usuarios</option>
+                        {% for u in usuarios %}
+                            <option value="{{ u.id }}" {% if filtros.usuario == u.id|stringformat:"s" %}selected{% endif %}>{{ u.get_full_name }} ({{ u.username }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label" for="accion">
+                        <i class="fas fa-tag"></i> Acción
+                    </label>
+                    <select name="accion" id="accion" class="form-select">
+                        <option value="">Todas las acciones</option>
+                        {% for k,label in acciones %}
+                            <option value="{{ k }}" {% if filtros.accion == k %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label" for="desde">
+                        <i class="fas fa-calendar-day"></i> Desde
+                    </label>
+                    <input type="date" name="desde" id="desde" class="form-control" value="{{ filtros.desde }}">
+                    <small id="error-desde" class="field-error" role="alert"></small>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label" for="hasta">
+                        <i class="fas fa-calendar-day"></i> Hasta
+                    </label>
+                    <input type="date" name="hasta" id="hasta" class="form-control" value="{{ filtros.hasta }}">
+                    <small id="error-hasta" class="field-error" role="alert"></small>
+                </div>
+            </div>
+
+            <div style="margin-top:0.5rem;">
+                <small id="error-desde-hasta" class="field-error" role="alert"></small>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" type="submit">
+                    <i class="fas fa-filter"></i> Aplicar Filtros
+                </button>
+                <a class="btn btn-secondary" href="{% url 'users:logs_export_excel' %}?{% if request.GET %}{{ request.GET.urlencode }}{% endif %}">
+                    <i class="fas fa-file-excel"></i> Exportar Excel
+                </a>
+                <a class="btn btn-secondary" href="{% url 'users:logs_export_pdf' %}?{% if request.GET %}{{ request.GET.urlencode }}{% endif %}" target="_blank">
+                    <i class="fas fa-file-pdf"></i> Exportar PDF
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Chart Card -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <h3 class="chart-title">
+                <i class="fas fa-chart-bar"></i>
+                Actividad de Usuarios (Últimos 30 días)
+            </h3>
+        </div>
+        <div>
+            <canvas id="logsChart" width="400" height="120"></canvas>
+        </div>
+    </div>
+
+    <!-- Logs Table -->
+    <div class="logs-table-card">
+        <div class="table-header">
+            <h3 class="table-title">
+                <i class="fas fa-list"></i>
+                Registros de Acceso
+            </h3>
+            <div class="logs-count">
+                Total: {{ logs|length }} registros
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="logs-table">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Acción</th>
+                        <th>Fecha / Hora</th>
+                        <th>IP</th>
+                        <th>Dispositivo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                        <tr>
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">
+                                        {% if log.usuario %}
+                                            {{ log.usuario.first_name.0|default:"U" }}{{ log.usuario.last_name.0|default:"" }}
+                                        {% else %}
+                                            ?
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        {% if log.usuario %}
+                                            <strong>{{ log.usuario.get_full_name }}</strong><br>
+                                            <small style="color: var(--dark-gray);">{{ log.usuario.username }}</small>
+                                        {% else %}
+                                            <strong>Usuario desconocido</strong>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="action-badge action-{{ log.accion }}">
+                                    {% if log.accion == 'login' %}
+                                        <i class="fas fa-sign-in-alt"></i> Inicio sesión
+                                    {% elif log.accion == 'logout' %}
+                                        <i class="fas fa-sign-out-alt"></i> Cierre sesión
+                                    {% elif log.accion == 'failed_login' %}
+                                        <i class="fas fa-exclamation-triangle"></i> Intento fallido
+                                    {% else %}
+                                        <i class="fas fa-info-circle"></i> {{ log.get_accion_display }}
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <i class="fas fa-clock"></i> {{ log.fecha_hora|date:"d/m/Y H:i:s" }}
+                            </td>
+                            <td>
+                                <i class="fas fa-globe-americas"></i> {{ log.direccion_ip }}
+                            </td>
+                            <td style="max-width:200px; overflow:hidden; text-overflow:ellipsis;" title="{{ log.user_agent }}">
+                                {% if 'Mobile' in log.user_agent %}
+                                    <i class="fas fa-mobile-alt" style="color: var(--primary-blue);"></i> Móvil
+                                {% elif 'Windows' in log.user_agent %}
+                                    <i class="fab fa-windows" style="color: var(--primary-blue);"></i> Windows
+                                {% elif 'Mac' in log.user_agent %}
+                                    <i class="fab fa-apple" style="color: var(--primary-blue);"></i> Mac
+                                {% else %}
+                                    <i class="fas fa-laptop" style="color: var(--primary-blue);"></i> {{ log.user_agent|truncatechars:15 }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="empty-state">
+                                <i class="fas fa-history"></i>
+                                <h4 style="color: var(--primary-blue); margin-bottom: 0.5rem;">No hay registros de acceso</h4>
+                                <p>No se han encontrado registros que coincidan con los filtros aplicados.</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if is_paginated %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}"><i class="fas fa-chevron-left"></i> Anterior</a>
+                {% endif %}
+                <span class="current">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">Siguiente <i class="fas fa-chevron-right"></i></a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- Validación de fechas en el formulario de filtros ---
+        const today = new Date().toISOString().split('T')[0];
+        const desdeInput = document.getElementById('desde');
+        const hastaInput = document.getElementById('hasta');
+        const filtersForm = document.getElementById('filtersForm');
+        const errDesde = document.getElementById('error-desde');
+        const errHasta = document.getElementById('error-hasta');
+        const errRange = document.getElementById('error-desde-hasta');
+
+        if (desdeInput) desdeInput.max = today;
+        if (hastaInput) hastaInput.max = today;
+
+        function clearErrors() {
+            [errDesde, errHasta, errRange].forEach(el => {
+                if (!el) return;
+                el.textContent = '';
+                el.classList.remove('active');
+            });
+        }
+
+        function validateDates() {
+            clearErrors();
+            const desde = desdeInput ? desdeInput.value : '';
+            const hasta = hastaInput ? hastaInput.value : '';
+            if (desde && hasta && desde > hasta) {
+                if (errRange) {
+                    errRange.textContent = 'La fecha "Desde" no puede ser posterior a "Hasta".';
+                    errRange.classList.add('active');
+                }
+                return false;
+            }
+            if (desde && desde > today) {
+                if (errDesde) {
+                    errDesde.textContent = 'La fecha "Desde" no puede ser futura.';
+                    errDesde.classList.add('active');
+                }
+                return false;
+            }
+            if (hasta && hasta > today) {
+                if (errHasta) {
+                    errHasta.textContent = 'La fecha "Hasta" no puede ser futura.';
+                    errHasta.classList.add('active');
+                }
+                return false;
+            }
+            return true;
+        }
+
+        if (filtersForm) {
+            filtersForm.addEventListener('submit', function(e) {
+                if (!validateDates()) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        }
+
+        [desdeInput, hastaInput].forEach(inp => {
+            if (!inp) return;
+            inp.addEventListener('input', () => clearErrors());
+        });
+
+        // --- Cargar el gráfico de registros (incluye filtros actuales en la query string) ---
+        fetch("{% url 'users:logs_json' %}?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}days=30")
+            .then(resp => resp.json())
+            .then(data => {
+                // Mapeo de acciones a nombres en español
+                const actionNames = {
+                    'login': 'Inicio de sesión',
+                    'logout': 'Cierre de sesión',
+                    'register': 'Registro',
+                    'failed_login': 'Intento fallido',
+                    'view_profile': 'Ver perfil',
+                    'login_unverified': 'Inicio de sesión no verificado',
+                    'email_verified': 'Correo verificado',
+                    'edit_profile': 'Editar perfil',
+                    'password_reset': 'Restablecer contraseña',
+                    'password_change': 'Cambiar contraseña',
+                    'create_user': 'Crear usuario',
+                    'edit_user': 'Editar usuario',
+                    'delete_user': 'Eliminar usuario'
+                };
+                
+                // Agrupar por tipo de acción para el gráfico
+                const actionCounts = {};
+                data.data.forEach(item => {
+                    // Usar el nombre en español si existe en el mapeo, sino usar el nombre original formateado
+                    const actionKey = item.accion.toLowerCase();
+                    let actionName = actionNames[actionKey] || item.accion.replace('_', ' ').charAt(0).toUpperCase() + 
+                                    item.accion.replace('_', ' ').slice(1);
+                    
+                    actionCounts[actionName] = (actionCounts[actionName] || 0) + item.count;
+                });
+                
+                const labels = Object.keys(actionCounts);
+                const counts = Object.values(actionCounts);
+                
+                // Colores para cada tipo de acción - actualizados para los nombres en español
+                const backgroundColors = labels.map(label => {
+                    const lowerLabel = label.toLowerCase();
+                    if (lowerLabel.includes('inicio de sesión') || lowerLabel.includes('login')) return 'rgba(40, 167, 69, 0.5)';
+                    if (lowerLabel.includes('cierre de sesión') || lowerLabel.includes('logout')) return 'rgba(23, 162, 184, 0.5)';
+                    if (lowerLabel.includes('intento fallido') || lowerLabel.includes('failed')) return 'rgba(220, 53, 69, 0.5)';
+                    if (lowerLabel.includes('registro') || lowerLabel.includes('register')) return 'rgba(255, 193, 7, 0.5)';
+                    return 'rgba(108, 117, 125, 0.5)';
+                });
+                
+                const borderColors = labels.map(label => {
+                    const lowerLabel = label.toLowerCase();
+                    if (lowerLabel.includes('inicio de sesión') || lowerLabel.includes('login')) return 'rgba(40, 167, 69, 1)';
+                    if (lowerLabel.includes('cierre de sesión') || lowerLabel.includes('logout')) return 'rgba(23, 162, 184, 1)';
+                    if (lowerLabel.includes('intento fallido') || lowerLabel.includes('failed')) return 'rgba(220, 53, 69, 1)';
+                    if (lowerLabel.includes('registro') || lowerLabel.includes('register')) return 'rgba(255, 193, 7, 1)';
+                    return 'rgba(108, 117, 125, 1)';
+                });
+
+                const ctx = document.getElementById('logsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Acciones por tipo (últimos 30 días)',
+                            data: counts,
+                            backgroundColor: backgroundColors,
+                            borderColor: borderColors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
+                                }
+                            }
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.raw} registros`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(err => console.error('Error al cargar los datos del gráfico:', err));
+    });
+</script>
+{% endblock %}

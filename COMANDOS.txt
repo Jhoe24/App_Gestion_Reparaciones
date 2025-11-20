@@ -1,4 +1,14 @@
- python -m http.server 8888 --directory staticfiles
+EJECUTAR
+
+python manage.py makemigrations
+
+python manage.py migrate
+
+python manage.py collectstatic
+
+-----------------------------------------
+
+python -m http.server 8888 --directory staticfiles
 
 
 waitress-serve --listen=0.0.0.0:8000 config.wsgi:application

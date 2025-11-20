@@ -16,7 +16,7 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = 'django-insecure-s9v$#l6z8*@u%+d5hq!1ikm+$#me!5dpluz$5y2_b4teuy2-kn'
 
 # ADVERTENCIA DE SEGURIDAD: ¡no ejecutes con debug activado en producción!
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '*']
 
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
@@ -126,7 +126,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # luego verifica tu ip en la red local
 # como vamos a distribuir archivos staticos pues lo vamos a ser de la siguiente manera
 # http://192.168.10.121:8888/              http://192.168.10.121:8888/
-STATIC_URL = '/static/'
+STATIC_URL = '/static/' #'http://192.168.10.114:8888/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -159,7 +159,7 @@ else:
     EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() in ('true', '1', 't')
     EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
     EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-    DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL') or EMAIL_HOST_USER or 'no-reply@example.com'
+    DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL') or EMAIL_HOST_USER or 'garciacleiber09@gmail.com'
 
 
 # Dirección remitente por defecto. Si no se provee, usar el usuario SMTP o un no-reply
@@ -202,3 +202,11 @@ MESSAGE_TAGS = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Configuración para tareas asíncronas
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'

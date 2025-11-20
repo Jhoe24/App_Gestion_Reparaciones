@@ -9,7 +9,7 @@ from apps.authentication.decorators import tech_required
 from django.views.decorators.http import require_http_methods
 from .forms import FichaEntradaForm, SeguimientoForm
 from django.contrib import messages
-from .models import FichaEntrada, Seguimiento
+from .models import FichaEntrada, Seguimiento, QueuedEmail
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
@@ -102,8 +102,18 @@ def ficha_entrada_view(request):
 @tech_required
 def historial_equipos(request):
     search_query = request.GET.get('search', '')
+    # Base queryset
+    registros = FichaEntrada.objects.all()
+
+    # Si el usuario es técnico (y no es superuser), limitar a sus fichas asignadas
+    is_tech_user = (getattr(request.user, 'rol', None) == 'tecnico') and (not request.user.is_superuser)
+    if is_tech_user:
+        registros = registros.filter(tecnico_asignado=request.user)
+
+    # Aplicar búsqueda sobre el queryset ya filtrado
     if search_query:
-        registros = FichaEntrada.objects.filter(
+        # agregamos el filtro por el tecnico asignado
+        registros = registros.filter(
             Q(codigo__icontains=search_query) |
             Q(nombre_cliente__icontains=search_query) |
             Q(apellido_cliente__icontains=search_query) |
@@ -111,23 +121,30 @@ def historial_equipos(request):
             Q(marca__icontains=search_query) |
             Q(modelo__icontains=search_query) |
             Q(dependencia__icontains=search_query) |
+            Q(ubicacion__icontains=search_query) |
             Q(departamento_cliente__icontains=search_query) |
             Q(numero_serie__icontains=search_query) |
             Q(descripcion_falla__icontains=search_query) |
             Q(tipo_falla__icontains=search_query) |
             Q(fecha_creacion__icontains=search_query)
         ).distinct()
-    else:
-        registros = FichaEntrada.objects.all()
-        
-    users = CustomUser.objects.filter(rol__in=['tecnico', 'administrador'])
 
-    return render(request, 'reports/historial_equipos.html', {'registros': registros, 'users': users})
+    # Lista de técnicos para el selector en la plantilla: si es técnico, solo incluirse a sí mismo
+    if is_tech_user:
+        users = CustomUser.objects.filter(id=request.user.id)
+    else:
+        users = CustomUser.objects.filter(rol__in=['tecnico', 'administrador'])
+
+    return render(request, 'reports/historial_equipos.html', {'registros': registros, 'users': users, 'is_tech_user': is_tech_user})
 
 @login_required
 def get_equipo_details(request, registro_id):
     try:
         registro = FichaEntrada.objects.get(id=registro_id)
+        # Si el usuario es técnico, solo puede ver detalles de las fichas que tiene asignadas
+        is_tech_user = (getattr(request.user, 'rol', None) == 'tecnico') and (not request.user.is_superuser)
+        if is_tech_user and registro.tecnico_asignado != request.user:
+            return JsonResponse({'error': 'No autorizado'}, status=403)
         data = {
             'codigo': registro.codigo,
             'tipo_equipo': registro.get_tipo_equipo_display(),
@@ -170,10 +187,16 @@ def asignar_tecnico(request, registro_id):
 
 def exportar_datos(request):
     search_query = request.GET.get('search', '')
+    # Base queryset
+    registros = FichaEntrada.objects.all()
+    # Si el usuario es técnico (y no es superuser), limitar a sus fichas asignadas
+    is_tech_user = (getattr(request.user, 'rol', None) == 'tecnico') and (not request.user.is_superuser)
+    if is_tech_user:
+        registros = registros.filter(tecnico_asignado=request.user)
 
-    # Filtrar los registros (el mismo código que ya tenías)
+    # Aplicar búsqueda sobre el queryset ya filtrado
     if search_query:
-        registros = FichaEntrada.objects.filter(
+        registros = registros.filter(
             Q(marca__icontains=search_query) |
             Q(modelo__icontains=search_query) |
             Q(nombre_cliente__icontains=search_query) |
@@ -182,8 +205,6 @@ def exportar_datos(request):
             Q(tipo_equipo__icontains=search_query) |
             Q(codigo__icontains=search_query)
         ).distinct()
-    else:
-        registros = FichaEntrada.objects.all()
 
     # 1. Crear un nuevo libro de trabajo de Excel
     workbook = openpyxl.Workbook()
@@ -251,11 +272,23 @@ def reporte_estadisticas(request):
         q |= Q(cedula_cliente__icontains=search)
         q |= Q(marca__icontains=search)
         q |= Q(modelo__icontains=search)
+        # sede/ubicación (ej: 'barinas')
+        q |= Q(ubicacion__icontains=search)
+        # número de serie y contactos/cliente
+        q |= Q(numero_serie__icontains=search)
+        q |= Q(correo_cliente__icontains=search)
+        q |= Q(telefono_cliente__icontains=search)
         q |= Q(dependencia__icontains=search)
         q |= Q(departamento_cliente__icontains=search)
         q |= Q(tipo_equipo__icontains=search)
+        # si el usuario escribió la etiqueta libre del tipo/falla cuando usó 'otro'
+        q |= Q(tipo_equipo_otro__icontains=search)
         q |= Q(tipo_falla__icontains=search)
+        q |= Q(tipo_falla_otro__icontains=search)
         q |= Q(descripcion_falla__icontains=search)
+        # descripción general/observaciones del equipo
+        q |= Q(descripcion__icontains=search)
+        q |= Q(observaciones__icontains=search)
         # técnico - buscar por nombre/apellido/username
         q |= Q(tecnico_asignado__first_name__icontains=search)
         q |= Q(tecnico_asignado__last_name__icontains=search)
@@ -276,6 +309,12 @@ def reporte_estadisticas(request):
         return qs.filter(q).distinct()
 
     base_qs = _apply_stats_filters(request)
+
+    # Si el usuario es técnico (y no es superuser), limitar el queryset a las fichas
+    # asignadas a ese técnico para que tanto tablas como gráficos muestren solo su información.
+    is_tech_user = (getattr(request.user, 'rol', None) == 'tecnico') and (not request.user.is_superuser)
+    if is_tech_user:
+        base_qs = base_qs.filter(tecnico_asignado=request.user)
 
     # Obtenemos estadisticas y metricas relevantes sobre el queryset filtrado
     total_equipos = base_qs.count()
@@ -363,6 +402,7 @@ def reporte_estadisticas(request):
         'selected_year': year_int,
         'rep_count_for_month': rep_count_for_month,
         'available_years': list(range(current_year, current_year-6, -1)),
+        'is_tech_user': is_tech_user,
         # JSON strings para inyectar de forma segura en JS
         'reparaciones_por_mes_json': json.dumps({
             'labels': reparaciones_por_mes_labels,
@@ -384,8 +424,12 @@ def add_seguimiento(request, registro_id):
     
     # Si el metodo es Get, mostramos el formulario
     if request.method == 'GET':
-        
-        form = SeguimientoForm(initial={'ficha': ficha})
+        # Si el usuario es técnico, pre-asignar el técnico en el formulario y bloquear la selección en el template
+        is_tech_user = (getattr(request.user, 'rol', None) == 'tecnico') and (not request.user.is_superuser)
+        if is_tech_user:
+            form = SeguimientoForm(initial={'ficha': ficha, 'tecnico': request.user})
+        else:
+            form = SeguimientoForm(initial={'ficha': ficha})
         html = render_to_string('reports/seguimiento_form_partial.html', {'form': form, 'ficha': ficha}, request=request)
         return JsonResponse({'html': html})
     
@@ -401,9 +445,23 @@ def add_seguimiento(request, registro_id):
     # Leemos los datos validados del formulario (no guardamos un nuevo objeto aquí)
     cleaned = form.cleaned_data
     estado = cleaned.get('estado')
-    progreso = cleaned.get('progreso') or 0
+    # Forzar progreso según el estado (backend authoritative)
+    estado_to_progress = {
+        'recepcion': 5,
+        'diagnostico': 20,
+        'reparacion': 60,
+        'pruebas': 85,
+        'listo': 95,
+        'entregado': 100,
+        'otro': 0,
+    }
+    progreso = estado_to_progress.get(estado, 0)
     descripcion = cleaned.get('descripcion') or ''
-    tecnico_instance = cleaned.get('tecnico') if 'tecnico' in cleaned else None
+    # Si el usuario es técnico, forzamos que el técnico del seguimiento sea el mismo usuario
+    if (getattr(request.user, 'rol', None) == 'tecnico') and (not request.user.is_superuser):
+        tecnico_instance = request.user
+    else:
+        tecnico_instance = cleaned.get('tecnico') if 'tecnico' in cleaned else None
 
     video_file = request.FILES.get('video')
     video_url = None
@@ -414,6 +472,35 @@ def add_seguimiento(request, registro_id):
         with transaction.atomic():
             # Bloquear y obtener el seguimiento existente si existe
             seguimiento = Seguimiento.objects.select_for_update().filter(ficha=ficha).first()
+            # Validación: no permitir registrar un estado que ya exista en el timeline
+            if seguimiento:
+                try:
+                    existing_timeline = list(seguimiento.timeline or [])
+                    used_estados = set([(ev.get('estado') or '').strip().lower() for ev in existing_timeline if ev.get('estado')])
+                    new_estado = (estado or '').strip().lower()
+                    if new_estado and new_estado in used_estados:
+                        # Determinar siguiente estado sugerido según la secuencia lógica
+                        sequence = ['recepcion', 'diagnostico', 'reparacion', 'pruebas', 'listo', 'entregado']
+                        choice_map = dict(Seguimiento.ESTADO_CHOICES)
+                        next_state = None
+                        for s in sequence:
+                            if s not in used_estados:
+                                next_state = s
+                                break
+
+                        # Preparar mensaje legible
+                        used_display = choice_map.get(new_estado, new_estado)
+                        if next_state:
+                            next_display = choice_map.get(next_state, next_state)
+                            msg = f"No puede usar el estado '{used_display}' porque ya fue usado en el timeline. Seleccione el siguiente estado: '{next_display}'."
+                        else:
+                            msg = f"No puede usar el estado '{used_display}' porque ya fue usado en el timeline. No hay estados siguientes disponibles."
+
+                        form.add_error(None, msg)
+                        html = render_to_string('reports/seguimiento_form_partial.html', {'form': form, 'ficha': ficha}, request=request)
+                        return JsonResponse({'success': False, 'html': html, 'message': msg}, status=400)
+                except Exception:
+                    logger.exception('Error verificando estados existentes en el timeline para ficha %s', ficha.id)
             if not seguimiento:
                 # Crear un seguimiento base
                 seguimiento = Seguimiento.objects.create(
@@ -481,6 +568,25 @@ def add_seguimiento(request, registro_id):
             existing_timeline.append(evento)
             seguimiento.timeline = existing_timeline
             seguimiento.save()
+
+            # Sincronizar el estado del seguimiento con la FichaEntrada relacionada
+            # Mapeo entre los estados del modelo Seguimiento y los valores válidos en FichaEntrada
+            estado_map = {
+                'recepcion': 'recibido',
+                'diagnostico': 'diagnostico',
+                'reparacion': 'reparacion',
+                'pruebas': 'pruebas_calidad',
+                'listo': 'listo_entrega',
+                'entregado': 'entregado',
+            }
+            try:
+                ficha_estado = estado_map.get((estado or '').strip().lower())
+                if ficha_estado:
+                    ficha.estado = ficha_estado
+                    ficha.save()
+                    logger.info('Ficha %s actualizada a estado %s por seguimiento %s', ficha.id, ficha_estado, seguimiento.id)
+            except Exception:
+                logger.exception('Error actualizando estado de FichaEntrada para ficha %s', getattr(ficha, 'id', None))
 
             # Enviar correo automático según el estado del evento
             try:
@@ -555,8 +661,22 @@ def add_seguimiento(request, registro_id):
                         )
                         logger.info('send_mail returned: %s', sent)
                         logger.info('Correo enviado a %s para ficha %s estado=%s', ficha_obj.correo_cliente, ficha_obj.id, estado_key)
-                    except Exception as ex:
-                        logger.exception('Error enviando correo a %s: %s', ficha_obj.correo_cliente, ex)
+                    except Exception as send_ex:
+                        # Registrar y encolar el correo para reintento en background
+                        logger.exception('Error enviando correo a %s: %s', ficha_obj.correo_cliente, send_ex)
+                        try:
+                            QueuedEmail.objects.create(
+                                to=[ficha_obj.correo_cliente],
+                                subject=subject,
+                                body_text=text_content,
+                                body_html=html_content,
+                                attempts=0,
+                                last_error=str(send_ex),
+                            )
+                            logger.info('Correo encolado para reintento a %s (ficha=%s)', ficha_obj.correo_cliente, ficha_obj.id)
+                        except Exception:
+                            logger.exception('No se pudo encolar el correo para ficha %s', ficha_obj.id)
+                    
 
                 # Llamada al helper (no bloquear si falla)
                 _send_event_email(ficha, seguimiento, evento)

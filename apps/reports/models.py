@@ -187,4 +187,37 @@ class Seguimiento(models.Model):
         timeline.append(evento)
         self.timeline = timeline
         self.save()
+
+
+class QueuedEmail(models.Model):
+    """Modelo simple para encolar correos a reenviar en background si el envío directo falla.
+
+    Campos:
+    - to: lista de destinatarios (JSON)
+    - subject: asunto
+    - body_text: texto plano
+    - body_html: HTML (opcional)
+    - attempts: número de intentos realizados
+    - last_error: último error registrado (texto)
+    - send_after: datetime opcional para esperar antes de reintentar
+    - sent: si ya se envió
+    - sent_at: datetime de envío
+    """
+    to = models.JSONField("Destinatarios", default=list)
+    subject = models.CharField("Asunto", max_length=255)
+    body_text = models.TextField("Cuerpo (texto)")
+    body_html = models.TextField("Cuerpo (html)", blank=True)
+    attempts = models.PositiveSmallIntegerField("Intentos", default=0)
+    last_error = models.TextField("Último error", blank=True)
+    send_after = models.DateTimeField("Reintentar después de", null=True, blank=True)
+    sent = models.BooleanField("Enviado", default=False)
+    sent_at = models.DateTimeField("Fecha de envío", null=True, blank=True)
+    created_at = models.DateTimeField("Creado en", auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Correo en cola"
+        verbose_name_plural = "Correos en cola"
+
+    def __str__(self):
+        return f"QueuedEmail to={','.join(self.to or [])} sent={self.sent} attempts={self.attempts}"
         

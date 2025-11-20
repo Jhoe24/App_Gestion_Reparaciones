@@ -1,0 +1,551 @@
+{% extends 'dashboard/admin.html' %}
+
+{% block title %}Configuración del Sistema{% endblock %}
+
+{% block extra_css %}
+<style>
+    .config-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    .section-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: var(--white);
+        position: relative;
+        overflow: hidden;
+    }
+    .section-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 20px,
+            rgba(255, 255, 255, 0.05) 20px,
+            rgba(255, 255, 255, 0.05) 40px
+        );
+        animation: diagonalMove 20s linear infinite;
+    }
+    @keyframes diagonalMove {
+        0% { transform: translateX(-100%) translateY(-100%); }
+        100% { transform: translateX(0) translateY(0); }
+    }
+    .section-header-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .section-title {
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: var(--white);
+    }
+    .section-title i {
+        color: var(--primary-yellow);
+        font-size: 2.5rem;
+    }
+    .config-card {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow);
+        transition: all 0.3s ease;
+    }
+    .config-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    .config-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e9ecef;
+        margin-bottom: 1.25rem;
+    }
+    .config-card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--primary-blue);
+        margin: 0;
+    }
+    .config-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    .form-label {
+        font-weight: 500;
+        color: var(--dark-blue);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .form-control, .form-select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        background: #fafafa;
+    }
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        background: var(--white);
+        box-shadow: 0 0 0 3px rgba(2, 2, 135, 0.1);
+    }
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        justify-content: flex-end;
+    }
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+        color: var(--white);
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(2, 2, 135, 0.3);
+    }
+    .btn-secondary {
+        background: var(--dark-gray);
+        color: var(--white);
+    }
+    .btn-secondary:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    .status-indicator {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+    }
+    .status-active {
+        background-color: var(--success);
+    }
+    .status-inactive {
+        background-color: var(--primary-red);
+    }
+    .system-info {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 12px;
+        margin-top: 0.5rem;
+    }
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    .info-label {
+        font-weight: 500;
+        color: var(--dark-blue);
+    }
+    .info-value {
+        font-weight: 500;
+        color: var(--primary-blue);
+    }
+    .notification-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    .notification-item:last-child {
+        border-bottom: none;
+    }
+    .notification-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(2, 2, 135, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-blue);
+    }
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 24px;
+    }
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+    input:checked + .slider {
+        background-color: var(--primary-blue);
+    }
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+    @media (max-width: 768px) {
+        .config-grid {
+            grid-template-columns: 1fr;
+        }
+        .btn-group {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .btn {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block main_content %}
+<div class="config-container">
+    <!-- Section Header -->
+    <div class="section-header">
+        <div class="section-header-content">
+            <h1 class="section-title">
+                <i class="fas fa-cog"></i>
+                Configuración del Sistema
+            </h1>
+            <div class="system-status">
+                <span class="status-indicator status-active"></span>
+                <span style="color: var(--white); font-weight: 500;">Sistema en línea</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Information Card -->
+    <div class="config-card">
+        <div class="config-card-header">
+            <i class="fas fa-info-circle" style="font-size: 1.5rem; color: var(--primary-blue);"></i>
+            <h3 class="config-card-title">Información del Sistema</h3>
+        </div>
+        <div class="system-info">
+            <div class="info-row">
+                <span class="info-label">Versión de la aplicación:</span>
+                <span class="info-value">{{ config.version }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Última actualización:</span>
+                <span class="info-value">{% if config.last_update %}{{ config.last_update|date:"d - F - Y" }}{% endif %}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Servidor:</span>
+                <span class="info-value">localhost:8000</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Base de datos:</span>
+                <span class="info-value">SQLite3 (Modo desarrollo)</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Entorno:</span>
+                <span class="info-value">Desarrollo</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration Grid -->
+    <form method="post">
+        {% csrf_token %}
+        <div class="config-grid">
+            <!-- General Settings Card -->
+            <div class="config-card">
+                <div class="config-card-header">
+                    <i class="fas fa-sliders-h" style="font-size: 1.5rem; color: var(--primary-blue);"></i>
+                    <h3 class="config-card-title">Configuración General</h3>
+                </div>
+                <div class="form-group">
+                    <label for="app_name" class="form-label">
+                        <i class="fas fa-font"></i> Nombre de la aplicación
+                    </label>
+                    <input type="text" id="app_name" name="app_name" class="form-control" value="{{ config.app_name }}">
+                </div>
+                <div class="form-group">
+                    <label for="timezone" class="form-label">
+                        <i class="fas fa-clock"></i> Zona horaria
+                    </label>
+                    <select id="timezone" name="timezone" class="form-select">
+                        <option value="America/Caracas" {% if config.timezone == 'America/Caracas' %}selected{% endif %}>Caracas (UTC-4)</option>
+                        <option value="America/New_York" {% if config.timezone == 'America/New_York' %}selected{% endif %}>Nueva York (UTC-5)</option>
+                        <option value="Europe/Madrid" {% if config.timezone == 'Europe/Madrid' %}selected{% endif %}>Madrid (UTC+1)</option>
+                        <option value="America/Los_Angeles" {% if config.timezone == 'America/Los_Angeles' %}selected{% endif %}>Los Ángeles (UTC-8)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-bell"></i> Notificaciones por correo
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" name="email_notifications" {% if config.email_notifications %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-mobile-alt"></i> Notificaciones por SMS
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" name="sms_notifications" {% if config.sms_notifications %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Security Settings Card -->
+            <div class="config-card">
+                <div class="config-card-header">
+                    <i class="fas fa-shield-alt" style="font-size: 1.5rem; color: var(--primary-blue);"></i>
+                    <h3 class="config-card-title">Seguridad</h3>
+                </div>
+                <div class="form-group">
+                    <label for="password_expiry" class="form-label">
+                        <i class="fas fa-key"></i> Vencimiento de contraseña (días)
+                    </label>
+                    <input type="number" id="password_expiry" name="password_expiry" class="form-control" value="{{ config.password_expiry }}" min="1" max="365">
+                </div>
+                <div class="form-group">
+                    <label for="max_attempts" class="form-label">
+                        <i class="fas fa-user-lock"></i> Intentos máximos de inicio de sesión
+                    </label>
+                    <input type="number" id="max_attempts" name="max_attempts" class="form-control" value="{{ config.max_attempts }}" min="1" max="10">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-lock"></i> Requiere autenticación de dos factores
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" name="two_factor" {% if config.two_factor %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-history"></i> Registro de actividades
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" name="activity_log" {% if config.activity_log %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Notifications Settings Card -->
+            <div class="config-card">
+                <div class="config-card-header">
+                    <i class="fas fa-bell" style="font-size: 1.5rem; color: var(--primary-blue);"></i>
+                    <h3 class="config-card-title">Notificaciones</h3>
+                </div>
+                <div class="notification-list">
+                    <div class="notification-item">
+                        <div class="notification-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <h6 style="margin: 0 0 0.25rem; font-weight: 500; color: var(--dark-blue);">Notificaciones de reparaciones</h6>
+                            <p style="margin: 0; font-size: 0.85rem; color: var(--dark-gray);">Alertas cuando se crean o actualizan reparaciones</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" name="notify_repairs" {% if config.email_notifications %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="notification-item">
+                        <div class="notification-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <h6 style="margin: 0 0 0.25rem; font-weight: 500; color: var(--dark-blue);">Notificaciones de usuarios</h6>
+                            <p style="margin: 0; font-size: 0.85rem; color: var(--dark-gray);">Alertas cuando usuarios son creados o modificados</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" name="notify_users" {% if config.email_notifications %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="notification-item">
+                        <div class="notification-icon">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <h6 style="margin: 0 0 0.25rem; font-weight: 500; color: var(--dark-blue);">Reportes periódicos</h6>
+                            <p style="margin: 0; font-size: 0.85rem; color: var(--dark-gray);">Resúmenes semanales o mensuales del sistema</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" name="notify_reports" {% if config.activity_log %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backup Settings Card -->
+            <div class="config-card">
+                <div class="config-card-header">
+                    <i class="fas fa-hdd" style="font-size: 1.5rem; color: var(--primary-blue);"></i>
+                    <h3 class="config-card-title">Respaldo y Recuperación</h3>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-sync-alt"></i> Frecuencia de respaldo
+                    </label>
+                    <select class="form-select" name="backup_frequency">
+                        <option value="daily" {% if config.backup_frequency == 'daily' %}selected{% endif %}>Diariamente</option>
+                        <option value="weekly" {% if config.backup_frequency == 'weekly' %}selected{% endif %}>Semanalmente</option>
+                        <option value="monthly" {% if config.backup_frequency == 'monthly' %}selected{% endif %}>Mensualmente</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-calendar-day"></i> Día de respaldo
+                    </label>
+                    <select class="form-select" name="backup_day">
+                        <option value="monday" {% if config.backup_day == 'monday' %}selected{% endif %}>Lunes</option>
+                        <option value="tuesday" {% if config.backup_day == 'tuesday' %}selected{% endif %}>Martes</option>
+                        <option value="wednesday" {% if config.backup_day == 'wednesday' %}selected{% endif %}>Miércoles</option>
+                        <option value="thursday" {% if config.backup_day == 'thursday' %}selected{% endif %}>Jueves</option>
+                        <option value="friday" {% if config.backup_day == 'friday' %}selected{% endif %}>Viernes</option>
+                        <option value="saturday" {% if config.backup_day == 'saturday' %}selected{% endif %}>Sábado</option>
+                        <option value="sunday" {% if config.backup_day == 'sunday' %}selected{% endif %}>Domingo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-clock"></i> Hora de respaldo
+                    </label>
+                    <input type="time" name="backup_time" class="form-control" value="{{ config.backup_time }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-cloud-upload-alt"></i> Subir a nube
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" name="upload_to_cloud" {% if config.upload_to_cloud %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+    <!-- Action Buttons -->
+    <div class="btn-group">
+        <button type="button" class="btn btn-secondary" id="reset-defaults">
+            <i class="fas fa-sync-alt"></i> Restablecer valores por defecto
+        </button>
+        <button type="submit" formmethod="post" class="btn btn-primary">
+            <i class="fas fa-save"></i> Guardar configuración
+        </button>
+    </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Agregar efectos hover a las tarjetas
+        const configCards = document.querySelectorAll('.config-card');
+        configCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.boxShadow = '0 15px 30px rgba(0, 0, 0, 0.15)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.boxShadow = 'var(--shadow)';
+            });
+        });
+        
+        // Manejar botones de guardar
+        const saveButton = document.querySelector('.btn-primary');
+        if (saveButton) {
+            saveButton.addEventListener('click', function() {
+                // Mostrar feedback de éxito
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i> Guardando...';
+                this.disabled = true;
+                this.style.opacity = '0.8';
+                
+                // Simular guardado
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-check"></i> ¡Guardado exitosamente!';
+                    this.style.background = 'linear-gradient(135deg, var(--success), #28a745)';
+                    
+                    // Restaurar texto original después de 2 segundos
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                        this.style.opacity = '1';
+                        this.style.background = '';
+                    }, 2000);
+                }, 800);
+            });
+        }
+        
+        // Inicializar tooltips para elementos de configuración
+        const configItems = document.querySelectorAll('.form-label, .config-card-title');
+        configItems.forEach(item => {
+            item.setAttribute('title', 'Configuración del sistema');
+            item.style.cursor = 'help';
+        });
+    });
+</script>
+{% endblock %}

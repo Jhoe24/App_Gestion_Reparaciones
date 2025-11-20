@@ -1,0 +1,578 @@
+{% extends 'dashboard/admin.html' %}
+
+{% block title %}Configuración de Técnico{% endblock %}
+
+{% block extra_css %}
+<style>
+    .config-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    .section-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: var(--white);
+        position: relative;
+        overflow: hidden;
+    }
+    .section-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 20px,
+            rgba(255, 255, 255, 0.05) 20px,
+            rgba(255, 255, 255, 0.05) 40px
+        );
+        animation: diagonalMove 20s linear infinite;
+    }
+    @keyframes diagonalMove {
+        0% { transform: translateX(-100%) translateY(-100%); }
+        100% { transform: translateX(0) translateY(0); }
+    }
+    .section-header-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .section-title {
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: var(--white);
+    }
+    .section-title i {
+        color: var(--primary-yellow);
+        font-size: 2.5rem;
+    }
+    .config-card {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow);
+        transition: all 0.3s ease;
+    }
+    .config-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    .config-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e9ecef;
+        margin-bottom: 1.25rem;
+    }
+    .config-card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--primary-blue);
+        margin: 0;
+    }
+    .config-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    .form-label {
+        font-weight: 500;
+        color: var(--dark-blue);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .form-control, .form-select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        background: #fafafa;
+    }
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        background: var(--white);
+        box-shadow: 0 0 0 3px rgba(2, 2, 135, 0.1);
+    }
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        justify-content: flex-end;
+    }
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+        color: var(--white);
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(2, 2, 135, 0.3);
+    }
+    .btn-secondary {
+        background: var(--dark-gray);
+        color: var(--white);
+    }
+    .btn-secondary:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Estadísticas y rendimiento - Simplificado */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .stat-card {
+        background: var(--white);
+        color: var(--dark-blue);
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        border: 1px solid #e9ecef;
+        box-shadow: var(--shadow);
+    }
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 0.5rem 0;
+    }
+    .stat-label {
+        font-size: 0.95rem;
+        opacity: 0.8;
+    }
+    .stat-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        color: var(--primary-blue);
+    }
+    
+    /* Especialidades */
+    .specialties-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    .specialty-badge {
+        background: rgba(2, 2, 135, 0.1);
+        color: var(--primary-blue);
+        padding: 0.5rem 1rem;
+        border-radius: 12px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+    }
+    .specialty-badge.active {
+        background: rgba(2, 2, 135, 0.15);
+        border: 1px solid var(--primary-blue);
+    }
+    
+    /* Horario de trabajo */
+    .schedule-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 0.75rem;
+    }
+    .schedule-item {
+        background: #f8f9fa;
+        padding: 0.75rem;
+        border-radius: 8px;
+        text-align: center;
+        border: 1px solid #e9ecef;
+        cursor: pointer;
+    }
+    .schedule-item.active {
+        background: rgba(2, 2, 135, 0.05);
+        border-color: var(--primary-blue);
+        font-weight: 500;
+    }
+    
+    /* Disponibilidad */
+    .availability-grid {
+        display: grid;
+        /* columnas pensadas para 7 dias, usar minmax para evitar que los items crezcan demasiado
+           y permitir scroll horizontal en pantallas estrechas */
+        grid-template-columns: repeat(7, minmax(100px, 1fr));
+        gap: 0.5rem;
+        margin-top: 1rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 0.5rem;
+    }
+    .day-label {
+        text-align: center;
+        font-weight: 500;
+        color: var(--dark-blue);
+        font-size: 0.85rem;
+        padding: 0.25rem;
+    }
+    .time-slot {
+        background: #f8f9fa;
+        padding: 0.5rem;
+        border-radius: 4px;
+        text-align: center;
+        font-size: 0.8rem;
+        cursor: pointer;
+        border: 1px solid #e9ecef;
+        transition: all 0.2s ease;
+        /* evitar desbordamiento del texto */
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+    .time-slot:hover {
+        background: #e9ecef;
+    }
+    .time-slot.selected {
+        background: rgba(2, 2, 135, 0.1);
+        border-color: var(--primary-blue);
+        font-weight: 500;
+    }
+    
+    /* Notificaciones */
+    .notification-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+    }
+    .notification-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .config-grid {
+            grid-template-columns: 1fr;
+        }
+        .btn-group {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .btn {
+            justify-content: center;
+        }
+        .availability-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block main_content %}
+<div class="config-container">
+    <!-- Section Header -->
+    <div class="section-header">
+        <div class="section-header-content">
+            <h1 class="section-title">
+                <i class="fas fa-tools"></i>
+                Configuración de Técnico
+            </h1>
+        </div>
+    </div>
+
+    <!-- Estadísticas Rápidas - Simplificado con datos vacíos -->
+    {% comment %} <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-wrench"></i>
+            </div>
+            <div class="stat-number">-</div>
+            <div class="stat-label">Reparaciones completadas</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-number">-</div>
+            <div class="stat-label">Tiempo promedio por reparación</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-medal"></i>
+            </div>
+            <div class="stat-number">-</div>
+            <div class="stat-label">Satisfacción de clientes</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-number">-</div>
+            <div class="stat-label">Clientes atendidos</div>
+        </div>
+    </div> {% endcomment %}
+
+    <!-- Configuración Grid -->
+    <div class="config-grid">
+        <!-- Perfil Profesional -->
+        <div class="config-card">
+            <div class="config-card-header">
+                <i class="fas fa-user-cog" style="font-size: 1.5rem; color: var(--primary-blue);"></i>
+                <h3 class="config-card-title">Perfil Profesional</h3>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="specialties" class="form-label">
+                        <i class="fas fa-tag"></i> Especialidades
+                    </label>
+                    <div class="specialties-list">
+                        <span class="specialty-badge">
+                            <i class="fas fa-laptop"></i> Electrónica
+                        </span>
+                        <span class="specialty-badge">
+                            <i class="fas fa-mobile-alt"></i> Celulares
+                        </span>
+                        <span class="specialty-badge">
+                            <i class="fas fa-tv"></i> Pantallas
+                        </span>
+                        <span class="specialty-badge">
+                            <i class="fas fa-microchip"></i> Componentes
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="bio" class="form-label">
+                        <i class="fas fa-info-circle"></i> Biografía profesional
+                    </label>
+                    <textarea id="bio" class="form-control" rows="3" placeholder="Describe tu experiencia y especialización..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="certifications" class="form-label">
+                        <i class="fas fa-certificate"></i> Certificaciones
+                    </label>
+                    <input type="text" id="certifications" class="form-control" placeholder="Lista tus certificaciones separadas por comas">
+                </div>
+            </form>
+        </div>
+
+        <!-- Horario y Disponibilidad -->
+        <div class="config-card">
+            <div class="config-card-header">
+                <i class="fas fa-calendar-alt" style="font-size: 1.5rem; color: var(--primary-blue);"></i>
+                <h3 class="config-card-title">Horario y Disponibilidad</h3>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-business-time"></i> Horas de trabajo
+                    </label>
+                    <div class="schedule-grid">
+                        <div class="schedule-item">
+                            8:00 - 12:00
+                        </div>
+                        <div class="schedule-item">
+                            13:00 - 17:00
+                        </div>
+                        <div class="schedule-item">
+                            17:00 - 20:00
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-calendar-check"></i> Días disponibles
+                    </label>
+                    <div class="availability-grid">
+                        <div class="day-label">Lun</div>
+                        <div class="day-label">Mar</div>
+                        <div class="day-label">Mié</div>
+                        <div class="day-label">Jue</div>
+                        <div class="day-label">Vie</div>
+                        <div class="day-label">Sáb</div>
+                        <div class="day-label">Dom</div>
+                        
+                        <div class="time-slot">Mañana</div>
+                        <div class="time-slot">Mañana</div>
+                        <div class="time-slot">Mañana</div>
+                        <div class="time-slot">Mañana</div>
+                        <div class="time-slot">Mañana</div>
+                        <div class="time-slot">Mañana</div>
+                        <div class="time-slot">Mañana</div>
+                        
+                        <div class="time-slot">Tarde</div>
+                        <div class="time-slot">Tarde</div>
+                        <div class="time-slot">Tarde</div>
+                        <div class="time-slot">Tarde</div>
+                        <div class="time-slot">Tarde</div>
+                        <div class="time-slot">Tarde</div>
+                        <div class="time-slot">Tarde</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-bell"></i> Notificaciones de nuevas reparaciones
+                    </label>
+                    <select class="form-select">
+                        <option value="immediately">Inmediatamente</option>
+                        <option value="hourly" selected>Cada hora</option>
+                        <option value="daily">Diariamente (resumen)</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+
+        <!-- Notificaciones -->
+        <div class="config-card">
+            <div class="config-card-header">
+                <i class="fas fa-bell" style="font-size: 1.5rem; color: var(--primary-blue);"></i>
+                <h3 class="config-card-title">Preferencias de Notificaciones</h3>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-envelope"></i> Notificaciones por correo electrónico
+                    </label>
+                    <div class="notification-group">
+                        <div class="notification-item">
+                            <input type="checkbox" id="notif_new_repair">
+                            <label for="notif_new_repair">Nuevas reparaciones asignadas</label>
+                        </div>
+                        <div class="notification-item">
+                            <input type="checkbox" id="notif_urgent">
+                            <label for="notif_urgent">Reparaciones urgentes</label>
+                        </div>
+                        <div class="notification-item">
+                            <input type="checkbox" id="notif_completion">
+                            <label for="notif_completion">Confirmación de reparaciones completadas</label>
+                        </div>
+                        <div class="notification-item">
+                            <input type="checkbox" id="notif_feedback">
+                            <label for="notif_feedback">Nuevos comentarios de clientes</label>
+                        </div>
+                        <div class="notification-item">
+                            <input type="checkbox" id="notif_schedule_change">
+                            <label for="notif_schedule_change">Cambios en horario de trabajo</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-mobile-alt"></i> Notificaciones push en dispositivo móvil
+                    </label>
+                    <div class="notification-group">
+                        <div class="notification-item">
+                            <input type="checkbox" id="push_new_repair">
+                            <label for="push_new_repair">Nuevas reparaciones asignadas</label>
+                        </div>
+                        <div class="notification-item">
+                            <input type="checkbox" id="push_urgent">
+                            <label for="push_urgent">Reparaciones urgentes</label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="btn-group">
+        <button type="button" class="btn btn-secondary">
+            <i class="fas fa-sync-alt"></i> Restablecer valores por defecto
+        </button>
+        <button type="button" class="btn btn-primary">
+            <i class="fas fa-save"></i> Guardar configuración
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Agregar efectos hover a las tarjetas
+        const configCards = document.querySelectorAll('.config-card');
+        configCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.boxShadow = '0 15px 30px rgba(0, 0, 0, 0.15)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.boxShadow = 'var(--shadow)';
+            });
+        });
+        
+        // Manejar selección de horarios
+        const timeSlots = document.querySelectorAll('.time-slot');
+        timeSlots.forEach(slot => {
+            slot.addEventListener('click', function() {
+                this.classList.toggle('selected');
+            });
+        });
+        
+        // Manejar especialidades
+        const specialtyBadges = document.querySelectorAll('.specialty-badge');
+        specialtyBadges.forEach(badge => {
+            badge.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
+        
+        // Manejar botones de guardar
+        const saveButton = document.querySelector('.btn-primary');
+        if (saveButton) {
+            saveButton.addEventListener('click', function() {
+                // Mostrar feedback de éxito
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i> Guardando...';
+                this.disabled = true;
+                this.style.opacity = '0.8';
+                
+                // Simular guardado
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-check"></i> ¡Guardado exitosamente!';
+                    this.style.background = 'linear-gradient(135deg, var(--success), #28a745)';
+                    
+                    // Restaurar texto original después de 2 segundos
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                        this.style.opacity = '1';
+                        this.style.background = '';
+                    }, 2000);
+                }, 800);
+            });
+        }
+    });
+</script>
+{% endblock %}
